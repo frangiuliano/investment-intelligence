@@ -33,7 +33,7 @@ describe('HealthController', () => {
     controller = module.get<HealthController>(HealthController);
   });
 
-  it('should return 200 when app and database are up', async () => {
+  it('should return 200 for GET /health when app and database are up', async () => {
     databaseHealth.isUp.mockResolvedValue(true);
     const res = mockResponse();
 
@@ -46,7 +46,7 @@ describe('HealthController', () => {
     });
   });
 
-  it('should return 503 when database is down', async () => {
+  it('should return 503 for GET /health when database is down', async () => {
     databaseHealth.isUp.mockResolvedValue(false);
     const res = mockResponse();
 
