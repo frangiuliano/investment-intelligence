@@ -142,6 +142,45 @@ npm run build
 Usa Node.js 22 LTS con cache de dependencias npm. Un PR con lint, tests o
 build fallidos queda con CI en rojo y no debería mergearse.
 
+## Flujo de PR (CI → review → merge manual)
+
+1. Abrís un PR hacia `main` (o actualizás la rama).
+2. Corre el **CI** (`ci.yml`: lint → test → build).
+3. **Review (camino por defecto):** invocá `/rev` en Cursor (Reviewer Agent
+   manual). Publica el veredicto como comentario en el PR.
+4. **Review automático (opt-in):** si la variable de Actions
+   `AI_REVIEW_ENABLED=true`, el workflow
+   [`.github/workflows/ai-review.yml`](./.github/workflows/ai-review.yml)
+   espera CI verde y comenta vía Gemini. Si está apagada o ausente, el job
+   se skipea. Si el CI está rojo, tampoco llama a Gemini.
+5. El **merge sigue siendo manual**: leé el veredicto y mergeá vos.
+
+### Variable y secret (solo si activás AI Review)
+
+En `Settings → Secrets and variables → Actions`:
+
+| Tipo | Nombre | Valor / uso |
+|------|--------|-------------|
+| Variable | `AI_REVIEW_ENABLED` | `true` para encender; ausente o distinto de `true` = apagado (default) |
+| Secret | `GEMINI_API_KEY_REVIEWER` | Solo `ai-review.yml` (Proyecto A). Requerido cuando el review automático está on |
+
+No uses `GEMINI_API_KEY_FINANCE` en Actions. Son proyectos/API keys distintos
+(ver tabla de variables arriba).
+
+`GEMINI_API_KEY_FINANCE`, `TELEGRAM_*`, etc. viven en `.env` local (o en el
+host de deploy futuro). **No** hacen falta como secrets de Actions mientras el
+CI solo corra lint/test/build.
+
+### Prompt del Reviewer
+
+La definición del agente vive en
+[`.github/reviewer/prompt.md`](./.github/reviewer/prompt.md) (copia del
+framework `ai-software-company/agents/reviewer/prompt.md`). El script
+[`.github/scripts/ai-review.mjs`](./.github/scripts/ai-review.mjs) la usa
+como system prompt cuando el review automático está habilitado. Los
+comentarios incluyen un marcador oculto por commit SHA para no duplicar
+reviews del mismo head.
+
 ## Testing
 
 Stack y convenciones alineados con

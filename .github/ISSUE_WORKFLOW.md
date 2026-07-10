@@ -34,8 +34,11 @@ Usar el label `order-NN`, no el número de issue de GitHub:
 
 | Variable / secret | Proyecto | Uso |
 |-------------------|----------|-----|
-| `GEMINI_API_KEY_REVIEWER` | A (CI) | Workflow `ai-review.yml` (Issue #11) |
-| `GEMINI_API_KEY_FINANCE` | B (producto) | Análisis de noticias (Issue #3) |
+| `GEMINI_API_KEY_REVIEWER` | A (CI) | Workflow `ai-review.yml` (Issue #11), solo si `AI_REVIEW_ENABLED=true` |
+| `GEMINI_API_KEY_FINANCE` | B (producto) | Análisis de noticias (Issue #3) — `.env` local / deploy, no Actions |
+
+Variable de Actions `AI_REVIEW_ENABLED`: opt-in del review automático. Por
+defecto apagada; el camino habitual es `/rev` en Cursor.
 
 No compartir la misma key entre ambos: el free tier es por proyecto.
 
