@@ -59,4 +59,39 @@ describe('envValidationSchema', () => {
     expect(error).toBeDefined();
     expect(error?.message).toContain('TELEGRAM_BOT_TOKEN');
   });
+
+  it('rejects whitespace-only required secrets', () => {
+    const { error } = envValidationSchema.validate({
+      ...validEnv,
+      GEMINI_API_KEY_FINANCE: '   ',
+      TELEGRAM_BOT_TOKEN: '\t',
+      TELEGRAM_CHAT_ID: '  ',
+    });
+
+    expect(error).toBeDefined();
+    expect(error?.message).toMatch(
+      /GEMINI_API_KEY_FINANCE|TELEGRAM_BOT_TOKEN|TELEGRAM_CHAT_ID/,
+    );
+  });
+
+  it('rejects RSS_FEED_URLS with only commas or whitespace', () => {
+    for (const rssFeedUrls of [',', ', ,', '   ', '\t,\n']) {
+      const { error } = envValidationSchema.validate({
+        ...validEnv,
+        RSS_FEED_URLS: rssFeedUrls,
+      });
+
+      expect(error).toBeDefined();
+      expect(error?.message).toContain('RSS_FEED_URLS');
+    }
+  });
+
+  it('accepts comma-separated RSS feeds with surrounding whitespace', () => {
+    const { error } = envValidationSchema.validate({
+      ...validEnv,
+      RSS_FEED_URLS: ' https://a.example/rss , https://b.example/rss ',
+    });
+
+    expect(error).toBeUndefined();
+  });
 });

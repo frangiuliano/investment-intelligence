@@ -1,6 +1,7 @@
 import {
   DEFAULT_COLLECTION_CRON_SCHEDULE,
   DEFAULT_GEMINI_REQUEST_DELAY_MS,
+  parseFeedUrls,
 } from './env.validation';
 
 export type AppConfig = {
@@ -22,22 +23,11 @@ export type AppConfig = {
   };
 };
 
-function parseFeedUrls(raw: string | undefined): string[] {
-  if (!raw) {
-    return [];
-  }
-
-  return raw
-    .split(',')
-    .map((url) => url.trim())
-    .filter((url) => url.length > 0);
-}
-
 export default (): AppConfig => ({
   port: parseInt(process.env.PORT ?? '3000', 10),
   databaseUrl: process.env.DATABASE_URL as string,
   gemini: {
-    apiKeyFinance: process.env.GEMINI_API_KEY_FINANCE as string,
+    apiKeyFinance: (process.env.GEMINI_API_KEY_FINANCE ?? '').trim(),
     requestDelayMs: parseInt(
       process.env.GEMINI_REQUEST_DELAY_MS ??
         String(DEFAULT_GEMINI_REQUEST_DELAY_MS),
@@ -45,14 +35,15 @@ export default (): AppConfig => ({
     ),
   },
   telegram: {
-    botToken: process.env.TELEGRAM_BOT_TOKEN as string,
-    chatId: process.env.TELEGRAM_CHAT_ID as string,
+    botToken: (process.env.TELEGRAM_BOT_TOKEN ?? '').trim(),
+    chatId: (process.env.TELEGRAM_CHAT_ID ?? '').trim(),
   },
   rss: {
     feedUrls: parseFeedUrls(process.env.RSS_FEED_URLS),
   },
   collection: {
     cronSchedule:
-      process.env.COLLECTION_CRON_SCHEDULE ?? DEFAULT_COLLECTION_CRON_SCHEDULE,
+      process.env.COLLECTION_CRON_SCHEDULE?.trim() ??
+      DEFAULT_COLLECTION_CRON_SCHEDULE,
   },
 });
