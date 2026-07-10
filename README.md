@@ -39,10 +39,37 @@ del inversor.
 - Docker + Docker Compose
 - npm
 
+## Variables de entorno
+
+Copiá `.env.example` a `.env` y completá los valores. La app **no arranca** si
+falta una variable obligatoria de runtime (mensaje explícito vía Joi).
+
+| Variable | Obligatoria en NestJS | Uso |
+|----------|----------------------|-----|
+| `PORT` | No (default `3000`) | Puerto HTTP |
+| `DATABASE_URL` | Sí | Conexión PostgreSQL |
+| `GEMINI_API_KEY_FINANCE` | Sí | Análisis de noticias (Proyecto B) |
+| `GEMINI_API_KEY_REVIEWER` | No | Solo GitHub Actions / Reviewer (Proyecto A) |
+| `GEMINI_REQUEST_DELAY_MS` | No (default `1000`) | Delay entre requests a Gemini |
+| `TELEGRAM_BOT_TOKEN` | Sí | Bot de alertas |
+| `TELEGRAM_CHAT_ID` | Sí | Chat destino de alertas |
+| `RSS_FEED_URLS` | Sí | Feeds RSS (separados por coma) |
+| `COLLECTION_CRON_SCHEDULE` | No (default `*/15 * * * *`) | Cron del collector |
+
+**Importante:** creá **dos proyectos** en Google AI Studio / Google Cloud, cada
+uno con su API key. No reutilices la misma key entre Finance y Reviewer: el
+free tier es por proyecto. `GEMINI_API_KEY_REVIEWER` se configura como secret
+de Actions (`Settings → Secrets and variables → Actions`), no hace falta en el
+boot de NestJS.
+
+La configuración se inyecta vía `ConfigModule` / `ConfigService`. No uses
+`process.env` disperso en el código de dominio.
+
 ## Arranque local con Docker
 
 ```bash
 cp .env.example .env
+# Completá GEMINI_API_KEY_FINANCE, TELEGRAM_*, RSS_FEED_URLS, etc.
 docker compose up --build
 ```
 
@@ -69,6 +96,7 @@ Si PostgreSQL no responde, el endpoint devuelve `503`.
 
 ```bash
 cp .env.example .env
+# Ajustá DATABASE_URL al host localhost y completá el resto de secrets
 # DATABASE_URL=postgresql://postgres:postgres@localhost:5432/investment_intelligence
 ```
 

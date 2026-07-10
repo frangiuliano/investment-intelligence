@@ -21,8 +21,11 @@ services:
       dockerfile: Dockerfile
     ports:
       - '3000:3000'
+    env_file:
+      - .env
     environment:
       PORT: 3000
+      # Always use the Compose service hostname inside the network
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/investment_intelligence
     depends_on:
       postgres:
