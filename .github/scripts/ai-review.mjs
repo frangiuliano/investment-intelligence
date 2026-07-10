@@ -109,27 +109,34 @@ function pickLatestCiCheck(runs, { requirePrLink = false } = {}) {
 
 /**
  * Prefer the pull_request workflow check (merge commit SHA = github.sha in CI).
- * Fall back to head SHA only when the check is explicitly linked to this PR,
- * so a push-to-issue-* check cannot mask a failing PR CI.
+ * When merge_commit_sha exists, never fall back to head — a green push check on
+ * the branch must not mask a missing/failing PR CI.
+ * Head is only used when there is no merge SHA (e.g. merge conflict).
  */
 async function findPrCiCheck() {
   const pr = await github(`/repos/${owner}/${repo}/pulls/${PR_NUMBER}`);
   const mergeSha = pr.merge_commit_sha;
   const headSha = pr.head?.sha ?? PR_HEAD_SHA;
 
-  const mergeRuns = await getCheckRunsForSha(mergeSha);
-  const fromMerge = pickLatestCiCheck(mergeRuns);
-  if (fromMerge) {
-    return { check: fromMerge, source: 'merge', mergeSha, headSha };
+  if (mergeSha) {
+    const mergeRuns = await getCheckRunsForSha(mergeSha);
+    const fromMerge = pickLatestCiCheck(mergeRuns);
+    return {
+      check: fromMerge,
+      source: fromMerge ? 'merge' : null,
+      mergeSha,
+      headSha,
+    };
   }
 
   const headRuns = await getCheckRunsForSha(headSha);
   const fromHead = pickLatestCiCheck(headRuns, { requirePrLink: true });
-  if (fromHead) {
-    return { check: fromHead, source: 'head', mergeSha, headSha };
-  }
-
-  return { check: null, source: null, mergeSha, headSha };
+  return {
+    check: fromHead,
+    source: fromHead ? 'head' : null,
+    mergeSha,
+    headSha,
+  };
 }
 
 async function waitForCi() {
@@ -175,12 +182,21 @@ async function waitForCi() {
   };
 }
 
+const ACTIONS_BOT_LOGINS = new Set([
+  'github-actions[bot]',
+  'github-actions',
+]);
+
 async function findExistingReviewComment() {
   const comments = await github(
     `/repos/${owner}/${repo}/issues/${PR_NUMBER}/comments?per_page=100`,
   );
   const marker = dedupeMarker(PR_HEAD_SHA);
-  return (comments ?? []).find((comment) => comment.body?.includes(marker));
+  return (comments ?? []).find(
+    (comment) =>
+      comment.body?.includes(marker) &&
+      ACTIONS_BOT_LOGINS.has(comment.user?.login ?? ''),
+  );
 }
 
 function extractIssueNumber(title) {
