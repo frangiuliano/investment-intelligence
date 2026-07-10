@@ -1,5 +1,7 @@
 # Investment Intelligence
 
+[![CI](https://github.com/frangiuliano/investment-intelligence/actions/workflows/ci.yml/badge.svg)](https://github.com/frangiuliano/investment-intelligence/actions/workflows/ci.yml)
+
 Sistema de investigación de inversiones que monitorea fuentes financieras
 (RSS), analiza el contenido con IA (Gemini Flash) y genera alertas
 accionables por Telegram.
@@ -119,7 +121,26 @@ npm run start:dev
 | `npm run test:watch` | Jest en modo watch |
 | `npm run test:cov` | Jest con reporte de coverage |
 
-Pre-push obligatorio: `lint` → `test` → `build` (mismos comandos que usará el CI).
+Pre-push obligatorio: `lint` → `test` → `build` (mismos comandos que el CI).
+
+## CI (GitHub Actions)
+
+El workflow [`.github/workflows/ci.yml`](./.github/workflows/ci.yml) corre en:
+
+- cada **pull request** hacia `main`
+- cada **push** a ramas `issue-*`
+
+Pipeline (mismos comandos que el pre-push local):
+
+```bash
+npm ci
+npm run lint
+npm run test
+npm run build
+```
+
+Usa Node.js 22 LTS con cache de dependencias npm. Un PR con lint, tests o
+build fallidos queda con CI en rojo y no debería mergearse.
 
 ## Testing
 
