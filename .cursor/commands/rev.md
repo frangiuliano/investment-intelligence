@@ -24,4 +24,5 @@ Interpretá el texto después de `/rev` (o `$ARGUMENTS` / `$1`):
 - No implementes fixes; devolvé al Developer.
 - Usá skills Bugbot y Security Review cuando estén disponibles.
 - Emití el veredicto en el formato del prompt del Reviewer.
+- **Publicá el veredicto como comentario en el PR** (GitHub), no solo en el chat.
 - El merge sigue siendo manual (humano).
