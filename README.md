@@ -116,8 +116,36 @@ npm run start:dev
 | `npm run build` | Compila TypeScript |
 | `npm run lint` | ESLint |
 | `npm run test` | Jest (unit) |
+| `npm run test:watch` | Jest en modo watch |
+| `npm run test:cov` | Jest con reporte de coverage |
 
-Pre-push recomendado: `lint` → `test` → `build`.
+Pre-push obligatorio: `lint` → `test` → `build` (mismos comandos que usará el CI).
+
+## Testing
+
+Stack y convenciones alineados con
+`ai-software-company/standards/testing-standards.md`:
+
+- **Unit tests:** Jest + `@nestjs/testing`.
+- **Ubicación:** `*.spec.ts` junto al archivo de producción bajo `src/`
+  (convención NestJS). Ejemplo: `src/health/health.controller.spec.ts`.
+- **E2E:** carpeta `test/` + supertest cuando un issue de feature lo pida;
+  no es parte del setup base.
+- **Externos:** mockear Gemini, Telegram, RSS, etc. — sin llamadas reales
+  en tests.
+- **Nombres:** descriptivos en inglés
+  (`should return 503 for GET /health when database is down`).
+
+### Cómo correrlos
+
+```bash
+npm run test        # suite unitaria
+npm run test:watch  # desarrollo
+npm run test:cov    # coverage en ./coverage (sin umbral mínimo en el MVP)
+```
+
+El smoke del health check vive como unit test del controller
+(`GET /health` con `DatabaseHealth` mockeado).
 
 ## Arquitectura
 
