@@ -142,6 +142,38 @@ npm run build
 Usa Node.js 22 LTS con cache de dependencias npm. Un PR con lint, tests o
 build fallidos queda con CI en rojo y no debería mergearse.
 
+## Flujo de PR (CI → AI Review → merge manual)
+
+1. Abrís un PR hacia `main` (o actualizás la rama).
+2. Corre el **CI** (`ci.yml`: lint → test → build).
+3. Si el CI está **verde**, el workflow
+   [`.github/workflows/ai-review.yml`](./.github/workflows/ai-review.yml)
+   ejecuta el **Reviewer Agent** vía Gemini y publica un comentario en el PR
+   con veredicto (Aprobado / Cambios solicitados / Bloqueado).
+4. Si el CI está **rojo** (o no terminó en éxito), el review **se skipea** y
+   no consume requests de Gemini.
+5. El **merge sigue siendo manual**: leé el veredicto y mergeá vos.
+
+### Secret requerido
+
+Configurá en el repo (`Settings → Secrets and variables → Actions`):
+
+| Secret | Uso |
+|--------|-----|
+| `GEMINI_API_KEY_REVIEWER` | Solo el workflow `ai-review.yml` (Proyecto A) |
+
+No uses `GEMINI_API_KEY_FINANCE` en Actions. Son proyectos/API keys distintos
+(ver tabla de variables arriba).
+
+### Prompt del Reviewer
+
+La definición del agente vive en
+[`.github/reviewer/prompt.md`](./.github/reviewer/prompt.md) (copia del
+framework `ai-software-company/agents/reviewer/prompt.md`). El script
+[`.github/scripts/ai-review.mjs`](./.github/scripts/ai-review.mjs) la usa
+como system prompt. Los comentarios incluyen un marcador oculto por commit
+SHA para no duplicar reviews del mismo head.
+
 ## Testing
 
 Stack y convenciones alineados con
