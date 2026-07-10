@@ -69,47 +69,101 @@ async function github(path, options = {}) {
   return response.json();
 }
 
+async function getCheckRunsForSha(sha) {
+  if (!sha) {
+    return [];
+  }
+  const data = await github(
+    `/repos/${owner}/${repo}/commits/${sha}/check-runs?per_page=100`,
+  );
+  return data.check_runs ?? [];
+}
+
+function isLinkedToPr(run, prNumber) {
+  return (run.pull_requests ?? []).some(
+    (pr) => Number(pr.number) === Number(prNumber),
+  );
+}
+
+function pickLatestCiCheck(runs, { requirePrLink = false } = {}) {
+  const matches = runs.filter((run) => {
+    if (run.name !== CI_CHECK_NAME) {
+      return false;
+    }
+    if (requirePrLink && !isLinkedToPr(run, PR_NUMBER)) {
+      return false;
+    }
+    return true;
+  });
+
+  if (matches.length === 0) {
+    return null;
+  }
+
+  return matches.sort(
+    (a, b) =>
+      new Date(b.started_at || b.completed_at || 0) -
+      new Date(a.started_at || a.completed_at || 0),
+  )[0];
+}
+
+/**
+ * Prefer the pull_request workflow check (merge commit SHA = github.sha in CI).
+ * Fall back to head SHA only when the check is explicitly linked to this PR,
+ * so a push-to-issue-* check cannot mask a failing PR CI.
+ */
+async function findPrCiCheck() {
+  const pr = await github(`/repos/${owner}/${repo}/pulls/${PR_NUMBER}`);
+  const mergeSha = pr.merge_commit_sha;
+  const headSha = pr.head?.sha ?? PR_HEAD_SHA;
+
+  const mergeRuns = await getCheckRunsForSha(mergeSha);
+  const fromMerge = pickLatestCiCheck(mergeRuns);
+  if (fromMerge) {
+    return { check: fromMerge, source: 'merge', mergeSha, headSha };
+  }
+
+  const headRuns = await getCheckRunsForSha(headSha);
+  const fromHead = pickLatestCiCheck(headRuns, { requirePrLink: true });
+  if (fromHead) {
+    return { check: fromHead, source: 'head', mergeSha, headSha };
+  }
+
+  return { check: null, source: null, mergeSha, headSha };
+}
+
 async function waitForCi() {
   const deadline = Date.now() + waitTimeoutMs;
   let sawCheck = false;
 
   while (Date.now() < deadline) {
-    const data = await github(
-      `/repos/${owner}/${repo}/commits/${PR_HEAD_SHA}/check-runs?per_page=100`,
-    );
-    const matches = (data.check_runs ?? []).filter(
-      (run) => run.name === CI_CHECK_NAME,
-    );
+    const { check, source, mergeSha, headSha } = await findPrCiCheck();
 
-    if (matches.length === 0) {
-      console.log(`Waiting for check "${CI_CHECK_NAME}" to appear...`);
+    if (!check) {
+      console.log(
+        `Waiting for check "${CI_CHECK_NAME}" (merge=${mergeSha ?? 'n/a'} head=${headSha})...`,
+      );
       await sleep(waitIntervalMs);
       continue;
     }
 
     sawCheck = true;
-    const latest = matches.sort(
-      (a, b) =>
-        new Date(b.started_at || b.completed_at || 0) -
-        new Date(a.started_at || a.completed_at || 0),
-    )[0];
-
     console.log(
-      `CI check status=${latest.status} conclusion=${latest.conclusion ?? 'n/a'}`,
+      `CI check via ${source} status=${check.status} conclusion=${check.conclusion ?? 'n/a'}`,
     );
 
-    if (latest.status !== 'completed') {
+    if (check.status !== 'completed') {
       await sleep(waitIntervalMs);
       continue;
     }
 
-    if (latest.conclusion === 'success') {
+    if (check.conclusion === 'success') {
       return { ok: true };
     }
 
     return {
       ok: false,
-      reason: `CI check "${CI_CHECK_NAME}" concluded with ${latest.conclusion}`,
+      reason: `CI check "${CI_CHECK_NAME}" concluded with ${check.conclusion}`,
     };
   }
 
@@ -171,10 +225,13 @@ async function loadPrContext() {
 }
 
 async function callGemini({ systemPrompt, userPrompt }) {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${encodeURIComponent(GEMINI_API_KEY_REVIEWER)}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
   const response = await fetch(url, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'x-goog-api-key': GEMINI_API_KEY_REVIEWER,
+    },
     body: JSON.stringify({
       systemInstruction: {
         parts: [{ text: systemPrompt }],
