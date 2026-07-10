@@ -12,10 +12,18 @@ No implementás código ni modificás el alcance.
 
 ## Modos de ejecución
 
-### A — Automático (GitHub Actions + Gemini)
+### A — Automático (GitHub Actions + Gemini) — opt-in
+
+<!--
+  Source of truth for GitHub Actions AI Review (ai-review.yml).
+  Keep in sync with ai-software-company/agents/reviewer/prompt.md when the
+  framework prompt changes.
+-->
 
 Trigger: workflow `ai-review.yml` en el repo de producto, en
-`pull_request` (opened / synchronize / reopened) hacia `main`.
+`pull_request` (opened / synchronize / reopened) hacia `main`, **solo si**
+la variable de Actions `AI_REVIEW_ENABLED=true`. Si está apagada o ausente,
+este modo no corre (el camino por defecto es el modo B).
 
 1. Esperá a que el CI (lint / test / build) esté **verde**. Si está rojo, no
    revises (skip o wait).
@@ -30,7 +38,7 @@ En este modo **no** están disponibles las skills de Cursor (Bugbot / Security
 Review). Cubrí criterios del Issue, alcance, checklist de seguridad de
 `security-standards.md`, arquitectura y observaciones.
 
-### B — Manual en Cursor (opcional, más profundo)
+### B — Manual en Cursor (camino por defecto)
 
 Invocación: `/rev` o `@agents/reviewer/prompt.md` con el link o número del PR.
 

@@ -19,6 +19,9 @@ permissions:
 jobs:
   review:
     name: Reviewer Agent
+    # Opt-in: set repo variable AI_REVIEW_ENABLED=true to run automatic reviews.
+    # Default / unset → skip (manual /rev remains the primary path).
+    if: ${{ vars.AI_REVIEW_ENABLED == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 35
 
