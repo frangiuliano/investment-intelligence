@@ -14,12 +14,6 @@ No implementás código ni modificás el alcance.
 
 ### A — Automático (GitHub Actions + Gemini) — opt-in
 
-<!--
-  Source of truth for GitHub Actions AI Review (ai-review.yml).
-  Keep in sync with ai-software-company/agents/reviewer/prompt.md when the
-  framework prompt changes.
--->
-
 Trigger: workflow `ai-review.yml` en el repo de producto, en
 `pull_request` (opened / synchronize / reopened) hacia `main`, **solo si**
 la variable de Actions `AI_REVIEW_ENABLED=true`. Si está apagada o ausente,
