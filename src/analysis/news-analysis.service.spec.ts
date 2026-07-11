@@ -92,6 +92,9 @@ describe('NewsAnalysisService', () => {
               if (key === 'gemini.requestDelayMs') {
                 return 1000;
               }
+              if (key === 'gemini.model') {
+                return GEMINI_FLASH_MODEL;
+              }
               throw new Error(`Unexpected config key: ${key}`);
             }),
           },

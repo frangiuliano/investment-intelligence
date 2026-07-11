@@ -1,5 +1,6 @@
 import {
   DEFAULT_COLLECTION_CRON_SCHEDULE,
+  DEFAULT_GEMINI_MODEL,
   DEFAULT_GEMINI_REQUEST_DELAY_MS,
   parseFeedUrls,
 } from './env.validation';
@@ -9,6 +10,7 @@ export type AppConfig = {
   databaseUrl: string;
   gemini: {
     apiKeyFinance: string;
+    model: string;
     requestDelayMs: number;
   };
   telegram: {
@@ -28,6 +30,7 @@ export default (): AppConfig => ({
   databaseUrl: process.env.DATABASE_URL as string,
   gemini: {
     apiKeyFinance: (process.env.GEMINI_API_KEY_FINANCE ?? '').trim(),
+    model: process.env.GEMINI_MODEL?.trim() || DEFAULT_GEMINI_MODEL,
     requestDelayMs: parseInt(
       process.env.GEMINI_REQUEST_DELAY_MS ??
         String(DEFAULT_GEMINI_REQUEST_DELAY_MS),

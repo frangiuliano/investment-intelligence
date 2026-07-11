@@ -24,6 +24,9 @@ describe('GeminiClient', () => {
               if (key === 'gemini.apiKeyFinance') {
                 return 'test-finance-key';
               }
+              if (key === 'gemini.model') {
+                return GEMINI_FLASH_MODEL;
+              }
               throw new Error(`Unexpected config key: ${key}`);
             }),
           },

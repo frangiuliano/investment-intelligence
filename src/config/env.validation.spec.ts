@@ -1,5 +1,6 @@
 import {
   DEFAULT_COLLECTION_CRON_SCHEDULE,
+  DEFAULT_GEMINI_MODEL,
   DEFAULT_GEMINI_REQUEST_DELAY_MS,
   envValidationSchema,
 } from './env.validation';
@@ -17,6 +18,7 @@ type ValidatedEnv = {
   PORT: number;
   COLLECTION_CRON_SCHEDULE: string;
   GEMINI_REQUEST_DELAY_MS: number;
+  GEMINI_MODEL: string;
 };
 
 describe('envValidationSchema', () => {
@@ -30,6 +32,7 @@ describe('envValidationSchema', () => {
       DEFAULT_COLLECTION_CRON_SCHEDULE,
     );
     expect(value.GEMINI_REQUEST_DELAY_MS).toBe(DEFAULT_GEMINI_REQUEST_DELAY_MS);
+    expect(value.GEMINI_MODEL).toBe(DEFAULT_GEMINI_MODEL);
   });
 
   it('does not require GEMINI_API_KEY_REVIEWER at boot', () => {

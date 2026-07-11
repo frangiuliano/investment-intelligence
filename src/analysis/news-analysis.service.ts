@@ -4,11 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { QueryFailedError, Repository } from 'typeorm';
 import { NewsArticle } from '../news/entities/news-article.entity';
 import { NewsAnalysis } from './entities/news-analysis.entity';
-import {
-  GEMINI_BACKOFF_BASE_MS,
-  GEMINI_FLASH_MODEL,
-  GEMINI_MAX_RETRIES,
-} from './gemini.constants';
+import { GEMINI_BACKOFF_BASE_MS, GEMINI_MAX_RETRIES } from './gemini.constants';
 import { GeminiApiError, GeminiClient } from './gemini.client';
 
 export type AnalysisRunResult = {
@@ -89,13 +85,14 @@ export class NewsAnalysisService {
   ): Promise<'analyzed' | 'skipped' | 'errors'> {
     try {
       const analysis = await this.analyzeWithRetry(article);
+      const model = this.configService.getOrThrow<string>('gemini.model');
       await this.newsAnalyses.save(
         this.newsAnalyses.create({
           articleId: article.id,
           summary: analysis.summary,
           sentiment: analysis.sentiment,
           tickers: analysis.tickers,
-          model: GEMINI_FLASH_MODEL,
+          model,
         }),
       );
       return 'analyzed';

@@ -1,9 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import {
-  GEMINI_FLASH_MODEL,
-  GEMINI_REQUEST_TIMEOUT_MS,
-} from './gemini.constants';
+import { GEMINI_REQUEST_TIMEOUT_MS } from './gemini.constants';
 import {
   GeminiAnalysisResult,
   buildAnalysisSystemPrompt,
@@ -39,7 +36,8 @@ export class GeminiClient {
     const apiKey = this.configService.getOrThrow<string>(
       'gemini.apiKeyFinance',
     );
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_FLASH_MODEL}:generateContent`;
+    const model = this.configService.getOrThrow<string>('gemini.model');
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
 
     const controller = new AbortController();
     const timeout = setTimeout(

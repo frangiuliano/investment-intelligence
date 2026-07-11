@@ -53,6 +53,7 @@ falta una variable obligatoria de runtime (mensaje explícito vía Joi).
 | `TEST_DATABASE_URL` | No (solo tests) | DB de integración; nombre debe terminar en `_test` |
 | `GEMINI_API_KEY_FINANCE` | Sí | Análisis de noticias (Proyecto B) |
 | `GEMINI_API_KEY_REVIEWER` | No | Solo GitHub Actions / Reviewer (Proyecto A) |
+| `GEMINI_MODEL` | No (default `gemini-3.5-flash`) | Modelo Gemini para análisis |
 | `GEMINI_REQUEST_DELAY_MS` | No (default `1000`) | Delay entre requests a Gemini |
 | `TELEGRAM_BOT_TOKEN` | Sí | Bot de alertas |
 | `TELEGRAM_CHAT_ID` | Sí | Chat destino de alertas |
@@ -238,7 +239,8 @@ análisis → relevancia → Telegram queda en el Issue #7.
 El módulo `analysis/` toma artículos de `news_articles` **sin** fila en
 `news_analysis` y los procesa en cola secuencial (concurrencia 1):
 
-1. Prompt estructurado a Gemini Flash (`gemini-2.0-flash`) pidiendo JSON:
+1. Prompt estructurado a Gemini Flash (`GEMINI_MODEL`, default
+   `gemini-3.5-flash`) pidiendo JSON:
    `summary`, `sentiment` (`positive` | `negative` | `neutral`), `tickers`.
 2. Usa `GEMINI_API_KEY_FINANCE` (nunca la key del Reviewer).
 3. Espera `GEMINI_REQUEST_DELAY_MS` (default 1000) entre requests para no
@@ -247,9 +249,15 @@ El módulo `analysis/` toma artículos de `news_articles` **sin** fila en
    sigue con el siguiente artículo (la corrida no tumba el proceso).
 5. Persiste en `news_analysis` (`article_id` unique → no re-analiza).
 
-Invocación desde código: `NewsAnalysisService.analyzePending()` (el cron
-end-to-end lo cableará el Issue #7). Truncá el contenido enviado al modelo
-y no loguees la API key ni el body completo de errores.
+Invocación local (one-shot, sin cron de pipeline):
+
+```bash
+npm run analysis:once
+```
+
+El cron end-to-end lo cableará el Issue #7. Truncá el contenido enviado al
+modelo y no loguees la API key ni el body completo de errores.
+
 
 ## Testing
 

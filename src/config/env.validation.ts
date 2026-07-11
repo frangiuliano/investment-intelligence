@@ -2,6 +2,7 @@ import * as Joi from 'joi';
 
 export const DEFAULT_COLLECTION_CRON_SCHEDULE = '*/15 * * * *';
 export const DEFAULT_GEMINI_REQUEST_DELAY_MS = 1000;
+export const DEFAULT_GEMINI_MODEL = 'gemini-3.5-flash';
 
 export function parseFeedUrls(raw: string | undefined): string[] {
   if (!raw) {
@@ -67,4 +68,5 @@ export const envValidationSchema = Joi.object({
     .integer()
     .min(0)
     .default(DEFAULT_GEMINI_REQUEST_DELAY_MS),
+  GEMINI_MODEL: Joi.string().trim().min(1).default(DEFAULT_GEMINI_MODEL),
 });

@@ -1,4 +1,8 @@
-export const GEMINI_FLASH_MODEL = 'gemini-2.0-flash';
+export { DEFAULT_GEMINI_MODEL } from '../config/env.validation';
+import { DEFAULT_GEMINI_MODEL } from '../config/env.validation';
+
+/** @deprecated Prefer config `gemini.model`; kept for tests/docs. */
+export const GEMINI_FLASH_MODEL = DEFAULT_GEMINI_MODEL;
 
 export const MAX_PROMPT_CONTENT_LENGTH = 8_000;
 export const MAX_SUMMARY_LENGTH = 4_000;

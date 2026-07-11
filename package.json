@@ -22,6 +22,7 @@
     "migration:run": "npm run typeorm -- migration:run -d src/database/data-source.ts",
     "migration:revert": "npm run typeorm -- migration:revert -d src/database/data-source.ts",
     "migration:show": "npm run typeorm -- migration:show -d src/database/data-source.ts",
+    "analysis:once": "ts-node -r tsconfig-paths/register scripts/run-analysis-once.ts",
     "verify:lockfile": "bash scripts/verify-lockfile.sh"
   },
   "dependencies": {
