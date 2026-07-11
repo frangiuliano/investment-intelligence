@@ -103,10 +103,22 @@ export class GeminiClient {
         .trim();
 
       if (!text) {
-        throw new GeminiApiError('Gemini returned empty response');
+        throw new GeminiApiError(
+          'Gemini returned empty response',
+          undefined,
+          false,
+        );
       }
 
-      return parseGeminiAnalysisText(text);
+      try {
+        return parseGeminiAnalysisText(text);
+      } catch (parseError) {
+        throw new GeminiApiError(
+          `Gemini response parse failed: ${errorMessage(parseError)}`,
+          undefined,
+          false,
+        );
+      }
     } catch (error) {
       if (error instanceof GeminiApiError) {
         throw error;

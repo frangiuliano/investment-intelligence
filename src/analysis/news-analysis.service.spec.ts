@@ -226,4 +226,95 @@ describe('NewsAnalysisService', () => {
     expect(result.errors).toBe(1);
     expect(result.analyzed).toBe(0);
   });
+
+  it('should not retry non-retryable Gemini parse errors', async () => {
+    queryBuilder.getMany.mockResolvedValueOnce([articles[0]]);
+    geminiClient.analyzeArticle.mockRejectedValue(
+      new GeminiApiError(
+        'Gemini response parse failed: bad schema',
+        undefined,
+        false,
+      ),
+    );
+
+    const runPromise = service.analyzePending();
+    await jest.runAllTimersAsync();
+    const result = await runPromise;
+
+    expect(geminiClient.analyzeArticle).toHaveBeenCalledTimes(1);
+    expect(result.errors).toBe(1);
+  });
+
+  it('should defer exhausted failures so later articles can progress', async () => {
+    queryBuilder.getMany
+      .mockResolvedValueOnce([articles[0]])
+      .mockResolvedValueOnce([articles[0], articles[1]]);
+    geminiClient.analyzeArticle
+      .mockRejectedValueOnce(new GeminiApiError('permanent', undefined, false))
+      .mockResolvedValueOnce({
+        summary: 'Second ok',
+        sentiment: 'positive',
+        tickers: ['MSFT'],
+      });
+
+    const firstPromise = service.analyzePending();
+    await jest.runAllTimersAsync();
+    const first = await firstPromise;
+
+    expect(first).toEqual({
+      pending: 1,
+      analyzed: 0,
+      skipped: 0,
+      errors: 1,
+    });
+
+    const secondPromise = service.analyzePending();
+    await jest.runAllTimersAsync();
+    const second = await secondPromise;
+
+    expect(queryBuilder.take).toHaveBeenLastCalledWith(6);
+    expect(geminiClient.analyzeArticle).toHaveBeenCalledTimes(2);
+    expect(geminiClient.analyzeArticle).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({ title: 'Second' }),
+    );
+    expect(second).toEqual({
+      pending: 1,
+      analyzed: 1,
+      skipped: 0,
+      errors: 0,
+    });
+  });
+
+  it('should reuse cached Gemini result when persist fails then succeeds', async () => {
+    queryBuilder.getMany
+      .mockResolvedValueOnce([articles[0]])
+      .mockResolvedValueOnce([articles[0]]);
+    newsAnalyses.save
+      .mockRejectedValueOnce(new Error('connection reset'))
+      .mockResolvedValueOnce({
+        id: 'analysis-1',
+        articleId: 'article-1',
+      });
+
+    const firstPromise = service.analyzePending();
+    await jest.runAllTimersAsync();
+    const first = await firstPromise;
+
+    expect(first.errors).toBe(1);
+    expect(geminiClient.analyzeArticle).toHaveBeenCalledTimes(1);
+
+    const secondPromise = service.analyzePending();
+    await jest.runAllTimersAsync();
+    const second = await secondPromise;
+
+    expect(geminiClient.analyzeArticle).toHaveBeenCalledTimes(1);
+    expect(newsAnalyses.save).toHaveBeenCalledTimes(2);
+    expect(second).toEqual({
+      pending: 1,
+      analyzed: 1,
+      skipped: 0,
+      errors: 0,
+    });
+  });
 });

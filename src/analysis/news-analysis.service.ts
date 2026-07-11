@@ -11,6 +11,7 @@ import {
 } from './gemini.constants';
 import { resolveRetryDelayMs } from './gemini-retry';
 import { GeminiApiError, GeminiClient } from './gemini.client';
+import type { GeminiAnalysisResult } from './gemini-response';
 
 export type AnalysisRunResult = {
   pending: number;
@@ -23,6 +24,10 @@ export type AnalysisRunResult = {
 export class NewsAnalysisService {
   private readonly logger = new Logger(NewsAnalysisService.name);
   private running = false;
+  /** Process-local skip set so permanent/exhausted failures do not stall the batch head. */
+  private readonly deferredArticleIds = new Set<string>();
+  /** Successful Gemini results awaiting DB persist (avoids re-calling Gemini). */
+  private readonly pendingPersist = new Map<string, GeminiAnalysisResult>();
 
   constructor(
     private readonly configService: ConfigService,
@@ -82,20 +87,38 @@ export class NewsAnalysisService {
   private async findUnanalyzedArticles(
     batchSize: number,
   ): Promise<NewsArticle[]> {
-    return this.newsArticles
+    const fetchSize = batchSize + this.deferredArticleIds.size;
+    const candidates = await this.newsArticles
       .createQueryBuilder('article')
       .leftJoin('article.analysis', 'analysis')
       .where('analysis.id IS NULL')
       .orderBy('article.createdAt', 'ASC')
-      .take(batchSize)
+      .take(Math.max(fetchSize, batchSize))
       .getMany();
+
+    return candidates
+      .filter((article) => !this.deferredArticleIds.has(article.id))
+      .slice(0, batchSize);
   }
 
   private async analyzeArticle(
     article: NewsArticle,
   ): Promise<'analyzed' | 'skipped' | 'errors'> {
+    let analysis = this.pendingPersist.get(article.id);
+    if (!analysis) {
+      try {
+        analysis = await this.analyzeWithRetry(article);
+        this.pendingPersist.set(article.id, analysis);
+      } catch (error) {
+        this.deferredArticleIds.add(article.id);
+        this.logger.error(
+          `Failed to analyze article ${article.id}: ${errorMessage(error)} (deferred for this process)`,
+        );
+        return 'errors';
+      }
+    }
+
     try {
-      const analysis = await this.analyzeWithRetry(article);
       const model = this.configService.getOrThrow<string>('gemini.model');
       await this.newsAnalyses.save(
         this.newsAnalyses.create({
@@ -106,13 +129,17 @@ export class NewsAnalysisService {
           model,
         }),
       );
+      this.pendingPersist.delete(article.id);
+      this.deferredArticleIds.delete(article.id);
       return 'analyzed';
     } catch (error) {
       if (isUniqueViolation(error)) {
+        this.pendingPersist.delete(article.id);
+        this.deferredArticleIds.delete(article.id);
         return 'skipped';
       }
       this.logger.error(
-        `Failed to analyze article ${article.id}: ${errorMessage(error)}`,
+        `Failed to persist analysis for article ${article.id}: ${errorMessage(error)}`,
       );
       return 'errors';
     }

@@ -102,4 +102,14 @@ describe('envValidationSchema', () => {
 
     expect(error).toBeUndefined();
   });
+
+  it('rejects GEMINI_ANALYSIS_BATCH_SIZE above 50', () => {
+    const { error } = envValidationSchema.validate({
+      ...validEnv,
+      GEMINI_ANALYSIS_BATCH_SIZE: 51,
+    });
+
+    expect(error).toBeDefined();
+    expect(error?.message).toContain('GEMINI_ANALYSIS_BATCH_SIZE');
+  });
 });

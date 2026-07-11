@@ -119,6 +119,37 @@ describe('GeminiClient', () => {
     );
   });
 
+  it('should throw a non-retryable GeminiApiError on invalid JSON schema', async () => {
+    fetchMock.mockResolvedValue({
+      ok: true,
+      json: () =>
+        Promise.resolve({
+          candidates: [
+            {
+              content: {
+                parts: [{ text: JSON.stringify({ summary: 'only' }) }],
+              },
+            },
+          ],
+        }),
+    });
+
+    try {
+      await client.analyzeArticle({
+        title: 't',
+        source: 's',
+        url: 'https://news.example.com/x',
+        content: 'c',
+      });
+      fail('expected analyzeArticle to reject');
+    } catch (error) {
+      expect(error).toBeInstanceOf(GeminiApiError);
+      const geminiError = error as GeminiApiError;
+      expect(geminiError.retryable).toBe(false);
+      expect(geminiError.message).toContain('Gemini response parse failed');
+    }
+  });
+
   it('should time out when response body never resolves', async () => {
     jest.useFakeTimers();
     fetchMock.mockResolvedValue({

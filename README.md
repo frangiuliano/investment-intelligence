@@ -248,7 +248,11 @@ El módulo `analysis/` toma artículos de `news_articles` **sin** fila en
    espera `GEMINI_REQUEST_DELAY_MS` (default 12000) entre requests.
 4. Ante 429/timeout/5xx reintenta con backoff; si Gemini indica
    `Please retry in Ns` / `Retry-After`, respeta esa espera (tope 60s).
-5. Persiste en `news_analysis` (`article_id` unique → no re-analiza).
+   Fallos de parse/schema no se reintentan. Tras agotar reintentos, el
+   artículo se omite en el proceso actual para no bloquear la cola.
+5. Persiste en `news_analysis` (`article_id` unique → no re-analiza). Si
+   Gemini respondió bien y falla el `save`, se reutiliza el resultado en
+   memoria (sin otra llamada a Gemini) en la siguiente corrida.
 
 Invocación local (one-shot, sin cron de pipeline):
 

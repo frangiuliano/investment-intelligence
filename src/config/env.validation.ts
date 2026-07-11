@@ -76,5 +76,6 @@ export const envValidationSchema = Joi.object({
   GEMINI_ANALYSIS_BATCH_SIZE: Joi.number()
     .integer()
     .min(1)
+    .max(50)
     .default(DEFAULT_GEMINI_ANALYSIS_BATCH_SIZE),
 });

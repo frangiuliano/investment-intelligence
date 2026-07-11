@@ -42,5 +42,5 @@ jobs:
           PR_NUMBER: ${{ github.event.pull_request.number }}
           PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
           CI_CHECK_NAME: 'lint · test · build'
-          GEMINI_MODEL: gemini-2.0-flash
+          GEMINI_MODEL: gemini-3.5-flash
         run: node .github/scripts/ai-review.mjs

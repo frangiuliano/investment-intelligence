@@ -15,7 +15,7 @@ const {
   PR_NUMBER,
   PR_HEAD_SHA,
   CI_CHECK_NAME = 'lint · test · build',
-  GEMINI_MODEL = 'gemini-2.0-flash',
+  GEMINI_MODEL = 'gemini-3.5-flash',
   WAIT_INTERVAL_SEC = '15',
   WAIT_TIMEOUT_SEC = '900',
 } = process.env;
