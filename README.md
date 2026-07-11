@@ -102,12 +102,37 @@ cp .env.example .env
 # DATABASE_URL=postgresql://postgres:postgres@localhost:5432/investment_intelligence
 ```
 
-3. Instalá dependencias y corré en modo watch:
+3. Instalá dependencias, aplicá migraciones y corré en modo watch:
 
 ```bash
 npm install
+npm run migration:run
 npm run start:dev
 ```
+
+## Base de datos y migraciones
+
+ORM: **TypeORM** (ver [docs/adr/001-orm-typeorm.md](./docs/adr/001-orm-typeorm.md)).
+
+Entidades en módulos de dominio (`news/`, `analysis/`, `notifications/`).
+Migraciones versionadas en `src/database/migrations/`.
+
+Con Postgres arriba y `DATABASE_URL` apuntando a `localhost` (fuera de Docker):
+
+```bash
+# Aplicar migraciones pendientes
+npm run migration:run
+
+# Ver estado
+npm run migration:show
+
+# Revertir la última
+npm run migration:revert
+```
+
+Tras un Postgres limpio, `migration:run` crea `news_articles`,
+`news_analysis` y `notifications` (unique en `url` / `content_hash`, FKs
+con `ON DELETE CASCADE`).
 
 ## Scripts npm
 
@@ -117,9 +142,12 @@ npm run start:dev
 | `npm run start:dev` | Arranca en modo watch |
 | `npm run build` | Compila TypeScript |
 | `npm run lint` | ESLint |
-| `npm run test` | Jest (unit) |
+| `npm run test` | Jest (unit + integración de schema) |
 | `npm run test:watch` | Jest en modo watch |
 | `npm run test:cov` | Jest con reporte de coverage |
+| `npm run migration:run` | Aplica migraciones TypeORM pendientes |
+| `npm run migration:show` | Lista migraciones y su estado |
+| `npm run migration:revert` | Revierte la última migración |
 
 Pre-push obligatorio: `lint` → `test` → `build` (mismos comandos que el CI).
 
@@ -139,8 +167,9 @@ npm run test
 npm run build
 ```
 
-Usa Node.js 22 LTS con cache de dependencias npm. Un PR con lint, tests o
-build fallidos queda con CI en rojo y no debería mergearse.
+Usa Node.js 22 LTS con cache de dependencias npm y un servicio PostgreSQL 16
+para los tests de integración de schema. Un PR con lint, tests o build
+fallidos queda con CI en rojo y no debería mergearse.
 
 ## Flujo de PR (CI → review → merge manual)
 
@@ -206,6 +235,11 @@ npm run test:cov    # coverage en ./coverage (sin umbral mínimo en el MVP)
 
 El smoke del health check vive como unit test del controller
 (`GET /health` con `DatabaseHealth` mockeado).
+
+Los tests de schema (`src/database/schema.integration.spec.ts`) requieren
+PostgreSQL accesible vía `DATABASE_URL` (default local:
+`postgresql://postgres:postgres@localhost:5432/investment_intelligence`).
+En CI el servicio Postgres del workflow lo provee.
 
 ## Arquitectura
 
