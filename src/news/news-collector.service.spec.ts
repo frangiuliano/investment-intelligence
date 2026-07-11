@@ -112,6 +112,44 @@ describe('NewsCollectorService', () => {
     expect(result.inserted).toBe(0);
   });
 
+  it('should use guid fallback and content snippet when link/content are blank', async () => {
+    rssFeedClient.fetchFeed.mockResolvedValueOnce({
+      title: 'Example Finance',
+      items: [
+        {
+          title: 'Guid only',
+          guid: 'https://news.example.com/guid-only',
+          content: '',
+          contentSnippet: 'From snippet',
+        },
+      ],
+    });
+
+    const result = await service.collect();
+
+    expect(newsArticles.save).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: 'Guid only',
+        url: 'https://news.example.com/guid-only',
+        content: 'From snippet',
+      }),
+    );
+    expect(result.inserted).toBe(1);
+    expect(result.skipped).toBe(0);
+  });
+
+  it('should count findOne failures as errors without aborting the run', async () => {
+    newsArticles.findOne
+      .mockRejectedValueOnce(new Error('db down'))
+      .mockResolvedValueOnce(null);
+
+    const result = await service.collect();
+
+    expect(result.errors).toBe(1);
+    expect(result.inserted).toBe(1);
+    expect(result.itemsSeen).toBe(2);
+  });
+
   it('should skip items without title or link and continue after feed errors', async () => {
     rssFeedClient.fetchFeed
       .mockRejectedValueOnce(new Error('network down'))
