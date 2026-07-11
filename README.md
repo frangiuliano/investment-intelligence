@@ -230,8 +230,26 @@ El módulo `news/` lee los feeds de `RSS_FEED_URLS` en el cron
 
 Solo se aceptan URLs `http`/`https` públicas (no `file://`, localhost,
 metadata cloud ni IPs privadas / IPv6 ULA). Si falta `link`, se usa `guid`
-cuando es una URL válida. El análisis Gemini y el pipeline end-to-end
-quedan en issues posteriores (#3 / #7).
+cuando es una URL válida. El pipeline end-to-end que encadena collector →
+análisis → relevancia → Telegram queda en el Issue #7.
+
+## News Analysis (Gemini Flash)
+
+El módulo `analysis/` toma artículos de `news_articles` **sin** fila en
+`news_analysis` y los procesa en cola secuencial (concurrencia 1):
+
+1. Prompt estructurado a Gemini Flash (`gemini-2.0-flash`) pidiendo JSON:
+   `summary`, `sentiment` (`positive` | `negative` | `neutral`), `tickers`.
+2. Usa `GEMINI_API_KEY_FINANCE` (nunca la key del Reviewer).
+3. Espera `GEMINI_REQUEST_DELAY_MS` (default 1000) entre requests para no
+   saturar el free tier.
+4. Ante 429/timeout/5xx reintenta con backoff acotado; si falla, loguea y
+   sigue con el siguiente artículo (la corrida no tumba el proceso).
+5. Persiste en `news_analysis` (`article_id` unique → no re-analiza).
+
+Invocación desde código: `NewsAnalysisService.analyzePending()` (el cron
+end-to-end lo cableará el Issue #7). Truncá el contenido enviado al modelo
+y no loguees la API key ni el body completo de errores.
 
 ## Testing
 

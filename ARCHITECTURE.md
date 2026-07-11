@@ -17,7 +17,7 @@ Mapa de módulos del backend NestJS y su relación con el backlog del MVP.
 | `database/` | Implementado | TypeORM connection, health, migraciones | #2 |
 | `health/` | Implementado | `GET /health` (app + DB) | #8 |
 | `news/` | Implementado | Recolección RSS (cron), dedupe y persistencia | #1 |
-| `analysis/` | Entidad lista | Análisis con Gemini Flash | #3 |
+| `analysis/` | Implementado | Análisis con Gemini Flash (cola + delay) | #3 |
 | `notifications/` | Entidad lista | Alertas Telegram | #4 |
 | `pipeline/` | Stub | Cron end-to-end | #7 |
 
