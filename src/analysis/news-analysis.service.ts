@@ -86,7 +86,7 @@ export class NewsAnalysisService {
       .createQueryBuilder('article')
       .leftJoin('article.analysis', 'analysis')
       .where('analysis.id IS NULL')
-      .orderBy('article.created_at', 'ASC')
+      .orderBy('article.createdAt', 'ASC')
       .take(batchSize)
       .getMany();
   }
