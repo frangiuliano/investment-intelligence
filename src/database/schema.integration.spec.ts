@@ -1,20 +1,26 @@
+import { Logger } from '@nestjs/common';
 import { DataSource, QueryFailedError, Repository } from 'typeorm';
 import { NewsAnalysis } from '../analysis/entities/news-analysis.entity';
 import { NewsArticle } from '../news/entities/news-article.entity';
 import { Notification } from '../notifications/entities/notification.entity';
 import { InitialSchema1752180000000 } from './migrations/1752180000000-InitialSchema';
+import {
+  DEFAULT_TEST_DATABASE_URL,
+  resolveTestDatabaseUrl,
+} from './test-database-url';
 
-const databaseUrl =
-  process.env.DATABASE_URL ??
-  'postgresql://postgres:postgres@localhost:5432/investment_intelligence';
+const logger = new Logger('SchemaIntegrationSpec');
 
 describe('Database schema (integration)', () => {
   let dataSource: DataSource;
   let articles: Repository<NewsArticle>;
   let analyses: Repository<NewsAnalysis>;
   let notifications: Repository<Notification>;
+  let databaseUrl: string;
 
   beforeAll(async () => {
+    databaseUrl = resolveTestDatabaseUrl(process.env.TEST_DATABASE_URL);
+
     dataSource = new DataSource({
       type: 'postgres',
       url: databaseUrl,
@@ -24,7 +30,17 @@ describe('Database schema (integration)', () => {
       logging: false,
     });
 
-    await dataSource.initialize();
+    try {
+      await dataSource.initialize();
+    } catch (error) {
+      logger.error(
+        `Cannot connect to TEST_DATABASE_URL. Create the test DB first, e.g.:\n` +
+          `  docker compose exec postgres psql -U postgres -c "CREATE DATABASE investment_intelligence_test;"\n` +
+          `Default URL: ${DEFAULT_TEST_DATABASE_URL}`,
+      );
+      throw error;
+    }
+
     await dataSource.query('DROP SCHEMA IF EXISTS public CASCADE');
     await dataSource.query('CREATE SCHEMA public');
     await dataSource.runMigrations();
