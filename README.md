@@ -215,6 +215,24 @@ como system prompt cuando el review automático está habilitado. Los
 comentarios incluyen un marcador oculto por commit SHA para no duplicar
 reviews del mismo head.
 
+## News Collector (RSS)
+
+El módulo `news/` lee los feeds de `RSS_FEED_URLS` en el cron
+`COLLECTION_CRON_SCHEDULE` (default cada 15 minutos):
+
+1. Fetch propio con `redirect: 'manual'`, revalidación de cada hop,
+   timeout con `AbortSignal` (15s) y tope de body (2 MB); parse con
+   `rss-parser` (`parseString`, sin seguir redirects del parser).
+2. Sanitiza título/contenido (strip HTML, límites de longitud).
+3. Deduplica por `url` o `content_hash` (SHA-256) antes de insertar.
+4. Persiste en `news_articles` y loguea
+   `seen / inserted / duplicates / skipped / errors` por corrida.
+
+Solo se aceptan URLs `http`/`https` públicas (no `file://`, localhost,
+metadata cloud ni IPs privadas / IPv6 ULA). Si falta `link`, se usa `guid`
+cuando es una URL válida. El análisis Gemini y el pipeline end-to-end
+quedan en issues posteriores (#3 / #7).
+
 ## Testing
 
 Stack y convenciones alineados con
