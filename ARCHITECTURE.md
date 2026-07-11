@@ -47,3 +47,7 @@ health   ← database (ping vía DataSource)
 
 - `200` si la app y PostgreSQL responden.
 - `503` si PostgreSQL no responde.
+
+TypeORM usa `manualInitialization`: si Postgres no está disponible al boot,
+la app **sigue levantando** y el health reporta `database: down` hasta que
+haya conectividad.

@@ -7,6 +7,9 @@ export class DatabaseHealth {
 
   async isUp(): Promise<boolean> {
     try {
+      if (!this.dataSource.isInitialized) {
+        await this.dataSource.initialize();
+      }
       await this.dataSource.query('SELECT 1');
       return true;
     } catch {
