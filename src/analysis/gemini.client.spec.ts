@@ -1,6 +1,9 @@
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
-import { GEMINI_FLASH_MODEL } from './gemini.constants';
+import {
+  GEMINI_FLASH_MODEL,
+  GEMINI_REQUEST_TIMEOUT_MS,
+} from './gemini.constants';
 import { GeminiApiError, GeminiClient } from './gemini.client';
 
 describe('GeminiClient', () => {
@@ -32,6 +35,7 @@ describe('GeminiClient', () => {
   });
 
   afterEach(() => {
+    jest.useRealTimers();
     jest.restoreAllMocks();
   });
 
@@ -105,5 +109,26 @@ describe('GeminiClient', () => {
         retryable: true,
       } satisfies Partial<GeminiApiError>),
     );
+  });
+
+  it('should time out when response body never resolves', async () => {
+    jest.useFakeTimers();
+    fetchMock.mockResolvedValue({
+      ok: true,
+      json: () => new Promise(() => undefined),
+    });
+
+    const pending = client.analyzeArticle({
+      title: 'hang',
+      source: 'Example',
+      url: 'https://news.example.com/hang',
+      content: 'body',
+    });
+    const expectation = expect(pending).rejects.toThrow(
+      /Gemini request timed out after/,
+    );
+
+    await jest.advanceTimersByTimeAsync(GEMINI_REQUEST_TIMEOUT_MS);
+    await expectation;
   });
 });

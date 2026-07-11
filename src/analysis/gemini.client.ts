@@ -47,9 +47,8 @@ export class GeminiClient {
       GEMINI_REQUEST_TIMEOUT_MS,
     );
 
-    let response: Response;
     try {
-      response = await fetch(url, {
+      const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -73,7 +72,40 @@ export class GeminiClient {
         }),
         signal: controller.signal,
       });
+
+      if (!response.ok) {
+        const body = await safeReadBody(response, controller.signal);
+        const retryable = response.status === 429 || response.status >= 500;
+        throw new GeminiApiError(
+          `Gemini API ${response.status}: ${truncateLogBody(body)}`,
+          response.status,
+          retryable,
+        );
+      }
+
+      const data = await readWithAbort(
+        response.json() as Promise<{
+          candidates?: Array<{
+            content?: { parts?: Array<{ text?: string }> };
+          }>;
+        }>,
+        controller.signal,
+      );
+
+      const text = data.candidates?.[0]?.content?.parts
+        ?.map((part) => part.text ?? '')
+        .join('')
+        .trim();
+
+      if (!text) {
+        throw new GeminiApiError('Gemini returned empty response');
+      }
+
+      return parseGeminiAnalysisText(text);
     } catch (error) {
+      if (error instanceof GeminiApiError) {
+        throw error;
+      }
       if (isAbortError(error)) {
         throw new GeminiApiError(
           `Gemini request timed out after ${GEMINI_REQUEST_TIMEOUT_MS}ms`,
@@ -89,42 +121,57 @@ export class GeminiClient {
     } finally {
       clearTimeout(timeout);
     }
-
-    if (!response.ok) {
-      const body = await safeReadBody(response);
-      const retryable = response.status === 429 || response.status >= 500;
-      throw new GeminiApiError(
-        `Gemini API ${response.status}: ${truncateLogBody(body)}`,
-        response.status,
-        retryable,
-      );
-    }
-
-    const data = (await response.json()) as {
-      candidates?: Array<{
-        content?: { parts?: Array<{ text?: string }> };
-      }>;
-    };
-
-    const text = data.candidates?.[0]?.content?.parts
-      ?.map((part) => part.text ?? '')
-      .join('')
-      .trim();
-
-    if (!text) {
-      throw new GeminiApiError('Gemini returned empty response');
-    }
-
-    return parseGeminiAnalysisText(text);
   }
 }
 
-async function safeReadBody(response: Response): Promise<string> {
+async function safeReadBody(
+  response: Response,
+  signal: AbortSignal,
+): Promise<string> {
   try {
-    return await response.text();
-  } catch {
+    return await readWithAbort(response.text(), signal);
+  } catch (error) {
+    if (isAbortError(error)) {
+      throw error;
+    }
     return '(unreadable body)';
   }
+}
+
+function readWithAbort<T>(
+  promise: Promise<T>,
+  signal: AbortSignal,
+): Promise<T> {
+  if (signal.aborted) {
+    return Promise.reject(createAbortError());
+  }
+
+  return new Promise<T>((resolve, reject) => {
+    const onAbort = () => {
+      reject(createAbortError());
+    };
+
+    signal.addEventListener('abort', onAbort, { once: true });
+    promise.then(
+      (value) => {
+        signal.removeEventListener('abort', onAbort);
+        resolve(value);
+      },
+      (error: unknown) => {
+        signal.removeEventListener('abort', onAbort);
+        reject(error instanceof Error ? error : new Error(String(error)));
+      },
+    );
+  });
+}
+
+function createAbortError(): Error {
+  if (typeof DOMException === 'function') {
+    return new DOMException('This operation was aborted', 'AbortError');
+  }
+  const error = new Error('This operation was aborted');
+  error.name = 'AbortError';
+  return error;
 }
 
 function truncateLogBody(body: string, maxLength = 500): string {
@@ -136,7 +183,12 @@ function truncateLogBody(body: string, maxLength = 500): string {
 }
 
 function isAbortError(error: unknown): boolean {
-  return error instanceof Error && error.name === 'AbortError';
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'name' in error &&
+    (error as { name: string }).name === 'AbortError'
+  );
 }
 
 function errorMessage(error: unknown): string {
