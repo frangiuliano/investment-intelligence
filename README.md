@@ -148,8 +148,11 @@ con `ON DELETE CASCADE`).
 | `npm run migration:run` | Aplica migraciones TypeORM pendientes |
 | `npm run migration:show` | Lista migraciones y su estado |
 | `npm run migration:revert` | Revierte la última migración |
+| `npm run verify:lockfile` | `npm ci` en Linux (Docker) — evita drift macOS→CI |
 
-Pre-push obligatorio: `lint` → `test` → `build` (mismos comandos que el CI).
+Pre-push obligatorio: `verify:lockfile` → `lint` → `test` → `build`.
+`verify:lockfile` es necesario porque un lockfile válido en macOS puede fallar
+en GitHub Actions (deps opcionales de plataforma, p. ej. `@emnapi/*`).
 
 ## CI (GitHub Actions)
 
