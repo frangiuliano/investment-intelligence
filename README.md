@@ -49,7 +49,8 @@ falta una variable obligatoria de runtime (mensaje explícito vía Joi).
 | Variable | Obligatoria en NestJS | Uso |
 |----------|----------------------|-----|
 | `PORT` | No (default `3000`) | Puerto HTTP |
-| `DATABASE_URL` | Sí | Conexión PostgreSQL |
+| `DATABASE_URL` | Sí | Conexión PostgreSQL (app) |
+| `TEST_DATABASE_URL` | No (solo tests) | DB de integración; nombre debe terminar en `_test` |
 | `GEMINI_API_KEY_FINANCE` | Sí | Análisis de noticias (Proyecto B) |
 | `GEMINI_API_KEY_REVIEWER` | No | Solo GitHub Actions / Reviewer (Proyecto A) |
 | `GEMINI_REQUEST_DELAY_MS` | No (default `1000`) | Delay entre requests a Gemini |
@@ -89,7 +90,8 @@ Respuesta esperada cuando todo está up:
 { "status": "ok", "checks": { "app": "up", "database": "up" } }
 ```
 
-Si PostgreSQL no responde, el endpoint devuelve `503`.
+Si PostgreSQL no responde, el endpoint devuelve `503` y la app **sigue
+corriendo** (TypeORM no bloquea el boot).
 
 ## Desarrollo local (sin Docker para la app)
 
@@ -102,12 +104,37 @@ cp .env.example .env
 # DATABASE_URL=postgresql://postgres:postgres@localhost:5432/investment_intelligence
 ```
 
-3. Instalá dependencias y corré en modo watch:
+3. Instalá dependencias, aplicá migraciones y corré en modo watch:
 
 ```bash
 npm install
+npm run migration:run
 npm run start:dev
 ```
+
+## Base de datos y migraciones
+
+ORM: **TypeORM** (ver [docs/adr/001-orm-typeorm.md](./docs/adr/001-orm-typeorm.md)).
+
+Entidades en módulos de dominio (`news/`, `analysis/`, `notifications/`).
+Migraciones versionadas en `src/database/migrations/`.
+
+Con Postgres arriba y `DATABASE_URL` apuntando a `localhost` (fuera de Docker):
+
+```bash
+# Aplicar migraciones pendientes
+npm run migration:run
+
+# Ver estado
+npm run migration:show
+
+# Revertir la última
+npm run migration:revert
+```
+
+Tras un Postgres limpio, `migration:run` crea `news_articles`,
+`news_analysis` y `notifications` (unique en `url` / `content_hash`, FKs
+con `ON DELETE CASCADE`).
 
 ## Scripts npm
 
@@ -117,11 +144,17 @@ npm run start:dev
 | `npm run start:dev` | Arranca en modo watch |
 | `npm run build` | Compila TypeScript |
 | `npm run lint` | ESLint |
-| `npm run test` | Jest (unit) |
+| `npm run test` | Jest (unit + integración de schema) |
 | `npm run test:watch` | Jest en modo watch |
 | `npm run test:cov` | Jest con reporte de coverage |
+| `npm run migration:run` | Aplica migraciones TypeORM pendientes |
+| `npm run migration:show` | Lista migraciones y su estado |
+| `npm run migration:revert` | Revierte la última migración |
+| `npm run verify:lockfile` | `npm ci` en Linux (Docker) — evita drift macOS→CI |
 
-Pre-push obligatorio: `lint` → `test` → `build` (mismos comandos que el CI).
+Pre-push obligatorio: `verify:lockfile` → `lint` → `test` → `build`.
+`verify:lockfile` es necesario porque un lockfile válido en macOS puede fallar
+en GitHub Actions (deps opcionales de plataforma, p. ej. `@emnapi/*`).
 
 ## CI (GitHub Actions)
 
@@ -139,8 +172,9 @@ npm run test
 npm run build
 ```
 
-Usa Node.js 22 LTS con cache de dependencias npm. Un PR con lint, tests o
-build fallidos queda con CI en rojo y no debería mergearse.
+Usa Node.js 22 LTS con cache de dependencias npm y un servicio PostgreSQL 16
+para los tests de integración de schema. Un PR con lint, tests o build
+fallidos queda con CI en rojo y no debería mergearse.
 
 ## Flujo de PR (CI → review → merge manual)
 
@@ -206,6 +240,28 @@ npm run test:cov    # coverage en ./coverage (sin umbral mínimo en el MVP)
 
 El smoke del health check vive como unit test del controller
 (`GET /health` con `DatabaseHealth` mockeado).
+
+Los tests de schema (`src/database/schema.integration.spec.ts`) usan
+**solo** `TEST_DATABASE_URL` (nunca `DATABASE_URL`). Default local:
+
+`postgresql://postgres:postgres@localhost:5432/investment_intelligence_test`
+
+El nombre de la base **debe** terminar en `_test`. Los tests hacen
+`DROP SCHEMA` sobre esa DB; la de desarrollo no se toca.
+
+Crear la DB de test (una vez; en volúmenes nuevos Compose ya la crea vía
+`docker/postgres/init-test-db.sh`):
+
+```bash
+docker compose up postgres -d
+docker compose exec postgres psql -U postgres -c \
+  "CREATE DATABASE investment_intelligence_test;"
+```
+
+En CI el servicio Postgres usa `investment_intelligence_test` +
+`TEST_DATABASE_URL`.
+
+`npm run verify:lockfile` **requiere Docker** (sin fallback a macOS).
 
 ## Arquitectura
 

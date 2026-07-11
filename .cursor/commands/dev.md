@@ -21,6 +21,6 @@ Interpretá el texto después de `/dev` (o `$ARGUMENTS` / `$1` si está disponib
 
 - No cambies el alcance del Issue.
 - Un issue a la vez; marcá `status:in-progress`.
-- Pre-push: lint → test → build.
+- Pre-push: verify:lockfile → lint → test → build.
 - Abrí el PR con el template del repo de producto.
 - No invoques Reviewer, PO ni otros agentes salvo que el estándar lo pida.

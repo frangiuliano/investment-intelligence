@@ -1,39 +1,54 @@
 import {
   Global,
-  Inject,
   Injectable,
+  Logger,
   Module,
-  OnModuleDestroy,
+  OnModuleInit,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Pool } from 'pg';
-import { DATABASE_POOL } from './database.constants';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
 import { DatabaseHealth } from './database.health';
 
 @Injectable()
-class DatabasePoolShutdown implements OnModuleDestroy {
-  constructor(@Inject(DATABASE_POOL) private readonly pool: Pool) {}
+class DatabaseConnectionBootstrap implements OnModuleInit {
+  private readonly logger = new Logger(DatabaseConnectionBootstrap.name);
 
-  async onModuleDestroy(): Promise<void> {
-    await this.pool.end();
+  constructor(private readonly dataSource: DataSource) {}
+
+  async onModuleInit(): Promise<void> {
+    if (this.dataSource.isInitialized) {
+      return;
+    }
+
+    try {
+      await this.dataSource.initialize();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.warn(
+        `PostgreSQL unavailable at boot (${message}). App stays up; GET /health will report database down until it connects.`,
+      );
+    }
   }
 }
 
 @Global()
 @Module({
-  providers: [
-    {
-      provide: DATABASE_POOL,
+  imports: [
+    TypeOrmModule.forRootAsync({
       inject: [ConfigService],
-      useFactory: (configService: ConfigService): Pool => {
-        return new Pool({
-          connectionString: configService.getOrThrow<string>('databaseUrl'),
-        });
-      },
-    },
-    DatabaseHealth,
-    DatabasePoolShutdown,
+      useFactory: (configService: ConfigService) => ({
+        type: 'postgres' as const,
+        url: configService.getOrThrow<string>('databaseUrl'),
+        autoLoadEntities: true,
+        synchronize: false,
+        logging: false,
+        retryAttempts: 0,
+        manualInitialization: true,
+      }),
+    }),
   ],
-  exports: [DATABASE_POOL, DatabaseHealth],
+  providers: [DatabaseHealth, DatabaseConnectionBootstrap],
+  exports: [TypeOrmModule, DatabaseHealth],
 })
 export class DatabaseModule {}

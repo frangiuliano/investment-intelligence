@@ -1,0 +1,45 @@
+---
+description: Prevent CI Install failures from macOS/Linux package-lock drift
+alwaysApply: true
+---
+
+# CI: verify lockfile on Linux before push
+
+Title: **CI lockfile — verify Linux npm ci before every push**
+
+The recurring CI failure on this repo is the **Install dependencies** stage
+(`npm ci`) with:
+
+```text
+Missing: @emnapi/core@… from lock file
+Missing: @emnapi/runtime@… from lock file
+```
+
+macOS `npm ci` can pass while Linux (GitHub Actions) fails. Local lint/test/build
+is **not** enough.
+
+## Mandatory pre-push
+
+```bash
+npm run verify:lockfile
+npm run lint
+npm run test
+npm run build
+```
+
+`verify:lockfile` **requires Docker** (daemon running). It must not fall back
+to host `npm ci` — that hides Linux lockfile drift.
+
+## After any dependency change
+
+1. Update deps as usual (`npm install …`).
+2. If `verify:lockfile` fails, regenerate the lockfile with Linux Node 22:
+
+```bash
+docker run --rm -v "$PWD:/app" -w /app node:22-bookworm-slim \
+  npm install --package-lock-only --ignore-scripts
+```
+
+3. Commit **both** `package.json` and `package-lock.json`.
+4. Re-run `npm run verify:lockfile` until it prints OK.
+5. Only then push / open the PR.
