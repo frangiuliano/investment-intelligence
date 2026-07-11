@@ -53,7 +53,9 @@ falta una variable obligatoria de runtime (mensaje explícito vía Joi).
 | `TEST_DATABASE_URL` | No (solo tests) | DB de integración; nombre debe terminar en `_test` |
 | `GEMINI_API_KEY_FINANCE` | Sí | Análisis de noticias (Proyecto B) |
 | `GEMINI_API_KEY_REVIEWER` | No | Solo GitHub Actions / Reviewer (Proyecto A) |
-| `GEMINI_REQUEST_DELAY_MS` | No (default `1000`) | Delay entre requests a Gemini |
+| `GEMINI_MODEL` | No (default `gemini-3.1-flash-lite`) | Modelo Gemini para análisis |
+| `GEMINI_REQUEST_DELAY_MS` | No (default `12000`) | Delay entre requests a Gemini |
+| `GEMINI_ANALYSIS_BATCH_SIZE` | No (default `5`) | Máx. artículos por corrida de análisis |
 | `TELEGRAM_BOT_TOKEN` | Sí | Bot de alertas |
 | `TELEGRAM_CHAT_ID` | Sí | Chat destino de alertas |
 | `RSS_FEED_URLS` | Sí | Feeds RSS (separados por coma) |
@@ -230,8 +232,37 @@ El módulo `news/` lee los feeds de `RSS_FEED_URLS` en el cron
 
 Solo se aceptan URLs `http`/`https` públicas (no `file://`, localhost,
 metadata cloud ni IPs privadas / IPv6 ULA). Si falta `link`, se usa `guid`
-cuando es una URL válida. El análisis Gemini y el pipeline end-to-end
-quedan en issues posteriores (#3 / #7).
+cuando es una URL válida. El pipeline end-to-end que encadena collector →
+análisis → relevancia → Telegram queda en el Issue #7.
+
+## News Analysis (Gemini Flash)
+
+El módulo `analysis/` toma artículos de `news_articles` **sin** fila en
+`news_analysis` y los procesa en cola secuencial (concurrencia 1):
+
+1. Prompt estructurado a Gemini Flash (`GEMINI_MODEL`, default
+   `gemini-3.1-flash-lite`) pidiendo JSON:
+   `summary`, `sentiment` (`positive` | `negative` | `neutral`), `tickers`.
+2. Usa `GEMINI_API_KEY_FINANCE` (nunca la key del Reviewer).
+3. Procesa como máximo `GEMINI_ANALYSIS_BATCH_SIZE` artículos por corrida y
+   espera `GEMINI_REQUEST_DELAY_MS` (default 12000) entre requests.
+4. Ante 429/timeout/5xx reintenta con backoff; si Gemini indica
+   `Please retry in Ns` / `Retry-After`, respeta esa espera (tope 60s).
+   Fallos de parse/schema no se reintentan. Tras agotar reintentos, el
+   artículo se omite en el proceso actual para no bloquear la cola.
+5. Persiste en `news_analysis` (`article_id` unique → no re-analiza). Si
+   Gemini respondió bien y falla el `save`, se reutiliza el resultado en
+   memoria (sin otra llamada a Gemini) en la siguiente corrida.
+
+Invocación local (one-shot, sin cron de pipeline):
+
+```bash
+npm run analysis:once
+```
+
+El cron end-to-end lo cableará el Issue #7. Truncá el contenido enviado al
+modelo y no loguees la API key ni el body completo de errores.
+
 
 ## Testing
 
