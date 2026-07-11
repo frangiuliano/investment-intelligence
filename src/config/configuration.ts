@@ -1,5 +1,6 @@
 import {
   DEFAULT_COLLECTION_CRON_SCHEDULE,
+  DEFAULT_GEMINI_ANALYSIS_BATCH_SIZE,
   DEFAULT_GEMINI_MODEL,
   DEFAULT_GEMINI_REQUEST_DELAY_MS,
   parseFeedUrls,
@@ -12,6 +13,7 @@ export type AppConfig = {
     apiKeyFinance: string;
     model: string;
     requestDelayMs: number;
+    analysisBatchSize: number;
   };
   telegram: {
     botToken: string;
@@ -34,6 +36,11 @@ export default (): AppConfig => ({
     requestDelayMs: parseInt(
       process.env.GEMINI_REQUEST_DELAY_MS ??
         String(DEFAULT_GEMINI_REQUEST_DELAY_MS),
+      10,
+    ),
+    analysisBatchSize: parseInt(
+      process.env.GEMINI_ANALYSIS_BATCH_SIZE ??
+        String(DEFAULT_GEMINI_ANALYSIS_BATCH_SIZE),
       10,
     ),
   },

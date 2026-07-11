@@ -22,6 +22,7 @@ describe('NewsAnalysisService', () => {
     leftJoin: jest.Mock;
     where: jest.Mock;
     orderBy: jest.Mock;
+    take: jest.Mock;
     getMany: jest.Mock;
   };
 
@@ -65,6 +66,7 @@ describe('NewsAnalysisService', () => {
       leftJoin: jest.fn().mockReturnThis(),
       where: jest.fn().mockReturnThis(),
       orderBy: jest.fn().mockReturnThis(),
+      take: jest.fn().mockReturnThis(),
       getMany: jest.fn().mockResolvedValue(articles),
     };
 
@@ -91,6 +93,9 @@ describe('NewsAnalysisService', () => {
             getOrThrow: jest.fn((key: string) => {
               if (key === 'gemini.requestDelayMs') {
                 return 1000;
+              }
+              if (key === 'gemini.analysisBatchSize') {
+                return 5;
               }
               if (key === 'gemini.model') {
                 return GEMINI_FLASH_MODEL;
@@ -125,6 +130,7 @@ describe('NewsAnalysisService', () => {
     const result = await runPromise;
 
     expect(queryBuilder.where).toHaveBeenCalledWith('analysis.id IS NULL');
+    expect(queryBuilder.take).toHaveBeenCalledWith(5);
     expect(geminiClient.analyzeArticle).toHaveBeenCalledTimes(2);
     expect(
       geminiClient.analyzeArticle.mock.invocationCallOrder[0],
@@ -171,7 +177,12 @@ describe('NewsAnalysisService', () => {
     queryBuilder.getMany.mockResolvedValueOnce([articles[0], articles[1]]);
     geminiClient.analyzeArticle
       .mockRejectedValueOnce(
-        new GeminiApiError('Gemini API 429: rate limited', 429, true),
+        new GeminiApiError(
+          'Gemini API 429: Please retry in 2s.',
+          429,
+          true,
+          2000,
+        ),
       )
       .mockResolvedValueOnce({
         summary: 'Recovered',
@@ -184,11 +195,15 @@ describe('NewsAnalysisService', () => {
         tickers: ['MSFT'],
       });
 
+    const setTimeoutSpy = jest.spyOn(global, 'setTimeout');
     const runPromise = service.analyzePending();
     await jest.runAllTimersAsync();
     const result = await runPromise;
 
     expect(geminiClient.analyzeArticle).toHaveBeenCalledTimes(3);
+    expect(
+      setTimeoutSpy.mock.calls.some((call) => Number(call[1]) === 2000),
+    ).toBe(true);
     expect(result).toEqual({
       pending: 2,
       analyzed: 2,

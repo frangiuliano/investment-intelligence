@@ -53,8 +53,9 @@ falta una variable obligatoria de runtime (mensaje explícito vía Joi).
 | `TEST_DATABASE_URL` | No (solo tests) | DB de integración; nombre debe terminar en `_test` |
 | `GEMINI_API_KEY_FINANCE` | Sí | Análisis de noticias (Proyecto B) |
 | `GEMINI_API_KEY_REVIEWER` | No | Solo GitHub Actions / Reviewer (Proyecto A) |
-| `GEMINI_MODEL` | No (default `gemini-3.5-flash`) | Modelo Gemini para análisis |
-| `GEMINI_REQUEST_DELAY_MS` | No (default `1000`) | Delay entre requests a Gemini |
+| `GEMINI_MODEL` | No (default `gemini-3.1-flash-lite`) | Modelo Gemini para análisis |
+| `GEMINI_REQUEST_DELAY_MS` | No (default `12000`) | Delay entre requests a Gemini |
+| `GEMINI_ANALYSIS_BATCH_SIZE` | No (default `5`) | Máx. artículos por corrida de análisis |
 | `TELEGRAM_BOT_TOKEN` | Sí | Bot de alertas |
 | `TELEGRAM_CHAT_ID` | Sí | Chat destino de alertas |
 | `RSS_FEED_URLS` | Sí | Feeds RSS (separados por coma) |
@@ -240,13 +241,13 @@ El módulo `analysis/` toma artículos de `news_articles` **sin** fila en
 `news_analysis` y los procesa en cola secuencial (concurrencia 1):
 
 1. Prompt estructurado a Gemini Flash (`GEMINI_MODEL`, default
-   `gemini-3.5-flash`) pidiendo JSON:
+   `gemini-3.1-flash-lite`) pidiendo JSON:
    `summary`, `sentiment` (`positive` | `negative` | `neutral`), `tickers`.
 2. Usa `GEMINI_API_KEY_FINANCE` (nunca la key del Reviewer).
-3. Espera `GEMINI_REQUEST_DELAY_MS` (default 1000) entre requests para no
-   saturar el free tier.
-4. Ante 429/timeout/5xx reintenta con backoff acotado; si falla, loguea y
-   sigue con el siguiente artículo (la corrida no tumba el proceso).
+3. Procesa como máximo `GEMINI_ANALYSIS_BATCH_SIZE` artículos por corrida y
+   espera `GEMINI_REQUEST_DELAY_MS` (default 12000) entre requests.
+4. Ante 429/timeout/5xx reintenta con backoff; si Gemini indica
+   `Please retry in Ns` / `Retry-After`, respeta esa espera (tope 60s).
 5. Persiste en `news_analysis` (`article_id` unique → no re-analiza).
 
 Invocación local (one-shot, sin cron de pipeline):

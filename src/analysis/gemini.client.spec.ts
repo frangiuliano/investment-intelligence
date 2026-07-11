@@ -95,7 +95,11 @@ describe('GeminiClient', () => {
     fetchMock.mockResolvedValue({
       ok: false,
       status: 429,
-      text: () => Promise.resolve('rate limited'),
+      headers: {
+        get: (name: string) => (name === 'retry-after' ? '5' : null),
+      },
+      text: () =>
+        Promise.resolve('Please retry in 5.2s. Quota exceeded for free tier'),
     });
 
     await expect(
@@ -110,6 +114,7 @@ describe('GeminiClient', () => {
         name: 'GeminiApiError',
         statusCode: 429,
         retryable: true,
+        retryAfterMs: 5000,
       } satisfies Partial<GeminiApiError>),
     );
   });

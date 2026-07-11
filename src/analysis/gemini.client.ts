@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { GEMINI_REQUEST_TIMEOUT_MS } from './gemini.constants';
+import { parseRetryAfterMs } from './gemini-retry';
 import {
   GeminiAnalysisResult,
   buildAnalysisSystemPrompt,
@@ -13,6 +14,7 @@ export class GeminiApiError extends Error {
     message: string,
     readonly statusCode?: number,
     readonly retryable = false,
+    readonly retryAfterMs?: number,
   ) {
     super(message);
     this.name = 'GeminiApiError';
@@ -74,10 +76,15 @@ export class GeminiClient {
       if (!response.ok) {
         const body = await safeReadBody(response, controller.signal);
         const retryable = response.status === 429 || response.status >= 500;
+        const retryAfterMs = parseRetryAfterMs(
+          body,
+          response.headers.get('retry-after'),
+        );
         throw new GeminiApiError(
           `Gemini API ${response.status}: ${truncateLogBody(body)}`,
           response.status,
           retryable,
+          retryAfterMs,
         );
       }
 

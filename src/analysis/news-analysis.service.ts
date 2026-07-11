@@ -4,7 +4,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { QueryFailedError, Repository } from 'typeorm';
 import { NewsArticle } from '../news/entities/news-article.entity';
 import { NewsAnalysis } from './entities/news-analysis.entity';
-import { GEMINI_BACKOFF_BASE_MS, GEMINI_MAX_RETRIES } from './gemini.constants';
+import {
+  GEMINI_BACKOFF_BASE_MS,
+  GEMINI_MAX_RETRIES,
+  GEMINI_MAX_RETRY_AFTER_MS,
+} from './gemini.constants';
+import { resolveRetryDelayMs } from './gemini-retry';
 import { GeminiApiError, GeminiClient } from './gemini.client';
 
 export type AnalysisRunResult = {
@@ -45,7 +50,10 @@ export class NewsAnalysisService {
     };
 
     try {
-      const articles = await this.findUnanalyzedArticles();
+      const batchSize = this.configService.getOrThrow<number>(
+        'gemini.analysisBatchSize',
+      );
+      const articles = await this.findUnanalyzedArticles(batchSize);
       result.pending = articles.length;
 
       const delayMs = this.configService.getOrThrow<number>(
@@ -63,7 +71,7 @@ export class NewsAnalysisService {
       }
 
       this.logger.log(
-        `Analysis finished: pending=${result.pending} analyzed=${result.analyzed} skipped=${result.skipped} errors=${result.errors}`,
+        `Analysis finished: batch=${batchSize} pending=${result.pending} analyzed=${result.analyzed} skipped=${result.skipped} errors=${result.errors}`,
       );
       return result;
     } finally {
@@ -71,12 +79,15 @@ export class NewsAnalysisService {
     }
   }
 
-  private async findUnanalyzedArticles(): Promise<NewsArticle[]> {
+  private async findUnanalyzedArticles(
+    batchSize: number,
+  ): Promise<NewsArticle[]> {
     return this.newsArticles
       .createQueryBuilder('article')
       .leftJoin('article.analysis', 'analysis')
       .where('analysis.id IS NULL')
       .orderBy('article.created_at', 'ASC')
+      .take(batchSize)
       .getMany();
   }
 
@@ -124,7 +135,12 @@ export class NewsAnalysisService {
           error.retryable &&
           attempt <= GEMINI_MAX_RETRIES
         ) {
-          const backoffMs = GEMINI_BACKOFF_BASE_MS * 2 ** (attempt - 1);
+          const backoffMs = resolveRetryDelayMs({
+            attempt,
+            baseMs: GEMINI_BACKOFF_BASE_MS,
+            retryAfterMs: error.retryAfterMs,
+            maxMs: GEMINI_MAX_RETRY_AFTER_MS,
+          });
           this.logger.warn(
             `Retryable Gemini error for article ${article.id} (attempt ${attempt}/${GEMINI_MAX_RETRIES}, status=${error.statusCode ?? 'n/a'}): waiting ${backoffMs}ms`,
           );

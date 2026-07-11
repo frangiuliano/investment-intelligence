@@ -1,8 +1,12 @@
 import * as Joi from 'joi';
 
 export const DEFAULT_COLLECTION_CRON_SCHEDULE = '*/15 * * * *';
-export const DEFAULT_GEMINI_REQUEST_DELAY_MS = 1000;
-export const DEFAULT_GEMINI_MODEL = 'gemini-3.5-flash';
+/** ~5 RPM free-tier friendly spacing between article analyses. */
+export const DEFAULT_GEMINI_REQUEST_DELAY_MS = 12_000;
+/** Prefer Flash-Lite: usually higher free-tier RPM than 3.5 Flash. */
+export const DEFAULT_GEMINI_MODEL = 'gemini-3.1-flash-lite';
+/** Cap articles processed per analyzePending() run on free tier. */
+export const DEFAULT_GEMINI_ANALYSIS_BATCH_SIZE = 5;
 
 export function parseFeedUrls(raw: string | undefined): string[] {
   if (!raw) {
@@ -69,4 +73,8 @@ export const envValidationSchema = Joi.object({
     .min(0)
     .default(DEFAULT_GEMINI_REQUEST_DELAY_MS),
   GEMINI_MODEL: Joi.string().trim().min(1).default(DEFAULT_GEMINI_MODEL),
+  GEMINI_ANALYSIS_BATCH_SIZE: Joi.number()
+    .integer()
+    .min(1)
+    .default(DEFAULT_GEMINI_ANALYSIS_BATCH_SIZE),
 });
