@@ -49,7 +49,8 @@ falta una variable obligatoria de runtime (mensaje explícito vía Joi).
 | Variable | Obligatoria en NestJS | Uso |
 |----------|----------------------|-----|
 | `PORT` | No (default `3000`) | Puerto HTTP |
-| `DATABASE_URL` | Sí | Conexión PostgreSQL |
+| `DATABASE_URL` | Sí | Conexión PostgreSQL (app) |
+| `TEST_DATABASE_URL` | No (solo tests) | DB de integración; nombre debe terminar en `_test` |
 | `GEMINI_API_KEY_FINANCE` | Sí | Análisis de noticias (Proyecto B) |
 | `GEMINI_API_KEY_REVIEWER` | No | Solo GitHub Actions / Reviewer (Proyecto A) |
 | `GEMINI_REQUEST_DELAY_MS` | No (default `1000`) | Delay entre requests a Gemini |
@@ -89,7 +90,8 @@ Respuesta esperada cuando todo está up:
 { "status": "ok", "checks": { "app": "up", "database": "up" } }
 ```
 
-Si PostgreSQL no responde, el endpoint devuelve `503`.
+Si PostgreSQL no responde, el endpoint devuelve `503` y la app **sigue
+corriendo** (TypeORM no bloquea el boot).
 
 ## Desarrollo local (sin Docker para la app)
 
@@ -239,10 +241,27 @@ npm run test:cov    # coverage en ./coverage (sin umbral mínimo en el MVP)
 El smoke del health check vive como unit test del controller
 (`GET /health` con `DatabaseHealth` mockeado).
 
-Los tests de schema (`src/database/schema.integration.spec.ts`) requieren
-PostgreSQL accesible vía `DATABASE_URL` (default local:
-`postgresql://postgres:postgres@localhost:5432/investment_intelligence`).
-En CI el servicio Postgres del workflow lo provee.
+Los tests de schema (`src/database/schema.integration.spec.ts`) usan
+**solo** `TEST_DATABASE_URL` (nunca `DATABASE_URL`). Default local:
+
+`postgresql://postgres:postgres@localhost:5432/investment_intelligence_test`
+
+El nombre de la base **debe** terminar en `_test`. Los tests hacen
+`DROP SCHEMA` sobre esa DB; la de desarrollo no se toca.
+
+Crear la DB de test (una vez; en volúmenes nuevos Compose ya la crea vía
+`docker/postgres/init-test-db.sh`):
+
+```bash
+docker compose up postgres -d
+docker compose exec postgres psql -U postgres -c \
+  "CREATE DATABASE investment_intelligence_test;"
+```
+
+En CI el servicio Postgres usa `investment_intelligence_test` +
+`TEST_DATABASE_URL`.
+
+`npm run verify:lockfile` **requiere Docker** (sin fallback a macOS).
 
 ## Arquitectura
 
