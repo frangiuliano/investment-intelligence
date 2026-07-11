@@ -6,8 +6,10 @@ import { NewsArticle } from './entities/news-article.entity';
 import { RssFeedClient, RssFeedItem } from './rss-feed.client';
 import {
   computeContentHash,
+  firstNonEmpty,
   isAllowedHttpUrl,
   parsePublishedAt,
+  resolveItemUrl,
   resolveSourceName,
   sanitizeContent,
   sanitizeTitle,
@@ -112,29 +114,30 @@ export class NewsCollectorService {
     source: string,
   ): Promise<'inserted' | 'duplicates' | 'skipped' | 'errors'> {
     const title = sanitizeTitle(item.title);
-    const url = item.link?.trim();
-    if (!title || !url || !isAllowedHttpUrl(url)) {
+    const url = resolveItemUrl([item.link, item.guid]);
+    if (!title || !url) {
       return 'skipped';
     }
 
     const content = sanitizeContent(
-      item.content ?? item.contentSnippet ?? item.summary,
+      firstNonEmpty(item.content, item.contentSnippet, item.summary),
     );
     const contentHash = computeContentHash({ title, url, content });
     const publishedAt = parsePublishedAt(item.isoDate, item.pubDate);
-
-    const existing = await this.newsArticles.findOne({
-      where: [{ url: truncate(url, 2048) }, { contentHash }],
-    });
-    if (existing) {
-      return 'duplicates';
-    }
+    const truncatedUrl = truncate(url, 2048);
 
     try {
+      const existing = await this.newsArticles.findOne({
+        where: [{ url: truncatedUrl }, { contentHash }],
+      });
+      if (existing) {
+        return 'duplicates';
+      }
+
       await this.newsArticles.save(
         this.newsArticles.create({
           title,
-          url: truncate(url, 2048),
+          url: truncatedUrl,
           content,
           source,
           contentHash,
