@@ -30,6 +30,17 @@ Usar el label `order-NN`, no el número de issue de GitHub:
 | 10 | #4 | Notificación por Telegram de noticias relevantes |
 | 11 | #7 | Orquestar pipeline de procesamiento end-to-end |
 
+## Orden de ejecución post-MVP (v1)
+
+| Orden | Issue | Título |
+|-------|-------|--------|
+| 12 | #22 | Configurar idioma de salida de la app (`APP_LOCALE`) |
+| 13 | #23 | Generar análisis Gemini en el locale configurado |
+| 14 | #24 | Localizar mensajes de Telegram según `APP_LOCALE` |
+| 15 | #25 | Disparar recolección RSS one-shot |
+
+Fase: `scope:v1` (cuando el label exista en el repo). No empezar v1 hasta cerrar #7, salvo #25 que solo depende del collector (#1) y es prioridad baja.
+
 ## Gemini: dos proyectos / API keys
 
 | Variable / secret | Proyecto | Uso |
@@ -47,6 +58,7 @@ No compartir la misma key entre ambos: el free tier es por proyecto.
 | Fase | Agente | Cuándo invocar |
 |------|--------|----------------|
 | Pre-scaffold | Architect | Antes del issue #8 |
+| Ideas de alertas / features de research | Finance Advisor (`/fin`) | Consultas de dominio; no crea Issues |
 | CI setup | DevOps | Antes o durante issue #10 |
 | AI Review workflow | DevOps | Antes o durante issue #11 |
 | Cada feature | Developer | Automático por `order-NN` |
