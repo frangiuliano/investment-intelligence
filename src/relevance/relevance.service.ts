@@ -7,6 +7,12 @@ import { NewsAnalysis } from '../analysis/entities/news-analysis.entity';
 import { Notification } from '../notifications/entities/notification.entity';
 import type { RelevanceInput, RelevanceResult } from './relevance.types';
 
+export type RelevanceRunResult = {
+  candidates: number;
+  relevant: number;
+  notRelevant: number;
+};
+
 @Injectable()
 export class RelevanceService {
   private readonly logger = new Logger(RelevanceService.name);
@@ -53,6 +59,39 @@ export class RelevanceService {
     };
   }
 
+  async evaluatePending(): Promise<RelevanceRunResult> {
+    const analyses = await this.findUnnotifiedAnalyses();
+    const result: RelevanceRunResult = {
+      candidates: analyses.length,
+      relevant: 0,
+      notRelevant: 0,
+    };
+
+    for (const analysis of analyses) {
+      const alreadyNotified = await this.notifications.exists({
+        where: { articleId: analysis.articleId },
+      });
+
+      const evaluation = this.evaluate({
+        sentiment: analysis.sentiment,
+        tickers: analysis.tickers ?? [],
+        alreadyNotified,
+      });
+
+      if (evaluation.isRelevant) {
+        result.relevant += 1;
+      } else {
+        result.notRelevant += 1;
+      }
+    }
+
+    this.logger.log(
+      `Relevance finished: candidates=${result.candidates} relevant=${result.relevant} notRelevant=${result.notRelevant}`,
+    );
+
+    return result;
+  }
+
   async evaluateArticle(articleId: string): Promise<RelevanceResult | null> {
     const analysis = await this.newsAnalyses.findOne({
       where: { articleId },
@@ -72,6 +111,16 @@ export class RelevanceService {
       tickers: analysis.tickers ?? [],
       alreadyNotified,
     });
+  }
+
+  private async findUnnotifiedAnalyses(): Promise<NewsAnalysis[]> {
+    return this.newsAnalyses
+      .createQueryBuilder('analysis')
+      .innerJoin('analysis.article', 'article')
+      .leftJoin('article.notifications', 'notification')
+      .where('notification.id IS NULL')
+      .orderBy('analysis.analyzedAt', 'ASC')
+      .getMany();
   }
 }
 
