@@ -60,6 +60,7 @@ falta una variable obligatoria de runtime (mensaje explícito vía Joi).
 | `TELEGRAM_CHAT_ID` | Sí | Chat destino de alertas |
 | `RSS_FEED_URLS` | Sí | Feeds RSS (separados por coma) |
 | `COLLECTION_CRON_SCHEDULE` | No (default `*/15 * * * *`) | Cron del collector |
+| `WATCHLIST_TICKERS` | No | Filtro opcional de tickers para relevancia |
 
 **Importante:** creá **dos proyectos** en Google AI Studio / Google Cloud, cada
 uno con su API key. No reutilices la misma key entre Finance y Reviewer: el
@@ -263,6 +264,21 @@ npm run analysis:once
 El cron end-to-end lo cableará el Issue #7. Truncá el contenido enviado al
 modelo y no loguees la API key ni el body completo de errores.
 
+## Relevance (alert criteria)
+
+El módulo `relevance/` decide si un análisis merece alerta (Telegram lo
+consumirá en el Issue #4). `RelevanceService.evaluate()` devuelve
+`{ isRelevant, reason }` con estas reglas MVP:
+
+1. Ya notificado → no relevante.
+2. Sentimiento `neutral` → no relevante.
+3. Sin tickers → no relevante.
+4. Sentimiento no neutral + ≥1 ticker → relevante.
+5. Si `WATCHLIST_TICKERS` está seteado, además hace falta al menos un
+   ticker del análisis en esa lista.
+
+`evaluateArticle(articleId)` carga `news_analysis` y consulta si ya existe
+fila en `notifications` para ese artículo.
 
 ## Testing
 

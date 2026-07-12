@@ -4,6 +4,7 @@ import {
   DEFAULT_GEMINI_MODEL,
   DEFAULT_GEMINI_REQUEST_DELAY_MS,
   parseFeedUrls,
+  parseWatchlistTickers,
 } from './env.validation';
 
 export type AppConfig = {
@@ -24,6 +25,9 @@ export type AppConfig = {
   };
   collection: {
     cronSchedule: string;
+  };
+  watchlist: {
+    tickers: string[];
   };
 };
 
@@ -55,5 +59,8 @@ export default (): AppConfig => ({
     cronSchedule:
       process.env.COLLECTION_CRON_SCHEDULE?.trim() ??
       DEFAULT_COLLECTION_CRON_SCHEDULE,
+  },
+  watchlist: {
+    tickers: parseWatchlistTickers(process.env.WATCHLIST_TICKERS),
   },
 });
