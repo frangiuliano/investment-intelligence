@@ -64,6 +64,19 @@ describe('RelevanceService', () => {
       });
     });
 
+    it('should return false when sentiment is not a known value', () => {
+      const result = service.evaluate({
+        sentiment: 'bullish',
+        tickers: ['AAPL'],
+        alreadyNotified: false,
+      });
+
+      expect(result).toEqual({
+        isRelevant: false,
+        reason: 'invalid sentiment',
+      });
+    });
+
     it('should return true when sentiment is non-neutral and has tickers', () => {
       const result = service.evaluate({
         sentiment: 'negative',
