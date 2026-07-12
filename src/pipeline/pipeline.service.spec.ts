@@ -105,4 +105,22 @@ describe('PipelineService', () => {
     resolveCollect();
     await firstRun;
   });
+
+  it('should catch stage failures and return null without throwing', async () => {
+    analyzePending.mockRejectedValue(new Error('database unavailable'));
+
+    await expect(service.run()).resolves.toBeNull();
+    expect(evaluatePending).not.toHaveBeenCalled();
+    expect(notifyRelevant).not.toHaveBeenCalled();
+    expect(service.getLastRunAt()).toBeNull();
+  });
+
+  it('should allow a new run after a previous stage failure', async () => {
+    analyzePending.mockRejectedValueOnce(new Error('transient'));
+
+    await expect(service.run()).resolves.toBeNull();
+    await expect(service.run()).resolves.toMatchObject({
+      analysis: { analyzed: 1 },
+    });
+  });
 });

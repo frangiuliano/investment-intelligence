@@ -20,6 +20,8 @@ export type PipelineRunResult = {
   finishedAt: Date;
 };
 
+type PipelineStage = 'collection' | 'analysis' | 'relevance' | 'notifications';
+
 @Injectable()
 export class PipelineService {
   private readonly logger = new Logger(PipelineService.name);
@@ -51,6 +53,7 @@ export class PipelineService {
     }
 
     this.running = true;
+    let stage: PipelineStage = 'collection';
 
     try {
       const collection = await this.newsCollectorService.collect();
@@ -58,16 +61,19 @@ export class PipelineService {
         `Pipeline stage collection: ${JSON.stringify({ stage: 'collection', ...collection })}`,
       );
 
+      stage = 'analysis';
       const analysis = await this.newsAnalysisService.analyzePending();
       this.logger.log(
         `Pipeline stage analysis: ${JSON.stringify({ stage: 'analysis', ...analysis })}`,
       );
 
+      stage = 'relevance';
       const relevance = await this.relevanceService.evaluatePending();
       this.logger.log(
         `Pipeline stage relevance: ${JSON.stringify({ stage: 'relevance', ...relevance })}`,
       );
 
+      stage = 'notifications';
       const notifications = await this.notificationsService.notifyRelevant();
       this.logger.log(
         `Pipeline stage notifications: ${JSON.stringify({ stage: 'notifications', ...notifications })}`,
@@ -90,8 +96,17 @@ export class PipelineService {
       );
 
       return result;
+    } catch (error) {
+      this.logger.error(
+        `Pipeline failed at stage=${stage}: ${errorMessage(error)}`,
+      );
+      return null;
     } finally {
       this.running = false;
     }
   }
+}
+
+function errorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
 }

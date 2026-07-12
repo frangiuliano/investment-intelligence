@@ -24,7 +24,11 @@ export class PipelineScheduler implements OnModuleInit {
     const job = CronJob.from({
       cronTime: cronSchedule,
       onTick: () => {
-        void this.pipelineService.run();
+        void this.pipelineService.run().catch((error: unknown) => {
+          this.logger.error(
+            `Pipeline cron tick failed: ${error instanceof Error ? error.message : String(error)}`,
+          );
+        });
       },
     });
 

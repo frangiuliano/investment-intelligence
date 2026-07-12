@@ -273,33 +273,34 @@ servicio).
 
 ### Validación manual del MVP (smoke test)
 
-Con Postgres, env completo y migraciones aplicadas:
+Con Postgres, env completo y migraciones aplicadas. **No** corras
+`start:dev` (cron activo) y `pipeline:once` a la vez: son dos procesos y
+pueden duplicar notificaciones Telegram.
+
+**Opción A — one-shot** (recomendada para smoke): con la app detenida:
 
 ```bash
-# 1. Levantar la app (cron activo) o correr one-shot:
+npm run pipeline:once
+```
+
+Salida JSON con métricas por etapa y `finishedAt`. Revisá logs de las 4
+etapas (`collection` → `analysis` → `relevance` → `notifications`).
+
+**Opción B — cron en la app:**
+
+```bash
 npm run start:dev
-# en otra terminal:
-npm run pipeline:once
-
-# 2. Ver métricas agregadas
+# Esperá un tick del cron (COLLECTION_CRON_SCHEDULE) o consultá:
 curl http://localhost:3000/status
-
-# 3. Confirmar en logs las 4 etapas (collection → analysis → relevance → notifications)
-
-# 4. Artículo no relevante: queda en news_analysis sin fila en notifications
-# 5. Artículo relevante: fila en notifications + mensaje en Telegram
 ```
 
-Para depurar una etapa aislada siguen disponibles `analysis:once`,
-`telegram:test` y `telegram:notify-once`.
+En ambos casos:
 
-Invocación one-shot del pipeline completo:
+- Artículo no relevante: queda en `news_analysis` sin fila en `notifications`.
+- Artículo relevante: fila en `notifications` + mensaje en Telegram.
 
-```bash
-npm run pipeline:once
-```
-
-Salida JSON con métricas por etapa y `finishedAt`.
+Para depurar una etapa aislada (también sin cron activo en paralelo):
+`analysis:once`, `telegram:test`, `telegram:notify-once`.
 
 ## News Analysis (Gemini Flash)
 
