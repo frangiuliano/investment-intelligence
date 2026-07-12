@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { SENTIMENT_VALUES } from '../analysis/gemini.constants';
 import { NewsAnalysis } from '../analysis/entities/news-analysis.entity';
 import { Notification } from '../notifications/entities/notification.entity';
 import type { RelevanceInput, RelevanceResult } from './relevance.types';
@@ -26,8 +27,12 @@ export class RelevanceService {
       return { isRelevant: false, reason: 'already notified' };
     }
 
-    if (normalizeSentiment(input.sentiment) === 'neutral') {
+    const sentiment = normalizeSentiment(input.sentiment);
+    if (sentiment === 'neutral') {
       return { isRelevant: false, reason: 'neutral sentiment' };
+    }
+    if (!(SENTIMENT_VALUES as readonly string[]).includes(sentiment)) {
+      return { isRelevant: false, reason: 'invalid sentiment' };
     }
 
     const tickers = normalizeTickers(input.tickers);

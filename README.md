@@ -266,19 +266,42 @@ modelo y no loguees la API key ni el body completo de errores.
 
 ## Relevance (alert criteria)
 
-El módulo `relevance/` decide si un análisis merece alerta (Telegram lo
-consumirá en el Issue #4). `RelevanceService.evaluate()` devuelve
-`{ isRelevant, reason }` con estas reglas MVP:
+El módulo `relevance/` decide si un análisis merece alerta. Telegram lo
+consume vía `NotificationsService`. `RelevanceService.evaluate()`
+devuelve `{ isRelevant, reason }` con estas reglas MVP:
 
 1. Ya notificado → no relevante.
 2. Sentimiento `neutral` → no relevante.
-3. Sin tickers → no relevante.
-4. Sentimiento no neutral + ≥1 ticker → relevante.
-5. Si `WATCHLIST_TICKERS` está seteado, además hace falta al menos un
+3. Sentimiento fuera de `positive` / `negative` / `neutral` → no relevante.
+4. Sin tickers → no relevante.
+5. Sentimiento no neutral + ≥1 ticker → relevante.
+6. Si `WATCHLIST_TICKERS` está seteado, además hace falta al menos un
    ticker del análisis en esa lista.
 
 `evaluateArticle(articleId)` carga `news_analysis` y consulta si ya existe
 fila en `notifications` para ese artículo.
+
+## Notifications (Telegram)
+
+El módulo `notifications/` envía alertas al chat configurado con
+`TELEGRAM_BOT_TOKEN` y `TELEGRAM_CHAT_ID` (Bot API `sendMessage` vía
+`fetch`, sin SDK):
+
+1. Busca análisis sin fila en `notifications`.
+2. Evalúa relevancia con `RelevanceService`.
+3. Si es relevante, formatea el mensaje (título, resumen, sentimiento,
+   tickers, URL) y lo envía a Telegram.
+4. Tras envío exitoso, persiste en `notifications` (`channel: telegram`).
+5. No reenvía artículos ya notificados.
+
+Invocación local (one-shot, sin cron de pipeline):
+
+```bash
+npm run telegram:test          # mensaje de prueba (no persiste)
+npm run telegram:notify-once   # notifica relevantes pendientes
+```
+
+El cron end-to-end lo cableará el Issue #7. No loguees el bot token.
 
 ## Testing
 

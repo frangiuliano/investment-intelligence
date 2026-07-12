@@ -19,7 +19,7 @@ Mapa de módulos del backend NestJS y su relación con el backlog del MVP.
 | `news/` | Implementado | Recolección RSS (cron), dedupe y persistencia | #1 |
 | `analysis/` | Implementado | Análisis con Gemini Flash (cola + delay) | #3 |
 | `relevance/` | Implementado | Criterios de relevancia para alertas | #6 |
-| `notifications/` | Entidad lista | Alertas Telegram | #4 |
+| `notifications/` | Implementado | Alertas Telegram | #4 |
 | `pipeline/` | Stub | Cron end-to-end | #7 |
 
 ## Diagrama de dependencias (MVP)
