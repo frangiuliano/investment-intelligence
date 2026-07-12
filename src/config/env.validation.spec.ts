@@ -4,6 +4,7 @@ import {
   DEFAULT_GEMINI_MODEL,
   DEFAULT_GEMINI_REQUEST_DELAY_MS,
   envValidationSchema,
+  parseWatchlistTickers,
 } from './env.validation';
 
 const validEnv = {
@@ -111,5 +112,29 @@ describe('envValidationSchema', () => {
 
     expect(error).toBeDefined();
     expect(error?.message).toContain('GEMINI_ANALYSIS_BATCH_SIZE');
+  });
+
+  it('accepts optional WATCHLIST_TICKERS', () => {
+    const { error } = envValidationSchema.validate({
+      ...validEnv,
+      WATCHLIST_TICKERS: 'AAPL, MSFT',
+    });
+
+    expect(error).toBeUndefined();
+  });
+});
+
+describe('parseWatchlistTickers', () => {
+  it('returns empty list when unset or blank', () => {
+    expect(parseWatchlistTickers(undefined)).toEqual([]);
+    expect(parseWatchlistTickers('')).toEqual([]);
+    expect(parseWatchlistTickers('  ,  ')).toEqual([]);
+  });
+
+  it('normalizes, trims, and deduplicates tickers', () => {
+    expect(parseWatchlistTickers(' aapl , MSFT,AAPL ')).toEqual([
+      'AAPL',
+      'MSFT',
+    ]);
   });
 });

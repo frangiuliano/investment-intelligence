@@ -19,6 +19,26 @@ export function parseFeedUrls(raw: string | undefined): string[] {
     .filter((url) => url.length > 0);
 }
 
+export function parseWatchlistTickers(raw: string | undefined): string[] {
+  if (!raw) {
+    return [];
+  }
+
+  const seen = new Set<string>();
+  const tickers: string[] = [];
+
+  for (const part of raw.split(',')) {
+    const ticker = part.trim().toUpperCase();
+    if (!ticker || seen.has(ticker)) {
+      continue;
+    }
+    seen.add(ticker);
+    tickers.push(ticker);
+  }
+
+  return tickers;
+}
+
 const requiredSecret = (name: string) =>
   Joi.string()
     .trim()
@@ -78,4 +98,5 @@ export const envValidationSchema = Joi.object({
     .min(1)
     .max(50)
     .default(DEFAULT_GEMINI_ANALYSIS_BATCH_SIZE),
+  WATCHLIST_TICKERS: Joi.string().optional().allow(''),
 });
