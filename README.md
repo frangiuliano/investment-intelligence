@@ -149,7 +149,8 @@ npm run start:dev
 
 ORM: **TypeORM** (ver [docs/adr/001-orm-typeorm.md](./docs/adr/001-orm-typeorm.md)).
 
-Entidades en módulos de dominio (`news/`, `analysis/`, `notifications/`).
+Entidades en módulos de dominio (`news/`, `analysis/`, `notifications/`,
+`portfolio/`).
 Migraciones versionadas en `src/database/migrations/`.
 
 Con Postgres arriba y `DATABASE_URL` apuntando a `localhost` (fuera de Docker):
@@ -166,8 +167,8 @@ npm run migration:revert
 ```
 
 Tras un Postgres limpio, `migration:run` crea `news_articles`,
-`news_analysis` y `notifications` (unique en `url` / `content_hash`, FKs
-con `ON DELETE CASCADE`).
+`news_analysis`, `notifications` y `holdings` (unique en `url` / `content_hash`,
+FKs con `ON DELETE CASCADE`, soft-delete en holdings).
 
 ## Scripts npm
 
@@ -426,6 +427,47 @@ npm run telegram:notify-once   # notifica relevantes pendientes
 ```
 
 No loguees el bot token.
+
+## Holdings (portfolio)
+
+El módulo `portfolio/` persiste la cartera del operador (no es sync con
+broker ni recomendaciones de comprá/vendé). Una fila activa por
+`symbol` + `asset_type`; el borrado es soft-delete (`deleted_at`).
+
+| Campo | Notas |
+|-------|--------|
+| `symbol` | Ticker normalizado a mayúsculas |
+| `assetType` | `equity`, `cedear`, `bond`, `treasury`, `other` |
+| `quantity` | Decimal > 0 |
+| `currency` | ISO 3 letras (default `USD`) |
+| `avgEntryPrice` | Opcional |
+| `notes` | Tesis corta opcional |
+
+API REST (sin auth en v1; pensada para red interna / Docker):
+
+```bash
+# Listar
+curl -s http://localhost:3000/holdings | jq
+
+# Crear
+curl -s -X POST http://localhost:3000/holdings \
+  -H 'Content-Type: application/json' \
+  -d '{"symbol":"AAPL","assetType":"equity","quantity":10,"currency":"USD","notes":"core"}' | jq
+
+# Actualizar
+curl -s -X PATCH http://localhost:3000/holdings/<id> \
+  -H 'Content-Type: application/json' \
+  -d '{"quantity":12.5}' | jq
+
+# Soft-delete
+curl -s -o /dev/null -w "%{http_code}\n" -X DELETE http://localhost:3000/holdings/<id>
+```
+
+Tras cambiar el schema: `npm run migration:run`.
+
+Cartera (`holdings`) ≠ watchlist (`WATCHLIST_TICKERS` / Issue #28): la
+cartera son posiciones del operador; la watchlist serán tickers seguidos
+sin posición necesariamente.
 
 ## Testing
 
