@@ -22,6 +22,7 @@
     "migration:run": "npm run typeorm -- migration:run -d src/database/data-source.ts",
     "migration:revert": "npm run typeorm -- migration:revert -d src/database/data-source.ts",
     "migration:show": "npm run typeorm -- migration:show -d src/database/data-source.ts",
+    "news:collect-once": "ts-node -r tsconfig-paths/register scripts/run-news-collect-once.ts",
     "analysis:once": "ts-node -r tsconfig-paths/register scripts/run-analysis-once.ts",
     "telegram:test": "ts-node -r tsconfig-paths/register scripts/run-telegram-test.ts",
     "telegram:notify-once": "ts-node -r tsconfig-paths/register scripts/run-telegram-notify-once.ts",
