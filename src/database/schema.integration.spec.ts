@@ -7,9 +7,11 @@ import {
   Holding,
   HoldingAssetType,
 } from '../portfolio/holdings/entities/holding.entity';
+import { WatchlistEntry } from '../portfolio/watchlist/entities/watchlist-entry.entity';
 import { InitialSchema1752180000000 } from './migrations/1752180000000-InitialSchema';
 import { AddNewsAnalysisMateriality1752430000000 } from './migrations/1752430000000-AddNewsAnalysisMateriality';
 import { CreateHoldings1752500000000 } from './migrations/1752500000000-CreateHoldings';
+import { CreateWatchlistEntries1752510000000 } from './migrations/1752510000000-CreateWatchlistEntries';
 import {
   DEFAULT_TEST_DATABASE_URL,
   resolveTestDatabaseUrl,
@@ -23,6 +25,7 @@ describe('Database schema (integration)', () => {
   let analyses: Repository<NewsAnalysis>;
   let notifications: Repository<Notification>;
   let holdings: Repository<Holding>;
+  let watchlistEntries: Repository<WatchlistEntry>;
   let databaseUrl: string;
 
   beforeAll(async () => {
@@ -31,11 +34,18 @@ describe('Database schema (integration)', () => {
     dataSource = new DataSource({
       type: 'postgres',
       url: databaseUrl,
-      entities: [NewsArticle, NewsAnalysis, Notification, Holding],
+      entities: [
+        NewsArticle,
+        NewsAnalysis,
+        Notification,
+        Holding,
+        WatchlistEntry,
+      ],
       migrations: [
         InitialSchema1752180000000,
         AddNewsAnalysisMateriality1752430000000,
         CreateHoldings1752500000000,
+        CreateWatchlistEntries1752510000000,
       ],
       synchronize: false,
       logging: false,
@@ -60,6 +70,7 @@ describe('Database schema (integration)', () => {
     analyses = dataSource.getRepository(NewsAnalysis);
     notifications = dataSource.getRepository(Notification);
     holdings = dataSource.getRepository(Holding);
+    watchlistEntries = dataSource.getRepository(WatchlistEntry);
   }, 30_000);
 
   afterAll(async () => {
@@ -70,7 +81,7 @@ describe('Database schema (integration)', () => {
 
   beforeEach(async () => {
     await dataSource.query(
-      'TRUNCATE TABLE "notifications", "news_analysis", "news_articles", "holdings" RESTART IDENTITY CASCADE',
+      'TRUNCATE TABLE "notifications", "news_analysis", "news_articles", "holdings", "watchlist_entries" RESTART IDENTITY CASCADE',
     );
   });
 
@@ -83,7 +94,8 @@ describe('Database schema (integration)', () => {
           'news_articles',
           'news_analysis',
           'notifications',
-          'holdings'
+          'holdings',
+          'watchlist_entries'
         )
       ORDER BY table_name
     `);
@@ -93,6 +105,7 @@ describe('Database schema (integration)', () => {
       'news_analysis',
       'news_articles',
       'notifications',
+      'watchlist_entries',
     ]);
   });
 
@@ -237,5 +250,43 @@ describe('Database schema (integration)', () => {
       }),
     );
     expect(recreated.id).not.toBe(holding.id);
+  });
+
+  it('should persist watchlist entries and enforce active uniqueness plus soft-delete', async () => {
+    const entry = await watchlistEntries.save(
+      watchlistEntries.create({
+        symbol: 'AAPL',
+        notes: 'earnings season',
+      }),
+    );
+
+    expect(entry.id).toBeDefined();
+    expect(entry.symbol).toBe('AAPL');
+
+    await expect(
+      watchlistEntries.save(
+        watchlistEntries.create({
+          symbol: 'AAPL',
+          notes: null,
+        }),
+      ),
+    ).rejects.toBeInstanceOf(QueryFailedError);
+
+    await watchlistEntries.softRemove(entry);
+
+    const afterSoftDelete = await watchlistEntries.findOne({
+      where: { id: entry.id },
+      withDeleted: true,
+    });
+    expect(afterSoftDelete?.deletedAt).not.toBeNull();
+    expect(await watchlistEntries.findOneBy({ id: entry.id })).toBeNull();
+
+    const recreated = await watchlistEntries.save(
+      watchlistEntries.create({
+        symbol: 'AAPL',
+        notes: null,
+      }),
+    );
+    expect(recreated.id).not.toBe(entry.id);
   });
 });
