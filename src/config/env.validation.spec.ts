@@ -1,4 +1,5 @@
 import {
+  DEFAULT_APP_LOCALE,
   DEFAULT_COLLECTION_CRON_SCHEDULE,
   DEFAULT_GEMINI_ANALYSIS_BATCH_SIZE,
   DEFAULT_GEMINI_MODEL,
@@ -18,6 +19,7 @@ const validEnv = {
 
 type ValidatedEnv = {
   PORT: number;
+  APP_LOCALE: string;
   COLLECTION_CRON_SCHEDULE: string;
   GEMINI_REQUEST_DELAY_MS: number;
   GEMINI_MODEL: string;
@@ -31,6 +33,7 @@ describe('envValidationSchema', () => {
 
     expect(result.error).toBeUndefined();
     expect(value.PORT).toBe(3000);
+    expect(value.APP_LOCALE).toBe(DEFAULT_APP_LOCALE);
     expect(value.COLLECTION_CRON_SCHEDULE).toBe(
       DEFAULT_COLLECTION_CRON_SCHEDULE,
     );
@@ -39,6 +42,31 @@ describe('envValidationSchema', () => {
     expect(value.GEMINI_ANALYSIS_BATCH_SIZE).toBe(
       DEFAULT_GEMINI_ANALYSIS_BATCH_SIZE,
     );
+  });
+
+  it('accepts APP_LOCALE=en and APP_LOCALE=es', () => {
+    for (const locale of ['en', 'es', 'EN', ' Es ']) {
+      const result = envValidationSchema.validate({
+        ...validEnv,
+        APP_LOCALE: locale,
+      });
+      const value = result.value as ValidatedEnv;
+
+      expect(result.error).toBeUndefined();
+      expect(value.APP_LOCALE).toBe(locale.trim().toLowerCase());
+    }
+  });
+
+  it('rejects an unsupported APP_LOCALE with an explicit message', () => {
+    const { error } = envValidationSchema.validate({
+      ...validEnv,
+      APP_LOCALE: 'fr',
+    });
+
+    expect(error).toBeDefined();
+    expect(error?.message).toContain('APP_LOCALE');
+    expect(error?.message).toContain('en');
+    expect(error?.message).toContain('es');
   });
 
   it('does not require GEMINI_API_KEY_REVIEWER at boot', () => {

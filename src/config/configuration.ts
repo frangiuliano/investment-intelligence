@@ -1,4 +1,7 @@
 import {
+  ALLOWED_APP_LOCALES,
+  AppLocale,
+  DEFAULT_APP_LOCALE,
   DEFAULT_COLLECTION_CRON_SCHEDULE,
   DEFAULT_GEMINI_ANALYSIS_BATCH_SIZE,
   DEFAULT_GEMINI_MODEL,
@@ -7,9 +10,23 @@ import {
   parseWatchlistTickers,
 } from './env.validation';
 
+function resolveAppLocale(raw: string | undefined): AppLocale {
+  const normalized = raw?.trim().toLowerCase();
+  if (!normalized) {
+    return DEFAULT_APP_LOCALE;
+  }
+
+  if ((ALLOWED_APP_LOCALES as readonly string[]).includes(normalized)) {
+    return normalized as AppLocale;
+  }
+
+  return DEFAULT_APP_LOCALE;
+}
+
 export type AppConfig = {
   port: number;
   databaseUrl: string;
+  locale: AppLocale;
   gemini: {
     apiKeyFinance: string;
     model: string;
@@ -34,6 +51,7 @@ export type AppConfig = {
 export default (): AppConfig => ({
   port: parseInt(process.env.PORT ?? '3000', 10),
   databaseUrl: process.env.DATABASE_URL as string,
+  locale: resolveAppLocale(process.env.APP_LOCALE),
   gemini: {
     apiKeyFinance: (process.env.GEMINI_API_KEY_FINANCE ?? '').trim(),
     model: process.env.GEMINI_MODEL?.trim() || DEFAULT_GEMINI_MODEL,
