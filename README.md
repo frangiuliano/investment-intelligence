@@ -253,7 +253,7 @@ reviews del mismo head.
 
 El módulo `news/` lee los feeds de `RSS_FEED_URLS`. La recolección corre como
 **primera etapa del pipeline** (cron `COLLECTION_CRON_SCHEDULE`, default cada
-15 minutos) o manualmente con `npm run pipeline:once`:
+15 minutos), con el one-shot de colección, o como parte de `pipeline:once`:
 
 1. Fetch propio con `redirect: 'manual'`, revalidación de cada hop,
    timeout con `AbortSignal` (15s) y tope de body (2 MB); parse con
@@ -266,6 +266,28 @@ El módulo `news/` lee los feeds de `RSS_FEED_URLS`. La recolección corre como
 Solo se aceptan URLs `http`/`https` públicas (no `file://`, localhost,
 metadata cloud ni IPs privadas / IPv6 ULA). Si falta `link`, se usa `guid`
 cuando es una URL válida.
+
+### Recolección one-shot
+
+Para demos, debug o validar feeds **sin** esperar al cron y **sin** correr
+análisis/Telegram:
+
+```bash
+# Preferible con la app detenida (evita overlap con el cron del pipeline)
+npm run news:collect-once
+```
+
+Reutiliza `NewsCollectorService.collect()` (misma dedupe e inserts que el
+cron). Imprime JSON con
+`feedsProcessed / itemsSeen / inserted / duplicates / skipped / errors` y
+termina el proceso. Si ya hay una recolección en curso en ese proceso, hace
+skip + warn (mismo guard que el collector). No agrega endpoint HTTP.
+
+| Cuándo | Usar |
+|--------|------|
+| Solo traer artículos RSS | `news:collect-once` |
+| Flujo completo MVP | `pipeline:once` o cron (`COLLECTION_CRON_SCHEDULE`) |
+| Solo análisis / Telegram | `analysis:once`, `telegram:test`, `telegram:notify-once` |
 
 ## Pipeline end-to-end (MVP)
 
@@ -310,7 +332,7 @@ En ambos casos:
 - Artículo relevante: fila en `notifications` + mensaje en Telegram.
 
 Para depurar una etapa aislada (también sin cron activo en paralelo):
-`analysis:once`, `telegram:test`, `telegram:notify-once`.
+`news:collect-once`, `analysis:once`, `telegram:test`, `telegram:notify-once`.
 
 ## News Analysis (Gemini Flash)
 
