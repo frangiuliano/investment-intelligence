@@ -3,11 +3,13 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { NewsAnalysis } from '../analysis/entities/news-analysis.entity';
 import { Notification } from '../notifications/entities/notification.entity';
+import { WatchlistService } from '../portfolio/watchlist/watchlist.service';
 import { RelevanceService } from './relevance.service';
 
 describe('RelevanceService', () => {
   let service: RelevanceService;
   let configGet: jest.Mock;
+  let listActiveSymbols: jest.Mock;
   let analysisFindOne: jest.Mock;
   let notificationsExists: jest.Mock;
   let createQueryBuilder: jest.Mock;
@@ -15,6 +17,7 @@ describe('RelevanceService', () => {
 
   beforeEach(async () => {
     configGet = jest.fn().mockReturnValue([]);
+    listActiveSymbols = jest.fn().mockResolvedValue([]);
     analysisFindOne = jest.fn();
     notificationsExists = jest.fn();
     getMany = jest.fn();
@@ -32,6 +35,10 @@ describe('RelevanceService', () => {
         {
           provide: ConfigService,
           useValue: { get: configGet },
+        },
+        {
+          provide: WatchlistService,
+          useValue: { listActiveSymbols },
         },
         {
           provide: getRepositoryToken(NewsAnalysis),
@@ -191,6 +198,55 @@ describe('RelevanceService', () => {
         reason: 'non-neutral sentiment with tickers and materiality',
       });
     });
+
+    it('should prefer explicit watchlistTickers over config', () => {
+      configGet.mockReturnValue(['MSFT']);
+
+      const noMatch = service.evaluate({
+        sentiment: 'positive',
+        tickers: ['AAPL'],
+        materiality: 'high',
+        alreadyNotified: false,
+        watchlistTickers: ['GOOG'],
+      });
+      expect(noMatch).toEqual({
+        isRelevant: false,
+        reason: 'no watchlist tickers',
+      });
+
+      const match = service.evaluate({
+        sentiment: 'positive',
+        tickers: ['AAPL'],
+        materiality: 'high',
+        alreadyNotified: false,
+        watchlistTickers: ['AAPL'],
+      });
+      expect(match.isRelevant).toBe(true);
+    });
+  });
+
+  describe('resolveWatchlistTickers', () => {
+    it('should prefer persisted watchlist when non-empty', async () => {
+      listActiveSymbols.mockResolvedValue(['AAPL', 'TSLA']);
+      configGet.mockReturnValue(['MSFT']);
+
+      await expect(service.resolveWatchlistTickers()).resolves.toEqual([
+        'AAPL',
+        'TSLA',
+      ]);
+      expect(configGet).not.toHaveBeenCalled();
+    });
+
+    it('should fall back to env watchlist when persisted is empty', async () => {
+      listActiveSymbols.mockResolvedValue([]);
+      configGet.mockReturnValue(['MSFT', 'GOOG']);
+
+      await expect(service.resolveWatchlistTickers()).resolves.toEqual([
+        'MSFT',
+        'GOOG',
+      ]);
+      expect(configGet).toHaveBeenCalledWith('watchlist.tickers');
+    });
   });
 
   describe('evaluateArticle', () => {
@@ -201,7 +257,7 @@ describe('RelevanceService', () => {
       expect(notificationsExists).not.toHaveBeenCalled();
     });
 
-    it('should load analysis and notification state then evaluate', async () => {
+    it('should load analysis and notification state then evaluate with persisted watchlist', async () => {
       analysisFindOne.mockResolvedValue({
         articleId: 'article-1',
         sentiment: 'positive',
@@ -209,6 +265,7 @@ describe('RelevanceService', () => {
         materiality: 'medium',
       });
       notificationsExists.mockResolvedValue(false);
+      listActiveSymbols.mockResolvedValue(['AAPL']);
 
       await expect(service.evaluateArticle('article-1')).resolves.toEqual({
         isRelevant: true,
@@ -220,6 +277,22 @@ describe('RelevanceService', () => {
       });
       expect(notificationsExists).toHaveBeenCalledWith({
         where: { articleId: 'article-1' },
+      });
+    });
+
+    it('should return false when persisted watchlist does not match tickers', async () => {
+      analysisFindOne.mockResolvedValue({
+        articleId: 'article-1',
+        sentiment: 'positive',
+        tickers: ['MSFT'],
+        materiality: 'high',
+      });
+      notificationsExists.mockResolvedValue(false);
+      listActiveSymbols.mockResolvedValue(['AAPL']);
+
+      await expect(service.evaluateArticle('article-1')).resolves.toEqual({
+        isRelevant: false,
+        reason: 'no watchlist tickers',
       });
     });
   });

@@ -2,10 +2,14 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { NewsAnalysis } from '../analysis/entities/news-analysis.entity';
 import { Notification } from '../notifications/entities/notification.entity';
+import { PortfolioModule } from '../portfolio/portfolio.module';
 import { RelevanceService } from './relevance.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([NewsAnalysis, Notification])],
+  imports: [
+    TypeOrmModule.forFeature([NewsAnalysis, Notification]),
+    PortfolioModule,
+  ],
   providers: [RelevanceService],
   exports: [RelevanceService],
 })
