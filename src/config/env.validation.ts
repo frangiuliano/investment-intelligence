@@ -7,6 +7,10 @@ export const DEFAULT_GEMINI_REQUEST_DELAY_MS = 12_000;
 export const DEFAULT_GEMINI_MODEL = 'gemini-3.1-flash-lite';
 /** Cap articles processed per analyzePending() run on free tier. */
 export const DEFAULT_GEMINI_ANALYSIS_BATCH_SIZE = 5;
+/** Output language for analysis summaries and alerts (one locale per deploy). */
+export const DEFAULT_APP_LOCALE = 'en' as const;
+export const ALLOWED_APP_LOCALES = ['en', 'es'] as const;
+export type AppLocale = (typeof ALLOWED_APP_LOCALES)[number];
 
 export function parseFeedUrls(raw: string | undefined): string[] {
   if (!raw) {
@@ -99,4 +103,12 @@ export const envValidationSchema = Joi.object({
     .max(50)
     .default(DEFAULT_GEMINI_ANALYSIS_BATCH_SIZE),
   WATCHLIST_TICKERS: Joi.string().optional().allow(''),
+  APP_LOCALE: Joi.string()
+    .trim()
+    .lowercase()
+    .valid(...ALLOWED_APP_LOCALES)
+    .default(DEFAULT_APP_LOCALE)
+    .messages({
+      'any.only': `APP_LOCALE must be one of: ${ALLOWED_APP_LOCALES.join(', ')}`,
+    }),
 });
