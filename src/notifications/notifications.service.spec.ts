@@ -1,6 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { ConfigService } from '@nestjs/config';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { NewsAnalysis } from '../analysis/entities/news-analysis.entity';
+import { AppLocale } from '../config/env.validation';
 import { RelevanceService } from '../relevance/relevance.service';
 import { Notification } from './entities/notification.entity';
 import { NotificationsService } from './notifications.service';
@@ -17,6 +19,7 @@ describe('NotificationsService', () => {
   let create: jest.Mock;
   let save: jest.Mock;
   let getMany: jest.Mock;
+  let locale: AppLocale;
 
   const article = {
     id: 'article-1',
@@ -33,6 +36,7 @@ describe('NotificationsService', () => {
   };
 
   beforeEach(async () => {
+    locale = 'en';
     sendMessage = jest.fn().mockResolvedValue(undefined);
     evaluate = jest.fn().mockReturnValue({
       isRelevant: true,
@@ -54,6 +58,17 @@ describe('NotificationsService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         NotificationsService,
+        {
+          provide: ConfigService,
+          useValue: {
+            getOrThrow: (key: string) => {
+              if (key === 'locale') {
+                return locale;
+              }
+              throw new Error(`Unexpected config key: ${key}`);
+            },
+          },
+        },
         {
           provide: TelegramClient,
           useValue: { sendMessage },
@@ -104,6 +119,18 @@ describe('NotificationsService', () => {
           url: 'https://news.example.com/oil',
         },
       });
+    });
+
+    it('should localize alert labels when APP_LOCALE is es', async () => {
+      locale = 'es';
+
+      await service.notifyRelevant();
+
+      const [[message]] = sendMessage.mock.calls as [[string]];
+      expect(message).toContain('Título: Oil slides');
+      expect(message).toContain('Resumen: Crude fell on inventory data.');
+      expect(message).toContain('Sentimiento: negative');
+      expect(message).not.toContain('Title:');
     });
 
     it('should skip non-relevant articles without sending', async () => {
@@ -201,6 +228,17 @@ describe('NotificationsService', () => {
 
       expect(sendMessage).toHaveBeenCalledWith(
         expect.stringContaining('test notification'),
+      );
+      expect(save).not.toHaveBeenCalled();
+    });
+
+    it('should send a Spanish test message when APP_LOCALE is es', async () => {
+      locale = 'es';
+
+      await service.sendTestMessage();
+
+      expect(sendMessage).toHaveBeenCalledWith(
+        expect.stringContaining('notificación de prueba'),
       );
       expect(save).not.toHaveBeenCalled();
     });

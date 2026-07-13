@@ -66,9 +66,10 @@ falta una variable obligatoria de runtime (mensaje explícito vía Joi).
 `APP_LOCALE` define el idioma de salida de la app (un locale por deploy).
 Valores permitidos: `en`, `es` (default `en`). Si el valor no está permitido,
 la app **no arranca**. El análisis Gemini genera y persiste `summary` en ese
-idioma. Los labels de alertas Telegram se localizan en un issue siguiente.
-No traduce títulos RSS ni contenido original de feeds. Sentimiento y tickers
-siguen siendo códigos independientes del idioma.
+idioma. Las alertas Telegram usan labels en el mismo locale y reutilizan el
+`summary` ya persistido (sin traducir otra vez al enviar). No traduce títulos
+RSS ni contenido original de feeds. Sentimiento y tickers siguen siendo
+códigos independientes del idioma.
 
 **Importante:** creá **dos proyectos** en Google AI Studio / Google Cloud, cada
 uno con su API key. No reutilices la misma key entre Finance y Reviewer: el
@@ -368,14 +369,19 @@ El módulo `notifications/` envía alertas al chat configurado con
 1. Busca análisis sin fila en `notifications`.
 2. Evalúa relevancia con `RelevanceService`.
 3. Si es relevante, formatea el mensaje (título, resumen, sentimiento,
-   tickers, URL) y lo envía a Telegram.
+   tickers, URL) según `APP_LOCALE` y lo envía a Telegram. El cuerpo del
+   resumen es el de `news_analysis` (ya en locale); no hay traducción extra.
 4. Tras envío exitoso, persiste en `notifications` (`channel: telegram`).
 5. No reenvía artículos ya notificados.
+
+Labels del mensaje (`en` / `es`): Title/Título, Summary/Resumen,
+Sentiment/Sentimiento, Tickers, URL. El título y la URL del artículo RSS
+pueden quedar en el idioma de la fuente.
 
 Invocación local (one-shot, sin esperar al cron del pipeline):
 
 ```bash
-npm run telegram:test          # mensaje de prueba (no persiste)
+npm run telegram:test          # mensaje de prueba (respeta APP_LOCALE; no persiste)
 npm run telegram:notify-once   # notifica relevantes pendientes
 ```
 
