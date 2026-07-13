@@ -1,7 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { NewsAnalysis } from '../analysis/entities/news-analysis.entity';
+import { AppLocale } from '../config/env.validation';
 import { RelevanceService } from '../relevance/relevance.service';
 import { Notification } from './entities/notification.entity';
 import {
@@ -26,6 +28,7 @@ export class NotificationsService {
   private running = false;
 
   constructor(
+    private readonly configService: ConfigService,
     private readonly telegramClient: TelegramClient,
     private readonly relevanceService: RelevanceService,
     @InjectRepository(NewsAnalysis)
@@ -83,7 +86,8 @@ export class NotificationsService {
   }
 
   async sendTestMessage(): Promise<void> {
-    await this.telegramClient.sendMessage(formatTelegramTestMessage());
+    const locale = this.configService.getOrThrow<AppLocale>('locale');
+    await this.telegramClient.sendMessage(formatTelegramTestMessage(locale));
     this.logger.log('Telegram test message sent');
   }
 
@@ -122,14 +126,17 @@ export class NotificationsService {
       return 'skipped';
     }
 
-    const message = formatTelegramAlert({
-      title: article.title,
-      summary: analysis.summary,
-      sentiment: analysis.sentiment,
-      tickers: analysis.tickers ?? [],
-      url: article.url,
-    });
-
+    const locale = this.configService.getOrThrow<AppLocale>('locale');
+    const message = formatTelegramAlert(
+      {
+        title: article.title,
+        summary: analysis.summary,
+        sentiment: analysis.sentiment,
+        tickers: analysis.tickers ?? [],
+        url: article.url,
+      },
+      locale,
+    );
     try {
       await this.telegramClient.sendMessage(message);
     } catch (error) {
