@@ -126,6 +126,7 @@ export class NewsAnalysisService {
           summary: analysis.summary,
           sentiment: analysis.sentiment,
           tickers: analysis.tickers,
+          materiality: analysis.materiality,
           model,
         }),
       );

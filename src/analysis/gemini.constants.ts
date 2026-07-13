@@ -13,3 +13,9 @@ export const GEMINI_MAX_RETRY_AFTER_MS = 60_000;
 
 export const SENTIMENT_VALUES = ['positive', 'negative', 'neutral'] as const;
 export type Sentiment = (typeof SENTIMENT_VALUES)[number];
+
+export const MATERIALITY_VALUES = ['low', 'medium', 'high'] as const;
+export type Materiality = (typeof MATERIALITY_VALUES)[number];
+
+/** Materiality levels that can trigger a push alert (with other relevance rules). */
+export const ALERTABLE_MATERIALITY_VALUES = ['medium', 'high'] as const;

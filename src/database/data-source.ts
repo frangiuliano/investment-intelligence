@@ -5,6 +5,7 @@ import { NewsAnalysis } from '../analysis/entities/news-analysis.entity';
 import { NewsArticle } from '../news/entities/news-article.entity';
 import { Notification } from '../notifications/entities/notification.entity';
 import { InitialSchema1752180000000 } from './migrations/1752180000000-InitialSchema';
+import { AddNewsAnalysisMateriality1752430000000 } from './migrations/1752430000000-AddNewsAnalysisMateriality';
 
 loadEnv();
 
@@ -20,7 +21,10 @@ export default new DataSource({
   type: 'postgres',
   url: databaseUrl,
   entities: [NewsArticle, NewsAnalysis, Notification],
-  migrations: [InitialSchema1752180000000],
+  migrations: [
+    InitialSchema1752180000000,
+    AddNewsAnalysisMateriality1752430000000,
+  ],
   synchronize: false,
   logging: false,
 });

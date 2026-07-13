@@ -62,6 +62,7 @@ describe('GeminiClient', () => {
                       summary: 'Oil prices fell.',
                       sentiment: 'negative',
                       tickers: ['XOM'],
+                      materiality: 'medium',
                     }),
                   },
                 ],
@@ -82,6 +83,7 @@ describe('GeminiClient', () => {
       summary: 'Oil prices fell.',
       sentiment: 'negative',
       tickers: ['XOM'],
+      materiality: 'medium',
     });
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
@@ -116,6 +118,7 @@ describe('GeminiClient', () => {
                       summary: 'El petróleo bajó.',
                       sentiment: 'negative',
                       tickers: ['XOM'],
+                      materiality: 'high',
                     }),
                   },
                 ],

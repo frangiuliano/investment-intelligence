@@ -25,6 +25,7 @@ describe('gemini-response', () => {
           summary: 'Apple rose after earnings.',
           sentiment: 'positive',
           tickers: ['aapl', 'MSFT', 'aapl', 'bad ticker!'],
+          materiality: 'high',
         }),
       );
 
@@ -32,16 +33,18 @@ describe('gemini-response', () => {
         summary: 'Apple rose after earnings.',
         sentiment: 'positive',
         tickers: ['AAPL', 'MSFT'],
+        materiality: 'high',
       });
     });
 
     it('should parse JSON wrapped in markdown fences', () => {
       const result = parseGeminiAnalysisText(`\`\`\`json
-{"summary":"Mixed signals","sentiment":"neutral","tickers":[]}
+{"summary":"Mixed signals","sentiment":"neutral","tickers":[],"materiality":"low"}
 \`\`\``);
 
       expect(result.sentiment).toBe('neutral');
       expect(result.tickers).toEqual([]);
+      expect(result.materiality).toBe('low');
     });
 
     it('should reject invalid sentiment values', () => {
@@ -51,9 +54,35 @@ describe('gemini-response', () => {
             summary: 'x',
             sentiment: 'bullish',
             tickers: [],
+            materiality: 'medium',
           }),
         ),
       ).toThrow(/invalid sentiment/i);
+    });
+
+    it('should reject invalid materiality values', () => {
+      expect(() =>
+        parseGeminiAnalysisText(
+          JSON.stringify({
+            summary: 'x',
+            sentiment: 'positive',
+            tickers: ['AAPL'],
+            materiality: 'critical',
+          }),
+        ),
+      ).toThrow(/invalid materiality/i);
+    });
+
+    it('should reject missing materiality', () => {
+      expect(() =>
+        parseGeminiAnalysisText(
+          JSON.stringify({
+            summary: 'x',
+            sentiment: 'positive',
+            tickers: ['AAPL'],
+          }),
+        ),
+      ).toThrow(/missing materiality/i);
     });
   });
 
@@ -67,6 +96,7 @@ describe('gemini-response', () => {
         'sentiment: one of "positive", "negative", "neutral"',
       );
       expect(prompt).toContain('tickers: array of stock ticker symbols');
+      expect(prompt).toContain('materiality: one of "low", "medium", "high"');
     });
 
     it('should instruct a Spanish summary when locale is es', () => {
@@ -78,6 +108,7 @@ describe('gemini-response', () => {
         'sentiment: one of "positive", "negative", "neutral"',
       );
       expect(prompt).toContain('tickers: array of stock ticker symbols');
+      expect(prompt).toContain('materiality: one of "low", "medium", "high"');
       expect(prompt).not.toContain('concise English summary');
     });
   });
