@@ -23,4 +23,6 @@ Interpretá el texto después de `/dev` (o `$ARGUMENTS` / `$1` si está disponib
 - Un issue a la vez; marcá `status:in-progress`.
 - Pre-push: verify:lockfile → lint → test → build.
 - Abrí el PR con el template del repo de producto.
+- Al cerrar en el chat: qué se hizo, URL/número del PR **y** pasos concretos
+  de **cómo probarlo en local** (obligatorio; ver prompt del Developer).
 - No invoques Reviewer, PO ni otros agentes salvo que el estándar lo pida.
