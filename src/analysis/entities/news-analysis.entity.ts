@@ -31,6 +31,9 @@ export class NewsAnalysis {
   @Column({ type: 'jsonb', default: () => "'[]'::jsonb" })
   tickers!: string[];
 
+  @Column({ type: 'varchar', length: 32 })
+  materiality!: string;
+
   @Column({ type: 'varchar', length: 128 })
   model!: string;
 

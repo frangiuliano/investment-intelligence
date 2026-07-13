@@ -341,10 +341,11 @@ El módulo `analysis/` toma artículos de `news_articles` **sin** fila en
 
 1. Prompt estructurado a Gemini Flash (`GEMINI_MODEL`, default
    `gemini-3.1-flash-lite`) pidiendo JSON:
-   `summary`, `sentiment` (`positive` | `negative` | `neutral`), `tickers`.
+   `summary`, `sentiment` (`positive` | `negative` | `neutral`), `tickers`,
+   `materiality` (`low` | `medium` | `high`).
    El `summary` se pide y se guarda en el idioma de `APP_LOCALE` (`en` /
-   `es`); `sentiment` y `tickers` no se localizan. Cambiar el locale no
-   re-analiza filas históricas.
+   `es`); `sentiment`, `tickers` y `materiality` no se localizan. Cambiar
+   el locale no re-analiza filas históricas.
 2. Usa `GEMINI_API_KEY_FINANCE` (nunca la key del Reviewer).
 3. Procesa como máximo `GEMINI_ANALYSIS_BATCH_SIZE` artículos por corrida y
    espera `GEMINI_REQUEST_DELAY_MS` (default 12000) entre requests.
@@ -369,15 +370,32 @@ completo de errores.
 
 El módulo `relevance/` decide si un análisis merece alerta. Telegram lo
 consume vía `NotificationsService`. `RelevanceService.evaluate()`
-devuelve `{ isRelevant, reason }` con estas reglas MVP:
+devuelve `{ isRelevant, reason }` con estas reglas:
 
 1. Ya notificado → no relevante.
 2. Sentimiento `neutral` → no relevante.
 3. Sentimiento fuera de `positive` / `negative` / `neutral` → no relevante.
 4. Sin tickers → no relevante.
-5. Sentimiento no neutral + ≥1 ticker → relevante.
-6. Si `WATCHLIST_TICKERS` está seteado, además hace falta al menos un
+5. Materialidad `low` (o inválida / ausente) → no relevante.
+6. Materialidad `medium` o `high`, sentimiento no neutral y ≥1 ticker →
+   relevante.
+7. Si `WATCHLIST_TICKERS` está seteado, además hace falta al menos un
    ticker del análisis en esa lista.
+
+`materiality` viene del análisis Gemini (`low` / `medium` / `high`) y se
+persiste en `news_analysis`. Es una señal no verificada del modelo: sirve
+para filtrar ruido, no para afirmar impacto de mercado. Filas previas a
+esta columna se migran con default `low` (no generan push hasta re-análisis).
+
+Ejemplos:
+
+| Caso | ¿Alerta push? |
+|------|----------------|
+| `negative` + tickers + `high` | Sí (sujeto a watchlist) |
+| `positive` + tickers + `medium` | Sí (sujeto a watchlist) |
+| `negative` + tickers + `low` | No |
+| `positive` + sin tickers + `high` | No |
+| `neutral` + tickers + `high` | No |
 
 `evaluateArticle(articleId)` carga `news_analysis` y consulta si ya existe
 fila en `notifications` para ese artículo.

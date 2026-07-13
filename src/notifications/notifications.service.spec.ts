@@ -32,6 +32,7 @@ describe('NotificationsService', () => {
     sentiment: 'negative',
     summary: 'Crude fell on inventory data.',
     tickers: ['XOM'],
+    materiality: 'high',
     article,
   };
 
@@ -40,7 +41,7 @@ describe('NotificationsService', () => {
     sendMessage = jest.fn().mockResolvedValue(undefined);
     evaluate = jest.fn().mockReturnValue({
       isRelevant: true,
-      reason: 'non-neutral sentiment with tickers',
+      reason: 'non-neutral sentiment with tickers and materiality',
     });
     getMany = jest.fn().mockResolvedValue([analysis]);
     createQueryBuilder = jest.fn().mockReturnValue({

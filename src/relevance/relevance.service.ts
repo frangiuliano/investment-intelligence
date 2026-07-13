@@ -2,7 +2,11 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { SENTIMENT_VALUES } from '../analysis/gemini.constants';
+import {
+  ALERTABLE_MATERIALITY_VALUES,
+  MATERIALITY_VALUES,
+  SENTIMENT_VALUES,
+} from '../analysis/gemini.constants';
 import { NewsAnalysis } from '../analysis/entities/news-analysis.entity';
 import { Notification } from '../notifications/entities/notification.entity';
 import type { RelevanceInput, RelevanceResult } from './relevance.types';
@@ -46,6 +50,16 @@ export class RelevanceService {
       return { isRelevant: false, reason: 'no tickers' };
     }
 
+    const materiality = normalizeMateriality(input.materiality);
+    if (!(MATERIALITY_VALUES as readonly string[]).includes(materiality)) {
+      return { isRelevant: false, reason: 'invalid materiality' };
+    }
+    if (
+      !(ALERTABLE_MATERIALITY_VALUES as readonly string[]).includes(materiality)
+    ) {
+      return { isRelevant: false, reason: 'low materiality' };
+    }
+
     if (watchlist.length > 0) {
       const matched = tickers.filter((ticker) => watchlist.includes(ticker));
       if (matched.length === 0) {
@@ -55,7 +69,7 @@ export class RelevanceService {
 
     return {
       isRelevant: true,
-      reason: 'non-neutral sentiment with tickers',
+      reason: 'non-neutral sentiment with tickers and materiality',
     };
   }
 
@@ -75,6 +89,7 @@ export class RelevanceService {
       const evaluation = this.evaluate({
         sentiment: analysis.sentiment,
         tickers: analysis.tickers ?? [],
+        materiality: analysis.materiality,
         alreadyNotified,
       });
 
@@ -109,6 +124,7 @@ export class RelevanceService {
     return this.evaluate({
       sentiment: analysis.sentiment,
       tickers: analysis.tickers ?? [],
+      materiality: analysis.materiality,
       alreadyNotified,
     });
   }
@@ -126,6 +142,10 @@ export class RelevanceService {
 
 function normalizeSentiment(sentiment: string): string {
   return sentiment.trim().toLowerCase();
+}
+
+function normalizeMateriality(materiality: string): string {
+  return materiality.trim().toLowerCase();
 }
 
 function normalizeTickers(tickers: string[]): string[] {

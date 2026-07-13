@@ -48,10 +48,25 @@ describe('RelevanceService', () => {
   });
 
   describe('evaluate', () => {
+    it('should return false when already notified', () => {
+      const result = service.evaluate({
+        sentiment: 'positive',
+        tickers: ['AAPL'],
+        materiality: 'high',
+        alreadyNotified: true,
+      });
+
+      expect(result).toEqual({
+        isRelevant: false,
+        reason: 'already notified',
+      });
+    });
+
     it('should return false when sentiment is neutral', () => {
       const result = service.evaluate({
         sentiment: 'neutral',
         tickers: ['AAPL'],
+        materiality: 'high',
         alreadyNotified: false,
       });
 
@@ -65,6 +80,7 @@ describe('RelevanceService', () => {
       const result = service.evaluate({
         sentiment: 'positive',
         tickers: [],
+        materiality: 'high',
         alreadyNotified: false,
       });
 
@@ -78,6 +94,7 @@ describe('RelevanceService', () => {
       const result = service.evaluate({
         sentiment: 'bullish',
         tickers: ['AAPL'],
+        materiality: 'high',
         alreadyNotified: false,
       });
 
@@ -87,29 +104,59 @@ describe('RelevanceService', () => {
       });
     });
 
-    it('should return true when sentiment is non-neutral and has tickers', () => {
+    it('should return false when materiality is low', () => {
+      const result = service.evaluate({
+        sentiment: 'negative',
+        tickers: ['AAPL'],
+        materiality: 'low',
+        alreadyNotified: false,
+      });
+
+      expect(result).toEqual({
+        isRelevant: false,
+        reason: 'low materiality',
+      });
+    });
+
+    it('should return false when materiality is invalid', () => {
+      const result = service.evaluate({
+        sentiment: 'positive',
+        tickers: ['AAPL'],
+        materiality: 'critical',
+        alreadyNotified: false,
+      });
+
+      expect(result).toEqual({
+        isRelevant: false,
+        reason: 'invalid materiality',
+      });
+    });
+
+    it('should return true when sentiment is non-neutral with tickers and high materiality', () => {
       const result = service.evaluate({
         sentiment: 'negative',
         tickers: ['MSFT'],
+        materiality: 'high',
         alreadyNotified: false,
       });
 
       expect(result).toEqual({
         isRelevant: true,
-        reason: 'non-neutral sentiment with tickers',
+        reason: 'non-neutral sentiment with tickers and materiality',
       });
     });
 
-    it('should return false when already notified', () => {
+    it('should return true when materiality is medium with tickers', () => {
       const result = service.evaluate({
         sentiment: 'positive',
         tickers: ['AAPL'],
-        alreadyNotified: true,
+        materiality: 'medium',
+        alreadyNotified: false,
       });
 
       expect(result).toEqual({
-        isRelevant: false,
-        reason: 'already notified',
+        isRelevant: true,
+        reason: 'non-neutral sentiment with tickers and materiality',
       });
     });
 
@@ -119,6 +166,7 @@ describe('RelevanceService', () => {
       const result = service.evaluate({
         sentiment: 'positive',
         tickers: ['MSFT'],
+        materiality: 'high',
         alreadyNotified: false,
       });
 
@@ -134,12 +182,13 @@ describe('RelevanceService', () => {
       const result = service.evaluate({
         sentiment: 'positive',
         tickers: ['msft', 'aapl'],
+        materiality: 'HIGH',
         alreadyNotified: false,
       });
 
       expect(result).toEqual({
         isRelevant: true,
-        reason: 'non-neutral sentiment with tickers',
+        reason: 'non-neutral sentiment with tickers and materiality',
       });
     });
   });
@@ -157,12 +206,13 @@ describe('RelevanceService', () => {
         articleId: 'article-1',
         sentiment: 'positive',
         tickers: ['AAPL'],
+        materiality: 'medium',
       });
       notificationsExists.mockResolvedValue(false);
 
       await expect(service.evaluateArticle('article-1')).resolves.toEqual({
         isRelevant: true,
-        reason: 'non-neutral sentiment with tickers',
+        reason: 'non-neutral sentiment with tickers and materiality',
       });
 
       expect(analysisFindOne).toHaveBeenCalledWith({
@@ -181,19 +231,27 @@ describe('RelevanceService', () => {
           articleId: 'article-1',
           sentiment: 'positive',
           tickers: ['AAPL'],
+          materiality: 'high',
         },
         {
           articleId: 'article-2',
           sentiment: 'neutral',
           tickers: ['MSFT'],
+          materiality: 'high',
+        },
+        {
+          articleId: 'article-3',
+          sentiment: 'negative',
+          tickers: ['XOM'],
+          materiality: 'low',
         },
       ]);
       notificationsExists.mockResolvedValue(false);
 
       await expect(service.evaluatePending()).resolves.toEqual({
-        candidates: 2,
+        candidates: 3,
         relevant: 1,
-        notRelevant: 1,
+        notRelevant: 2,
       });
     });
   });

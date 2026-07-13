@@ -4,6 +4,7 @@ import { NewsAnalysis } from '../analysis/entities/news-analysis.entity';
 import { NewsArticle } from '../news/entities/news-article.entity';
 import { Notification } from '../notifications/entities/notification.entity';
 import { InitialSchema1752180000000 } from './migrations/1752180000000-InitialSchema';
+import { AddNewsAnalysisMateriality1752430000000 } from './migrations/1752430000000-AddNewsAnalysisMateriality';
 import {
   DEFAULT_TEST_DATABASE_URL,
   resolveTestDatabaseUrl,
@@ -25,7 +26,10 @@ describe('Database schema (integration)', () => {
       type: 'postgres',
       url: databaseUrl,
       entities: [NewsArticle, NewsAnalysis, Notification],
-      migrations: [InitialSchema1752180000000],
+      migrations: [
+        InitialSchema1752180000000,
+        AddNewsAnalysisMateriality1752430000000,
+      ],
       synchronize: false,
       logging: false,
     });
@@ -135,6 +139,7 @@ describe('Database schema (integration)', () => {
         summary: 'Short summary',
         sentiment: 'positive',
         tickers: ['AAPL'],
+        materiality: 'high',
         model: 'gemini-flash',
       }),
     );
@@ -148,6 +153,7 @@ describe('Database schema (integration)', () => {
     );
 
     expect(analysis.articleId).toBe(article.id);
+    expect(analysis.materiality).toBe('high');
     expect(notification.articleId).toBe(article.id);
 
     await expect(
@@ -157,6 +163,7 @@ describe('Database schema (integration)', () => {
           summary: 'orphan',
           sentiment: 'neutral',
           tickers: [],
+          materiality: 'low',
           model: 'gemini-flash',
         }),
       ),

@@ -1,7 +1,9 @@
 import { AppLocale } from '../config/env.validation';
 import {
+  MATERIALITY_VALUES,
   MAX_PROMPT_CONTENT_LENGTH,
   MAX_SUMMARY_LENGTH,
+  Materiality,
   SENTIMENT_VALUES,
   Sentiment,
 } from './gemini.constants';
@@ -10,6 +12,7 @@ export type GeminiAnalysisResult = {
   summary: string;
   sentiment: Sentiment;
   tickers: string[];
+  materiality: Materiality;
 };
 
 const SUMMARY_LANGUAGE_BY_LOCALE: Record<AppLocale, string> = {
@@ -41,6 +44,7 @@ export function buildAnalysisSystemPrompt(locale: AppLocale): string {
     `- summary: concise ${language} summary of the article (2-4 sentences)`,
     '- sentiment: one of "positive", "negative", "neutral" for market/investor impact',
     '- tickers: array of stock ticker symbols mentioned (e.g. ["AAPL","MSFT"]); empty array if none',
+    '- materiality: one of "low", "medium", "high" for how market-moving the news is (low = routine/noise or unverified rumor; medium = notable for investors; high = major catalyst or significant market impact). Do not invent prices; treat AI judgment as unverified.',
     'Do not include markdown fences or extra keys.',
   ].join(' ');
 }
@@ -77,8 +81,9 @@ export function parseGeminiAnalysisText(raw: string): GeminiAnalysisResult {
   const summary = normalizeSummary(parsed.summary);
   const sentiment = normalizeSentiment(parsed.sentiment);
   const tickers = normalizeTickers(parsed.tickers);
+  const materiality = normalizeMateriality(parsed.materiality);
 
-  return { summary, sentiment, tickers };
+  return { summary, sentiment, tickers, materiality };
 }
 
 function extractJsonObject(raw: string): string {
@@ -147,6 +152,17 @@ function normalizeTickers(value: unknown): string[] {
     }
   }
   return tickers;
+}
+
+function normalizeMateriality(value: unknown): Materiality {
+  if (typeof value !== 'string') {
+    throw new Error('Gemini response missing materiality');
+  }
+  const normalized = value.trim().toLowerCase();
+  if ((MATERIALITY_VALUES as readonly string[]).includes(normalized)) {
+    return normalized as Materiality;
+  }
+  throw new Error(`Gemini response has invalid materiality: ${value}`);
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
