@@ -59,7 +59,7 @@ falta una variable obligatoria de runtime (mensaje explícito vía Joi).
 | `TELEGRAM_BOT_TOKEN` | Sí | Bot de alertas |
 | `TELEGRAM_CHAT_ID` | Sí | Chat destino de alertas |
 | `RSS_FEED_URLS` | Sí | Feeds RSS (separados por coma) |
-| `COLLECTION_CRON_SCHEDULE` | No (default `*/15 * * * *`) | Cron del collector |
+| `COLLECTION_CRON_SCHEDULE` | No (default `*/15 * * * *`) | Cron del pipeline end-to-end |
 | `WATCHLIST_TICKERS` | No | Filtro opcional de tickers para relevancia |
 
 **Importante:** creá **dos proyectos** en Google AI Studio / Google Cloud, cada
@@ -93,7 +93,27 @@ Respuesta esperada cuando todo está up:
 { "status": "ok", "checks": { "app": "up", "database": "up" } }
 ```
 
-Si PostgreSQL no responde, el endpoint devuelve `503` y la app **sigue
+### Status del pipeline
+
+```bash
+curl http://localhost:3000/status
+```
+
+Respuesta esperada (valores de ejemplo):
+
+```json
+{
+  "articles": 42,
+  "analyzed": 38,
+  "notified": 5,
+  "lastPipelineRunAt": "2026-07-12T20:15:00.000Z"
+}
+```
+
+`lastPipelineRunAt` es `null` hasta la primera corrida del pipeline en ese
+proceso (cron o `pipeline:once`).
+
+Si PostgreSQL no responde, `GET /health` devuelve `503` y la app **sigue
 corriendo** (TypeORM no bloquea el boot).
 
 ## Desarrollo local (sin Docker para la app)
@@ -153,6 +173,7 @@ con `ON DELETE CASCADE`).
 | `npm run migration:run` | Aplica migraciones TypeORM pendientes |
 | `npm run migration:show` | Lista migraciones y su estado |
 | `npm run migration:revert` | Revierte la última migración |
+| `npm run pipeline:once` | Pipeline MVP completo (one-shot) |
 | `npm run verify:lockfile` | `npm ci` en Linux (Docker) — evita drift macOS→CI |
 
 Pre-push obligatorio: `verify:lockfile` → `lint` → `test` → `build`.
@@ -220,8 +241,9 @@ reviews del mismo head.
 
 ## News Collector (RSS)
 
-El módulo `news/` lee los feeds de `RSS_FEED_URLS` en el cron
-`COLLECTION_CRON_SCHEDULE` (default cada 15 minutos):
+El módulo `news/` lee los feeds de `RSS_FEED_URLS`. La recolección corre como
+**primera etapa del pipeline** (cron `COLLECTION_CRON_SCHEDULE`, default cada
+15 minutos) o manualmente con `npm run pipeline:once`:
 
 1. Fetch propio con `redirect: 'manual'`, revalidación de cada hop,
    timeout con `AbortSignal` (15s) y tope de body (2 MB); parse con
@@ -233,8 +255,52 @@ El módulo `news/` lee los feeds de `RSS_FEED_URLS` en el cron
 
 Solo se aceptan URLs `http`/`https` públicas (no `file://`, localhost,
 metadata cloud ni IPs privadas / IPv6 ULA). Si falta `link`, se usa `guid`
-cuando es una URL válida. El pipeline end-to-end que encadena collector →
-análisis → relevancia → Telegram queda en el Issue #7.
+cuando es una URL válida.
+
+## Pipeline end-to-end (MVP)
+
+El módulo `pipeline/` orquesta el flujo automático en secuencia:
+
+1. **Recolección** — `NewsCollectorService.collect()` (RSS → PostgreSQL).
+2. **Análisis** — `NewsAnalysisService.analyzePending()` (Gemini Flash).
+3. **Relevancia** — `RelevanceService.evaluatePending()` (conteo sí/no alerta).
+4. **Notificación** — `NotificationsService.notifyRelevant()` (Telegram).
+
+El cron usa `COLLECTION_CRON_SCHEDULE` (default `*/15 * * * *`). Cada etapa
+loguea métricas estructuradas (`stage`, contadores). Si una corrida del
+pipeline ya está en curso, la siguiente se omite (mismo guard que en cada
+servicio).
+
+### Validación manual del MVP (smoke test)
+
+Con Postgres, env completo y migraciones aplicadas. **No** corras
+`start:dev` (cron activo) y `pipeline:once` a la vez: son dos procesos y
+pueden duplicar notificaciones Telegram.
+
+**Opción A — one-shot** (recomendada para smoke): con la app detenida:
+
+```bash
+npm run pipeline:once
+```
+
+Salida JSON con métricas por etapa y `finishedAt`. Revisá logs de las 4
+etapas (`collection` → `analysis` → `relevance` → `notifications`).
+
+**Opción B — cron en la app:**
+
+```bash
+npm run start:dev
+# Esperá un tick del cron (COLLECTION_CRON_SCHEDULE) o consultá:
+curl http://localhost:3000/status
+```
+
+En ambos casos:
+
+- Artículo no relevante: queda en `news_analysis` sin fila en `notifications`.
+- Artículo relevante: fila en `notifications` + mensaje en Telegram.
+
+Para depurar una etapa aislada (también sin cron activo en paralelo):
+`analysis:once`, `telegram:test`, `telegram:notify-once`.
 
 ## News Analysis (Gemini Flash)
 
@@ -255,14 +321,14 @@ El módulo `analysis/` toma artículos de `news_articles` **sin** fila en
    Gemini respondió bien y falla el `save`, se reutiliza el resultado en
    memoria (sin otra llamada a Gemini) en la siguiente corrida.
 
-Invocación local (one-shot, sin cron de pipeline):
+Invocación local (one-shot, sin esperar al cron del pipeline):
 
 ```bash
 npm run analysis:once
 ```
 
-El cron end-to-end lo cableará el Issue #7. Truncá el contenido enviado al
-modelo y no loguees la API key ni el body completo de errores.
+Truncá el contenido enviado al modelo y no loguees la API key ni el body
+completo de errores.
 
 ## Relevance (alert criteria)
 
@@ -294,14 +360,14 @@ El módulo `notifications/` envía alertas al chat configurado con
 4. Tras envío exitoso, persiste en `notifications` (`channel: telegram`).
 5. No reenvía artículos ya notificados.
 
-Invocación local (one-shot, sin cron de pipeline):
+Invocación local (one-shot, sin esperar al cron del pipeline):
 
 ```bash
 npm run telegram:test          # mensaje de prueba (no persiste)
 npm run telegram:notify-once   # notifica relevantes pendientes
 ```
 
-El cron end-to-end lo cableará el Issue #7. No loguees el bot token.
+No loguees el bot token.
 
 ## Testing
 
@@ -358,4 +424,5 @@ relación con los issues del MVP.
 
 ## Estado
 
-En desarrollo — MVP en construcción vía flujo de Issues (ver `/issues`).
+MVP funcional — pipeline end-to-end automatizado vía Issues #1–#7. Próxima
+fase v1 (locale, research bot): ver `/issues` o `.github/ISSUE_WORKFLOW.md`.

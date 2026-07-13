@@ -10,11 +10,21 @@ describe('RelevanceService', () => {
   let configGet: jest.Mock;
   let analysisFindOne: jest.Mock;
   let notificationsExists: jest.Mock;
+  let createQueryBuilder: jest.Mock;
+  let getMany: jest.Mock;
 
   beforeEach(async () => {
     configGet = jest.fn().mockReturnValue([]);
     analysisFindOne = jest.fn();
     notificationsExists = jest.fn();
+    getMany = jest.fn();
+    createQueryBuilder = jest.fn().mockReturnValue({
+      innerJoin: jest.fn().mockReturnThis(),
+      leftJoin: jest.fn().mockReturnThis(),
+      where: jest.fn().mockReturnThis(),
+      orderBy: jest.fn().mockReturnThis(),
+      getMany,
+    });
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -25,7 +35,7 @@ describe('RelevanceService', () => {
         },
         {
           provide: getRepositoryToken(NewsAnalysis),
-          useValue: { findOne: analysisFindOne },
+          useValue: { findOne: analysisFindOne, createQueryBuilder },
         },
         {
           provide: getRepositoryToken(Notification),
@@ -160,6 +170,30 @@ describe('RelevanceService', () => {
       });
       expect(notificationsExists).toHaveBeenCalledWith({
         where: { articleId: 'article-1' },
+      });
+    });
+  });
+
+  describe('evaluatePending', () => {
+    it('should count relevant and not relevant pending analyses', async () => {
+      getMany.mockResolvedValue([
+        {
+          articleId: 'article-1',
+          sentiment: 'positive',
+          tickers: ['AAPL'],
+        },
+        {
+          articleId: 'article-2',
+          sentiment: 'neutral',
+          tickers: ['MSFT'],
+        },
+      ]);
+      notificationsExists.mockResolvedValue(false);
+
+      await expect(service.evaluatePending()).resolves.toEqual({
+        candidates: 2,
+        relevant: 1,
+        notRelevant: 1,
       });
     });
   });

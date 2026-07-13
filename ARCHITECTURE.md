@@ -20,7 +20,7 @@ Mapa de módulos del backend NestJS y su relación con el backlog del MVP.
 | `analysis/` | Implementado | Análisis con Gemini Flash (cola + delay) | #3 |
 | `relevance/` | Implementado | Criterios de relevancia para alertas | #6 |
 | `notifications/` | Implementado | Alertas Telegram | #4 |
-| `pipeline/` | Stub | Cron end-to-end | #7 |
+| `pipeline/` | Implementado | Cron end-to-end + `GET /status` | #7 |
 
 ## Diagrama de dependencias (MVP)
 
@@ -48,6 +48,12 @@ health   ← database (ping vía DataSource)
 
 - `200` si la app y PostgreSQL responden.
 - `503` si PostgreSQL no responde.
+
+## Pipeline status
+
+`GET /status` responde conteos de `news_articles`, `news_analysis` y
+`notifications`, más `lastPipelineRunAt` (ISO 8601 o `null` si el proceso
+aún no ejecutó el pipeline).
 
 TypeORM usa `manualInitialization`: si Postgres no está disponible al boot,
 la app **sigue levantando** y el health reporta `database: down` hasta que
