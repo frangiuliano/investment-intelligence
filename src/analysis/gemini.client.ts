@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { AppLocale } from '../config/env.validation';
 import { GEMINI_REQUEST_TIMEOUT_MS } from './gemini.constants';
 import { parseRetryAfterMs } from './gemini-retry';
 import {
@@ -39,6 +40,7 @@ export class GeminiClient {
       'gemini.apiKeyFinance',
     );
     const model = this.configService.getOrThrow<string>('gemini.model');
+    const locale = this.configService.getOrThrow<AppLocale>('locale');
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
 
     const controller = new AbortController();
@@ -56,7 +58,7 @@ export class GeminiClient {
         },
         body: JSON.stringify({
           systemInstruction: {
-            parts: [{ text: buildAnalysisSystemPrompt() }],
+            parts: [{ text: buildAnalysisSystemPrompt(locale) }],
           },
           contents: [
             {

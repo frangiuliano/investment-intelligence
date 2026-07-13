@@ -1,4 +1,5 @@
 import {
+  buildAnalysisSystemPrompt,
   buildAnalysisUserPrompt,
   parseGeminiAnalysisText,
   truncateForPrompt,
@@ -53,6 +54,31 @@ describe('gemini-response', () => {
           }),
         ),
       ).toThrow(/invalid sentiment/i);
+    });
+  });
+
+  describe('buildAnalysisSystemPrompt', () => {
+    it('should instruct an English summary when locale is en', () => {
+      const prompt = buildAnalysisSystemPrompt('en');
+
+      expect(prompt).toContain('Write the summary in English.');
+      expect(prompt).toContain('concise English summary');
+      expect(prompt).toContain(
+        'sentiment: one of "positive", "negative", "neutral"',
+      );
+      expect(prompt).toContain('tickers: array of stock ticker symbols');
+    });
+
+    it('should instruct a Spanish summary when locale is es', () => {
+      const prompt = buildAnalysisSystemPrompt('es');
+
+      expect(prompt).toContain('Write the summary in Spanish.');
+      expect(prompt).toContain('concise Spanish summary');
+      expect(prompt).toContain(
+        'sentiment: one of "positive", "negative", "neutral"',
+      );
+      expect(prompt).toContain('tickers: array of stock ticker symbols');
+      expect(prompt).not.toContain('concise English summary');
     });
   });
 
