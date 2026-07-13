@@ -17,6 +17,18 @@ Interpretá el texto después de `/dev` (o `$ARGUMENTS` / `$1` si está disponib
 | `siguiente` / `next` / (vacío) | Elegí el próximo issue con el algoritmo de `issue-workflow.md` e implementalo hasta PR |
 | `#N` / `N` / `issue N` | Tomá el issue **N** (solo si dependencias cerradas) e implementalo hasta PR |
 
+## Título del chat
+
+Cursor titula el chat con el primer mensaje (`/dev siguiente` → nombres genéricos).
+Los agentes de chat **no** tienen `rename_chat` expuesto (limitación de Cursor).
+
+En cuanto sepas el issue, **antes de implementar**, escribí una línea clara:
+
+`Chat: #N <título corto>` — renombralo en la barra Agents (click derecho → Rename).
+
+Ejemplos: `Chat: #7 Telegram alerts`, `Chat: #24 Telegram locale`. Máx. ~60 chars.
+Si `rename_chat` aparece en tus herramientas, usalo; si no, no reintentes ni bloquees.
+
 ## Reglas
 
 - No cambies el alcance del Issue.
