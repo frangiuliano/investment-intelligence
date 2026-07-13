@@ -116,6 +116,7 @@ export class NotificationsService {
     const relevance = this.relevanceService.evaluate({
       sentiment: analysis.sentiment,
       tickers: analysis.tickers ?? [],
+      materiality: analysis.materiality,
       alreadyNotified,
     });
 

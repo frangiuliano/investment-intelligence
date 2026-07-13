@@ -1,6 +1,7 @@
 export type RelevanceInput = {
   sentiment: string;
   tickers: string[];
+  materiality: string;
   alreadyNotified: boolean;
 };
 
