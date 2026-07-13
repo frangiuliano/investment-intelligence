@@ -380,8 +380,14 @@ devuelve `{ isRelevant, reason }` con estas reglas:
 5. Materialidad `low` (o inválida / ausente) → no relevante.
 6. Materialidad `medium` o `high`, sentimiento no neutral y ≥1 ticker →
    relevante.
-7. Si `WATCHLIST_TICKERS` está seteado, además hace falta al menos un
+7. Si la watchlist efectiva no está vacía, además hace falta al menos un
    ticker del análisis en esa lista.
+
+**Fuente de la watchlist (prioridad):**
+
+1. Filas activas en `watchlist_entries` (REST `/watchlist`) — si hay ≥1.
+2. Si la tabla está vacía, fallback a `WATCHLIST_TICKERS` (env), documentado
+   como transición; preferí editar la watchlist persistida.
 
 `materiality` viene del análisis Gemini (`low` / `medium` / `high`) y se
 persiste en `news_analysis`. Es una señal no verificada del modelo: sirve
@@ -465,9 +471,41 @@ curl -s -o /dev/null -w "%{http_code}\n" -X DELETE http://localhost:3000/holding
 
 Tras cambiar el schema: `npm run migration:run`.
 
-Cartera (`holdings`) ≠ watchlist (`WATCHLIST_TICKERS` / Issue #28): la
-cartera son posiciones del operador; la watchlist serán tickers seguidos
-sin posición necesariamente.
+Cartera (`holdings`) ≠ watchlist (`watchlist_entries` / `/watchlist`):
+
+| | Cartera (`/holdings`) | Watchlist (`/watchlist`) |
+|--|----------------------|--------------------------|
+| Qué es | Posiciones del operador (cantidad, moneda, tipo) | Tickers que el operador **sigue** |
+| Uso | Briefs/journal/contexto de cartera | Filtro de alertas de relevancia |
+| Sin posición | No aplica | Sí: podés seguir un ticker sin tenerlo |
+
+### Watchlist (REST)
+
+Tabla `watchlist_entries`: `symbol` (unique activo), `notes` opcional,
+timestamps + soft-delete (`deleted_at`). Misma convención que holdings:
+`DELETE` no borra la fila; queda fuera del listado y libera el símbolo.
+
+```bash
+# Listar
+curl -s http://localhost:3000/watchlist | jq
+
+# Agregar
+curl -s -X POST http://localhost:3000/watchlist \
+  -H 'Content-Type: application/json' \
+  -d '{"symbol":"AAPL","notes":"earnings watch"}' | jq
+
+# Actualizar notas
+curl -s -X PATCH http://localhost:3000/watchlist/<id> \
+  -H 'Content-Type: application/json' \
+  -d '{"notes":"catalyst upcoming"}' | jq
+
+# Soft-delete (quitar de la watchlist)
+curl -s -o /dev/null -w "%{http_code}\n" -X DELETE http://localhost:3000/watchlist/<id>
+```
+
+Con watchlist persistida no vacía, `RelevanceService` **ignora**
+`WATCHLIST_TICKERS` y solo alerta si el análisis intersecta esos símbolos.
+Si la tabla está vacía, sigue valiendo el env como fallback de transición.
 
 ## Testing
 

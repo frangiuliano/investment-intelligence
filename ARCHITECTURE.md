@@ -21,7 +21,7 @@ Mapa de módulos del backend NestJS y su relación con el backlog del MVP.
 | `relevance/` | Implementado | Criterios de relevancia para alertas | #6 |
 | `notifications/` | Implementado | Alertas Telegram | #4 |
 | `pipeline/` | Implementado | Cron end-to-end + `GET /status` | #7 |
-| `portfolio/` | Implementado | Holdings del operador (`/holdings`) | #27 |
+| `portfolio/` | Implementado | Holdings + watchlist (`/holdings`, `/watchlist`) | #27, #28 |
 
 ## Diagrama de dependencias (MVP)
 
@@ -32,7 +32,7 @@ pipeline
   ├── relevance
   └── notifications
 
-portfolio  ← holdings (REST CRUD; base para watchlist/briefs/journal)
+portfolio  ← holdings + watchlist (REST CRUD; base para briefs/journal)
 
 database ← TypeORM DataSource + entidades de dominio
 config   ← global
@@ -44,8 +44,10 @@ health   ← database (ping vía DataSource)
 - **ORM:** TypeORM (`docs/adr/001-orm-typeorm.md`).
 - **Entidades** en módulos de dominio; **migraciones** en `src/database/migrations/`.
 - `synchronize: false` — el schema solo cambia vía migraciones.
-- `holdings` usa soft-delete (`deleted_at`) y unique parcial activo
-  `(symbol, asset_type) WHERE deleted_at IS NULL`.
+- `holdings` y `watchlist_entries` usan soft-delete (`deleted_at`) y unique
+  parcial activo (`WHERE deleted_at IS NULL`).
+- Relevancia: watchlist persistida (si no vacía) prevalece sobre
+  `WATCHLIST_TICKERS` (env fallback).
 
 ## Health check
 
