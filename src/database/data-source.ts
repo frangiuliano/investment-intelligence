@@ -4,8 +4,10 @@ import { DataSource } from 'typeorm';
 import { NewsAnalysis } from '../analysis/entities/news-analysis.entity';
 import { NewsArticle } from '../news/entities/news-article.entity';
 import { Notification } from '../notifications/entities/notification.entity';
+import { Holding } from '../portfolio/holdings/entities/holding.entity';
 import { InitialSchema1752180000000 } from './migrations/1752180000000-InitialSchema';
 import { AddNewsAnalysisMateriality1752430000000 } from './migrations/1752430000000-AddNewsAnalysisMateriality';
+import { CreateHoldings1752500000000 } from './migrations/1752500000000-CreateHoldings';
 
 loadEnv();
 
@@ -20,10 +22,11 @@ if (!databaseUrl) {
 export default new DataSource({
   type: 'postgres',
   url: databaseUrl,
-  entities: [NewsArticle, NewsAnalysis, Notification],
+  entities: [NewsArticle, NewsAnalysis, Notification, Holding],
   migrations: [
     InitialSchema1752180000000,
     AddNewsAnalysisMateriality1752430000000,
+    CreateHoldings1752500000000,
   ],
   synchronize: false,
   logging: false,

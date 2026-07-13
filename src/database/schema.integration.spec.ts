@@ -3,8 +3,13 @@ import { DataSource, QueryFailedError, Repository } from 'typeorm';
 import { NewsAnalysis } from '../analysis/entities/news-analysis.entity';
 import { NewsArticle } from '../news/entities/news-article.entity';
 import { Notification } from '../notifications/entities/notification.entity';
+import {
+  Holding,
+  HoldingAssetType,
+} from '../portfolio/holdings/entities/holding.entity';
 import { InitialSchema1752180000000 } from './migrations/1752180000000-InitialSchema';
 import { AddNewsAnalysisMateriality1752430000000 } from './migrations/1752430000000-AddNewsAnalysisMateriality';
+import { CreateHoldings1752500000000 } from './migrations/1752500000000-CreateHoldings';
 import {
   DEFAULT_TEST_DATABASE_URL,
   resolveTestDatabaseUrl,
@@ -17,6 +22,7 @@ describe('Database schema (integration)', () => {
   let articles: Repository<NewsArticle>;
   let analyses: Repository<NewsAnalysis>;
   let notifications: Repository<Notification>;
+  let holdings: Repository<Holding>;
   let databaseUrl: string;
 
   beforeAll(async () => {
@@ -25,10 +31,11 @@ describe('Database schema (integration)', () => {
     dataSource = new DataSource({
       type: 'postgres',
       url: databaseUrl,
-      entities: [NewsArticle, NewsAnalysis, Notification],
+      entities: [NewsArticle, NewsAnalysis, Notification, Holding],
       migrations: [
         InitialSchema1752180000000,
         AddNewsAnalysisMateriality1752430000000,
+        CreateHoldings1752500000000,
       ],
       synchronize: false,
       logging: false,
@@ -52,6 +59,7 @@ describe('Database schema (integration)', () => {
     articles = dataSource.getRepository(NewsArticle);
     analyses = dataSource.getRepository(NewsAnalysis);
     notifications = dataSource.getRepository(Notification);
+    holdings = dataSource.getRepository(Holding);
   }, 30_000);
 
   afterAll(async () => {
@@ -62,20 +70,26 @@ describe('Database schema (integration)', () => {
 
   beforeEach(async () => {
     await dataSource.query(
-      'TRUNCATE TABLE "notifications", "news_analysis", "news_articles" RESTART IDENTITY CASCADE',
+      'TRUNCATE TABLE "notifications", "news_analysis", "news_articles", "holdings" RESTART IDENTITY CASCADE',
     );
   });
 
-  it('should create the three domain tables after migrations', async () => {
+  it('should create the domain tables after migrations', async () => {
     const rows: Array<{ table_name: string }> = await dataSource.query(`
       SELECT table_name
       FROM information_schema.tables
       WHERE table_schema = 'public'
-        AND table_name IN ('news_articles', 'news_analysis', 'notifications')
+        AND table_name IN (
+          'news_articles',
+          'news_analysis',
+          'notifications',
+          'holdings'
+        )
       ORDER BY table_name
     `);
 
     expect(rows.map((row) => row.table_name)).toEqual([
+      'holdings',
       'news_analysis',
       'news_articles',
       'notifications',
@@ -173,5 +187,55 @@ describe('Database schema (integration)', () => {
 
     expect(await analyses.findOneBy({ id: analysis.id })).toBeNull();
     expect(await notifications.findOneBy({ id: notification.id })).toBeNull();
+  });
+
+  it('should persist holdings and enforce active uniqueness plus soft-delete', async () => {
+    const holding = await holdings.save(
+      holdings.create({
+        symbol: 'AAPL',
+        assetType: HoldingAssetType.EQUITY,
+        quantity: '10',
+        currency: 'USD',
+        avgEntryPrice: '150',
+        notes: 'core position',
+      }),
+    );
+
+    expect(holding.id).toBeDefined();
+    expect(holding.symbol).toBe('AAPL');
+
+    await expect(
+      holdings.save(
+        holdings.create({
+          symbol: 'AAPL',
+          assetType: HoldingAssetType.EQUITY,
+          quantity: '1',
+          currency: 'USD',
+          avgEntryPrice: null,
+          notes: null,
+        }),
+      ),
+    ).rejects.toBeInstanceOf(QueryFailedError);
+
+    await holdings.softRemove(holding);
+
+    const afterSoftDelete = await holdings.findOne({
+      where: { id: holding.id },
+      withDeleted: true,
+    });
+    expect(afterSoftDelete?.deletedAt).not.toBeNull();
+    expect(await holdings.findOneBy({ id: holding.id })).toBeNull();
+
+    const recreated = await holdings.save(
+      holdings.create({
+        symbol: 'AAPL',
+        assetType: HoldingAssetType.EQUITY,
+        quantity: '5',
+        currency: 'USD',
+        avgEntryPrice: null,
+        notes: null,
+      }),
+    );
+    expect(recreated.id).not.toBe(holding.id);
   });
 });
