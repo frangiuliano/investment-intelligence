@@ -6,6 +6,7 @@ import { NewsModule } from './news/news.module';
 import { AnalysisModule } from './analysis/analysis.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { PipelineModule } from './pipeline/pipeline.module';
+import { PortfolioModule } from './portfolio/portfolio.module';
 import { RelevanceModule } from './relevance/relevance.module';
 
 @Module({
@@ -18,6 +19,7 @@ import { RelevanceModule } from './relevance/relevance.module';
     RelevanceModule,
     NotificationsModule,
     PipelineModule,
+    PortfolioModule,
   ],
 })
 export class AppModule {}
