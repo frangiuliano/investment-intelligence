@@ -49,6 +49,7 @@ falta una variable obligatoria de runtime (mensaje explícito vía Joi).
 | Variable | Obligatoria en NestJS | Uso |
 |----------|----------------------|-----|
 | `PORT` | No (default `3000`) | Puerto HTTP |
+| `APP_LOCALE` | No (default `en`) | Idioma de salida (`en` \| `es`) |
 | `DATABASE_URL` | Sí | Conexión PostgreSQL (app) |
 | `TEST_DATABASE_URL` | No (solo tests) | DB de integración; nombre debe terminar en `_test` |
 | `GEMINI_API_KEY_FINANCE` | Sí | Análisis de noticias (Proyecto B) |
@@ -62,6 +63,14 @@ falta una variable obligatoria de runtime (mensaje explícito vía Joi).
 | `COLLECTION_CRON_SCHEDULE` | No (default `*/15 * * * *`) | Cron del pipeline end-to-end |
 | `WATCHLIST_TICKERS` | No | Filtro opcional de tickers para relevancia |
 
+`APP_LOCALE` define el idioma de salida de la app (un locale por deploy).
+Valores permitidos: `en`, `es` (default `en`). Si el valor no está permitido,
+la app **no arranca**. Hoy solo expone la config tipada (`locale` vía
+`ConfigService`); issues siguientes usarán este valor para resúmenes de
+análisis (Gemini) y labels de alertas Telegram. No traduce títulos RSS ni
+contenido original de feeds. Sentimiento y tickers siguen siendo códigos
+independientes del idioma.
+
 **Importante:** creá **dos proyectos** en Google AI Studio / Google Cloud, cada
 uno con su API key. No reutilices la misma key entre Finance y Reviewer: el
 free tier es por proyecto. `GEMINI_API_KEY_REVIEWER` se configura como secret
@@ -69,7 +78,8 @@ de Actions (`Settings → Secrets and variables → Actions`), no hace falta en 
 boot de NestJS.
 
 La configuración se inyecta vía `ConfigModule` / `ConfigService`. No uses
-`process.env` disperso en el código de dominio.
+`process.env` disperso en el código de dominio. Leé el locale con
+`configService.getOrThrow<AppLocale>('locale')`.
 
 ## Arranque local con Docker
 
