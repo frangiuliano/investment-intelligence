@@ -1,3 +1,4 @@
+import { AppLocale } from '../config/env.validation';
 import {
   MAX_PROMPT_CONTENT_LENGTH,
   MAX_SUMMARY_LENGTH,
@@ -9,6 +10,11 @@ export type GeminiAnalysisResult = {
   summary: string;
   sentiment: Sentiment;
   tickers: string[];
+};
+
+const SUMMARY_LANGUAGE_BY_LOCALE: Record<AppLocale, string> = {
+  en: 'English',
+  es: 'Spanish',
 };
 
 export function truncateForPrompt(
@@ -25,12 +31,14 @@ export function truncateForPrompt(
   return trimmed.slice(0, maxLength);
 }
 
-export function buildAnalysisSystemPrompt(): string {
+export function buildAnalysisSystemPrompt(locale: AppLocale): string {
+  const language = SUMMARY_LANGUAGE_BY_LOCALE[locale];
   return [
     'You are a financial news analyst.',
     'Analyze the article and respond with JSON only.',
+    `Write the summary in ${language}.`,
     'Required keys:',
-    '- summary: concise English summary of the article (2-4 sentences)',
+    `- summary: concise ${language} summary of the article (2-4 sentences)`,
     '- sentiment: one of "positive", "negative", "neutral" for market/investor impact',
     '- tickers: array of stock ticker symbols mentioned (e.g. ["AAPL","MSFT"]); empty array if none',
     'Do not include markdown fences or extra keys.',

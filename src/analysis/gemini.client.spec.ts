@@ -1,5 +1,6 @@
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
+import { AppLocale } from '../config/env.validation';
 import {
   GEMINI_FLASH_MODEL,
   GEMINI_REQUEST_TIMEOUT_MS,
@@ -9,10 +10,12 @@ import { GeminiApiError, GeminiClient } from './gemini.client';
 describe('GeminiClient', () => {
   let client: GeminiClient;
   let fetchMock: jest.Mock;
+  let locale: AppLocale;
 
   beforeEach(async () => {
     fetchMock = jest.fn();
     global.fetch = fetchMock;
+    locale = 'en';
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -26,6 +29,9 @@ describe('GeminiClient', () => {
               }
               if (key === 'gemini.model') {
                 return GEMINI_FLASH_MODEL;
+              }
+              if (key === 'locale') {
+                return locale;
               }
               throw new Error(`Unexpected config key: ${key}`);
             }),
@@ -86,9 +92,53 @@ describe('GeminiClient', () => {
     });
     expect(typeof options.body).toBe('string');
     const body = JSON.parse(options.body as string) as {
+      systemInstruction: { parts: Array<{ text: string }> };
       generationConfig: { responseMimeType: string };
     };
     expect(body.generationConfig.responseMimeType).toBe('application/json');
+    expect(body.systemInstruction.parts[0]?.text).toContain(
+      'Write the summary in English.',
+    );
+  });
+
+  it('should instruct Spanish summary when APP_LOCALE is es', async () => {
+    locale = 'es';
+    fetchMock.mockResolvedValue({
+      ok: true,
+      json: () =>
+        Promise.resolve({
+          candidates: [
+            {
+              content: {
+                parts: [
+                  {
+                    text: JSON.stringify({
+                      summary: 'El petróleo bajó.',
+                      sentiment: 'negative',
+                      tickers: ['XOM'],
+                    }),
+                  },
+                ],
+              },
+            },
+          ],
+        }),
+    });
+
+    await client.analyzeArticle({
+      title: 'Oil slides',
+      source: 'Example',
+      url: 'https://news.example.com/oil',
+      content: 'Crude fell on inventory data.',
+    });
+
+    const [, options] = fetchMock.mock.calls[0] as [string, RequestInit];
+    const body = JSON.parse(options.body as string) as {
+      systemInstruction: { parts: Array<{ text: string }> };
+    };
+    expect(body.systemInstruction.parts[0]?.text).toContain(
+      'Write the summary in Spanish.',
+    );
   });
 
   it('should throw a retryable GeminiApiError on HTTP 429', async () => {
