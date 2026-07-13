@@ -65,11 +65,10 @@ falta una variable obligatoria de runtime (mensaje explícito vía Joi).
 
 `APP_LOCALE` define el idioma de salida de la app (un locale por deploy).
 Valores permitidos: `en`, `es` (default `en`). Si el valor no está permitido,
-la app **no arranca**. Hoy solo expone la config tipada (`locale` vía
-`ConfigService`); issues siguientes usarán este valor para resúmenes de
-análisis (Gemini) y labels de alertas Telegram. No traduce títulos RSS ni
-contenido original de feeds. Sentimiento y tickers siguen siendo códigos
-independientes del idioma.
+la app **no arranca**. El análisis Gemini genera y persiste `summary` en ese
+idioma. Los labels de alertas Telegram se localizan en un issue siguiente.
+No traduce títulos RSS ni contenido original de feeds. Sentimiento y tickers
+siguen siendo códigos independientes del idioma.
 
 **Importante:** creá **dos proyectos** en Google AI Studio / Google Cloud, cada
 uno con su API key. No reutilices la misma key entre Finance y Reviewer: el
@@ -320,6 +319,9 @@ El módulo `analysis/` toma artículos de `news_articles` **sin** fila en
 1. Prompt estructurado a Gemini Flash (`GEMINI_MODEL`, default
    `gemini-3.1-flash-lite`) pidiendo JSON:
    `summary`, `sentiment` (`positive` | `negative` | `neutral`), `tickers`.
+   El `summary` se pide y se guarda en el idioma de `APP_LOCALE` (`en` /
+   `es`); `sentiment` y `tickers` no se localizan. Cambiar el locale no
+   re-analiza filas históricas.
 2. Usa `GEMINI_API_KEY_FINANCE` (nunca la key del Reviewer).
 3. Procesa como máximo `GEMINI_ANALYSIS_BATCH_SIZE` artículos por corrida y
    espera `GEMINI_REQUEST_DELAY_MS` (default 12000) entre requests.
