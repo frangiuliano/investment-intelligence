@@ -2,6 +2,8 @@ import { Logger } from '@nestjs/common';
 import { DataSource, QueryFailedError, Repository } from 'typeorm';
 import { NewsAnalysis } from '../analysis/entities/news-analysis.entity';
 import { NewsArticle } from '../news/entities/news-article.entity';
+import { DigestItem } from '../notifications/entities/digest-item.entity';
+import { DigestRun } from '../notifications/entities/digest-run.entity';
 import { NewsStoryClusterMember } from '../notifications/entities/news-story-cluster-member.entity';
 import { NewsStoryCluster } from '../notifications/entities/news-story-cluster.entity';
 import { Notification } from '../notifications/entities/notification.entity';
@@ -16,6 +18,7 @@ import { CreateHoldings1752500000000 } from './migrations/1752500000000-CreateHo
 import { CreateWatchlistEntries1752510000000 } from './migrations/1752510000000-CreateWatchlistEntries';
 import { AddNewsAnalysisEventType1752520000000 } from './migrations/1752520000000-AddNewsAnalysisEventType';
 import { CreateNewsStoryClusters1752530000000 } from './migrations/1752530000000-CreateNewsStoryClusters';
+import { CreateDigestTables1752540000000 } from './migrations/1752540000000-CreateDigestTables';
 import {
   DEFAULT_TEST_DATABASE_URL,
   resolveTestDatabaseUrl,
@@ -32,6 +35,8 @@ describe('Database schema (integration)', () => {
   let watchlistEntries: Repository<WatchlistEntry>;
   let storyClusters: Repository<NewsStoryCluster>;
   let storyClusterMembers: Repository<NewsStoryClusterMember>;
+  let digestRuns: Repository<DigestRun>;
+  let digestItems: Repository<DigestItem>;
   let databaseUrl: string;
 
   beforeAll(async () => {
@@ -48,6 +53,8 @@ describe('Database schema (integration)', () => {
         WatchlistEntry,
         NewsStoryCluster,
         NewsStoryClusterMember,
+        DigestRun,
+        DigestItem,
       ],
       migrations: [
         InitialSchema1752180000000,
@@ -56,6 +63,7 @@ describe('Database schema (integration)', () => {
         CreateWatchlistEntries1752510000000,
         AddNewsAnalysisEventType1752520000000,
         CreateNewsStoryClusters1752530000000,
+        CreateDigestTables1752540000000,
       ],
       synchronize: false,
       logging: false,
@@ -83,6 +91,8 @@ describe('Database schema (integration)', () => {
     watchlistEntries = dataSource.getRepository(WatchlistEntry);
     storyClusters = dataSource.getRepository(NewsStoryCluster);
     storyClusterMembers = dataSource.getRepository(NewsStoryClusterMember);
+    digestRuns = dataSource.getRepository(DigestRun);
+    digestItems = dataSource.getRepository(DigestItem);
   }, 30_000);
 
   afterAll(async () => {
@@ -93,7 +103,7 @@ describe('Database schema (integration)', () => {
 
   beforeEach(async () => {
     await dataSource.query(
-      'TRUNCATE TABLE "notifications", "news_story_cluster_members", "news_story_clusters", "news_analysis", "news_articles", "holdings", "watchlist_entries" RESTART IDENTITY CASCADE',
+      'TRUNCATE TABLE "digest_items", "digest_runs", "notifications", "news_story_cluster_members", "news_story_clusters", "news_analysis", "news_articles", "holdings", "watchlist_entries" RESTART IDENTITY CASCADE',
     );
   });
 
@@ -109,12 +119,16 @@ describe('Database schema (integration)', () => {
           'holdings',
           'watchlist_entries',
           'news_story_clusters',
-          'news_story_cluster_members'
+          'news_story_cluster_members',
+          'digest_runs',
+          'digest_items'
         )
       ORDER BY table_name
     `);
 
     expect(rows.map((row) => row.table_name)).toEqual([
+      'digest_items',
+      'digest_runs',
       'holdings',
       'news_analysis',
       'news_articles',
@@ -336,6 +350,47 @@ describe('Database schema (integration)', () => {
           clusterId: cluster.id,
           articleId: article.id,
           alerted: false,
+        }),
+      ),
+    ).rejects.toBeInstanceOf(QueryFailedError);
+  });
+
+  it('should persist digest runs/items and enforce unique article_id', async () => {
+    const article = await articles.save(
+      articles.create({
+        title: 'Digest story',
+        url: 'https://example.com/digest',
+        content: 'body',
+        source: 'example',
+        contentHash: 'hash-digest',
+        publishedAt: null,
+      }),
+    );
+
+    const periodEnd = new Date();
+    const periodStart = new Date(periodEnd.getTime() - 24 * 60 * 60 * 1000);
+    const run = await digestRuns.save(
+      digestRuns.create({
+        channel: 'telegram',
+        itemCount: 1,
+        lookbackHours: 24,
+        periodStart,
+        periodEnd,
+      }),
+    );
+
+    await digestItems.save(
+      digestItems.create({
+        digestRunId: run.id,
+        articleId: article.id,
+      }),
+    );
+
+    await expect(
+      digestItems.save(
+        digestItems.create({
+          digestRunId: run.id,
+          articleId: article.id,
         }),
       ),
     ).rejects.toBeInstanceOf(QueryFailedError);
