@@ -61,6 +61,8 @@ falta una variable obligatoria de runtime (mensaje explícito vía Joi).
 | `TELEGRAM_CHAT_ID` | Sí | Chat destino de alertas |
 | `RSS_FEED_URLS` | Sí | Feeds RSS (separados por coma) |
 | `COLLECTION_CRON_SCHEDULE` | No (default `*/15 * * * *`) | Cron del pipeline end-to-end |
+| `DIGEST_CRON_SCHEDULE` | No (default `0 12 * * *`) | Cron del digesto Telegram (diario 12:00 UTC) |
+| `DIGEST_LOOKBACK_HOURS` | No (default `24`) | Ventana de candidatos al digesto (1–168) |
 | `STORY_CLUSTER_WINDOW_HOURS` | No (default `24`) | Ventana para colapsar historias duplicadas en un solo push |
 | `WATCHLIST_TICKERS` | No | Filtro opcional de tickers para relevancia |
 
@@ -470,9 +472,33 @@ Invocación local (one-shot, sin esperar al cron del pipeline):
 ```bash
 npm run telegram:test          # mensaje de prueba (respeta APP_LOCALE; no persiste)
 npm run telegram:notify-once   # notifica relevantes pendientes
+npm run telegram:digest-once   # digesto del período (material medium+, no pusheados)
 ```
 
 No loguees el bot token.
+
+### Digesto diario/semanal (baja urgencia)
+
+No todo lo material merece push inmediato. El digesto es un canal aparte del
+pipeline (`COLLECTION_CRON_SCHEDULE`):
+
+| | Push inmediato | Digesto |
+|--|----------------|---------|
+| Cuándo | Cada tick del pipeline | Cron `DIGEST_CRON_SCHEDULE` (default diario 12:00 UTC) |
+| Qué | Relevantes (materialidad + sentimiento/catalizador + universo) | `materiality` medium/high en la ventana, **sin** push real previo |
+| Cluster | Primera historia sí push; duplicados se suprimen | Duplicados suprimidos sí pueden entrar al digesto |
+| Persistencia | `notifications` | `digest_runs` + `digest_items` (no bloquea futuros push) |
+
+Reglas:
+
+- Ventana: `DIGEST_LOOKBACK_HOURS` (default **24**). Para semanal usá
+  `DIGEST_CRON_SCHEDULE=0 12 * * 1` y `DIGEST_LOOKBACK_HOURS=168`.
+- No reenvía artículos ya presentes en `digest_items`.
+- Si no hay candidatos → log + skip (sin mensaje vacío).
+- Mensaje único truncado al límite de Telegram; si no caben todos, footer
+  `(+N more omitted)` / `(+N más omitidos)`.
+- Respeta `APP_LOCALE` en los labels del mensaje.
+- Si hay watchlist/holdings activos, solo incluye tickers de ese universo.
 
 ## Holdings (portfolio)
 
