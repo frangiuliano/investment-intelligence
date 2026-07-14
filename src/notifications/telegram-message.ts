@@ -26,6 +26,12 @@ export type TelegramDigestInput = {
   items: DigestItemInput[];
 };
 
+export type TelegramDigestResult = {
+  message: string;
+  /** Prefix length of `items` that fit in the sent message body. */
+  includedCount: number;
+};
+
 type TelegramMessageLabels = {
   alertHeader: string;
   title: string;
@@ -117,7 +123,7 @@ export function formatTelegramAlert(
 export function formatTelegramDigest(
   input: TelegramDigestInput,
   locale: AppLocale = 'en',
-): string {
+): TelegramDigestResult {
   const labels = LABELS_BY_LOCALE[locale];
   const header = [
     `${labels.digestHeader} (${input.lookbackHours}h)`,
@@ -151,14 +157,20 @@ export function formatTelegramDigest(
       remaining > 0 ? `\n\n(+${remaining} ${labels.digestMore})` : '';
     const message = header + first + footer;
     if (message.length <= TELEGRAM_MAX_MESSAGE_LENGTH) {
-      return message;
+      return { message, includedCount: 1 };
     }
-    return `${message.slice(0, TELEGRAM_MAX_MESSAGE_LENGTH - 1)}…`;
+    return {
+      message: `${message.slice(0, TELEGRAM_MAX_MESSAGE_LENGTH - 1)}…`,
+      includedCount: 1,
+    };
   }
 
   const omitted = input.items.length - included;
   const footer = omitted > 0 ? `\n\n(+${omitted} ${labels.digestMore})` : '';
-  return [header, ...blocks].join('\n\n') + footer;
+  return {
+    message: [header, ...blocks].join('\n\n') + footer,
+    includedCount: included,
+  };
 }
 
 export function formatTelegramTestMessage(locale: AppLocale = 'en'): string {

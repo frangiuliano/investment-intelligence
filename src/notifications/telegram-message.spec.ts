@@ -161,7 +161,7 @@ describe('telegram-message', () => {
   });
 
   it('should format an English digest with lookback and item count', () => {
-    const message = formatTelegramDigest(
+    const { message, includedCount } = formatTelegramDigest(
       {
         lookbackHours: 24,
         items: [
@@ -178,6 +178,7 @@ describe('telegram-message', () => {
       'en',
     );
 
+    expect(includedCount).toBe(1);
     expect(message).toContain('News digest (24h)');
     expect(message).toContain('1 items');
     expect(message).toContain('1. Oil slides');
@@ -188,7 +189,7 @@ describe('telegram-message', () => {
   });
 
   it('should format a Spanish digest with localized labels', () => {
-    const message = formatTelegramDigest(
+    const { message, includedCount } = formatTelegramDigest(
       {
         lookbackHours: 168,
         items: [
@@ -206,6 +207,7 @@ describe('telegram-message', () => {
       'es',
     );
 
+    expect(includedCount).toBe(1);
     expect(message).toContain('Digesto de noticias (168h)');
     expect(message).toContain('1 ítems');
     expect(message).toContain('Materialidad: high');
@@ -222,11 +224,19 @@ describe('telegram-message', () => {
       url: `https://news.example.com/${index + 1}`,
     }));
 
-    const message = formatTelegramDigest({ lookbackHours: 24, items }, 'en');
+    const { message, includedCount } = formatTelegramDigest(
+      { lookbackHours: 24, items },
+      'en',
+    );
 
     expect(message.length).toBeLessThanOrEqual(TELEGRAM_MAX_MESSAGE_LENGTH);
     expect(message).toContain('News digest (24h)');
     expect(message).toContain('40 items');
     expect(message).toMatch(/\(\+\d+ more omitted\)/);
+    expect(includedCount).toBeGreaterThan(0);
+    expect(includedCount).toBeLessThan(items.length);
+    expect(message).toContain(
+      `(+${items.length - includedCount} more omitted)`,
+    );
   });
 });

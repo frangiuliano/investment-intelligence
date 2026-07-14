@@ -77,7 +77,7 @@ export class DigestService {
       }
 
       const locale = this.configService.getOrThrow<AppLocale>('locale');
-      const message = formatTelegramDigest(
+      const { message, includedCount } = formatTelegramDigest(
         {
           lookbackHours,
           items: items.map((item) => ({
@@ -92,6 +92,9 @@ export class DigestService {
         },
         locale,
       );
+      const includedArticleIds = items
+        .slice(0, includedCount)
+        .map((item) => item.articleId);
 
       try {
         await this.telegramClient.sendMessage(message);
@@ -110,7 +113,7 @@ export class DigestService {
           lookbackHours,
           periodStart,
           periodEnd,
-          articleIds: items.map((item) => item.articleId),
+          articleIds: includedArticleIds,
         });
       } catch (error) {
         this.logger.error(
@@ -118,14 +121,14 @@ export class DigestService {
         );
         return {
           candidates: items.length,
-          sent: 0,
+          sent: 1,
           skipped: false,
           errors: 1,
         };
       }
 
       this.logger.log(
-        `Digest sent: items=${items.length} lookbackHours=${lookbackHours}`,
+        `Digest sent: included=${includedArticleIds.length} candidates=${items.length} lookbackHours=${lookbackHours}`,
       );
       return {
         candidates: items.length,

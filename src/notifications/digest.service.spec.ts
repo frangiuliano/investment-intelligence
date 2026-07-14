@@ -18,10 +18,12 @@ describe('DigestService', () => {
   let digestRuns: {
     manager: { transaction: jest.Mock };
   };
+  let persistedArticleIds: string[];
 
   const articleId = '11111111-1111-4111-8111-111111111111';
 
   beforeEach(async () => {
+    persistedArticleIds = [];
     telegramClient = { sendMessage: jest.fn().mockResolvedValue(undefined) };
     relevanceService = {
       resolveWatchlistTickers: jest.fn().mockResolvedValue([]),
@@ -35,7 +37,12 @@ describe('DigestService', () => {
           fn({
             create: (_entity: unknown, data: unknown) => data,
             save: jest.fn((entityOrRows: unknown, maybeRows?: unknown) => {
-              if (maybeRows !== undefined) {
+              if (Array.isArray(maybeRows)) {
+                for (const row of maybeRows as Array<{ articleId?: string }>) {
+                  if (row.articleId) {
+                    persistedArticleIds.push(row.articleId);
+                  }
+                }
                 return Promise.resolve(maybeRows);
               }
               return Promise.resolve({
@@ -156,6 +163,47 @@ describe('DigestService', () => {
     expect(message).toContain('News digest (24h)');
     expect(message).toContain('Apple note');
     expect(digestRuns.manager.transaction).toHaveBeenCalledTimes(1);
+    expect(persistedArticleIds).toEqual([articleId]);
+  });
+
+  it('should persist only items that fit in the Telegram digest message', async () => {
+    const analyses = Array.from({ length: 40 }, (_, index) =>
+      analysisFixture({
+        id: `analysis-${index}`,
+        articleId: `${String(index).padStart(8, '0')}-1111-4111-8111-111111111111`,
+        summary: 'summary '.repeat(30),
+        article: {
+          title: `Story ${index + 1} ${'title '.repeat(20)}`,
+          url: `https://news.example.com/${index + 1}`,
+        },
+      }),
+    );
+    mockCandidates(analyses);
+
+    const result = await service.sendDigest();
+
+    expect(result.sent).toBe(1);
+    expect(result.candidates).toBe(40);
+    expect(persistedArticleIds.length).toBeGreaterThan(0);
+    expect(persistedArticleIds.length).toBeLessThan(40);
+    expect(persistedArticleIds).toEqual(
+      analyses.slice(0, persistedArticleIds.length).map((a) => a.articleId),
+    );
+  });
+
+  it('should report sent when Telegram succeeds but persist fails', async () => {
+    mockCandidates([analysisFixture()]);
+    digestRuns.manager.transaction.mockRejectedValue(new Error('db down'));
+
+    const result = await service.sendDigest();
+
+    expect(telegramClient.sendMessage).toHaveBeenCalledTimes(1);
+    expect(result).toEqual({
+      candidates: 1,
+      sent: 1,
+      skipped: false,
+      errors: 1,
+    });
   });
 
   it('should filter out candidates outside the operator universe', async () => {
