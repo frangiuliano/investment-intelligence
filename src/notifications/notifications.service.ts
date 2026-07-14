@@ -170,6 +170,18 @@ export class NotificationsService {
       );
     }
 
+    const existingClusterId =
+      await this.storyClusterService.findAlertedClusterId(analysis.articleId);
+    if (existingClusterId) {
+      return this.persistAlertNotification(
+        analysis,
+        candidate,
+        existingClusterId,
+        alertedThisRun,
+        { skipTelegram: true },
+      );
+    }
+
     const locale = this.configService.getOrThrow<AppLocale>('locale');
     const message = formatTelegramAlert(
       {
@@ -193,9 +205,38 @@ export class NotificationsService {
 
     let clusterId: string;
     try {
-      clusterId = await this.storyClusterService.createAlertedCluster(
+      clusterId = await this.storyClusterService.ensureClusterForAlertedArticle(
         analysis.articleId,
       );
+    } catch (error) {
+      this.logger.error(
+        `Telegram sent for article ${analysis.articleId} but cluster persist failed: ${errorMessage(error)}`,
+      );
+      return 'errors';
+    }
+
+    return this.persistAlertNotification(
+      analysis,
+      candidate,
+      clusterId,
+      alertedThisRun,
+      { skipTelegram: false },
+    );
+  }
+
+  private async persistAlertNotification(
+    analysis: NewsAnalysis,
+    candidate: StoryCandidate,
+    clusterId: string,
+    alertedThisRun: Array<StoryCandidate & { clusterId: string }>,
+    options: { skipTelegram: boolean },
+  ): Promise<NotifyArticleResult> {
+    const article = analysis.article;
+    if (!article) {
+      return 'skipped';
+    }
+
+    try {
       await this.notifications.save(
         this.notifications.create({
           articleId: analysis.articleId,
@@ -213,13 +254,19 @@ export class NotificationsService {
       );
     } catch (error) {
       this.logger.error(
-        `Telegram sent for article ${analysis.articleId} but persist failed: ${errorMessage(error)}`,
+        options.skipTelegram
+          ? `Recovered Telegram send for article ${analysis.articleId} but notification persist failed: ${errorMessage(error)}`
+          : `Telegram sent for article ${analysis.articleId} but notification persist failed: ${errorMessage(error)}`,
       );
       return 'errors';
     }
 
     alertedThisRun.push({ ...candidate, clusterId });
-    this.logger.log(`Notified article ${analysis.articleId} via Telegram`);
+    this.logger.log(
+      options.skipTelegram
+        ? `Recovered notification persist for article ${analysis.articleId} (skipped duplicate Telegram send)`
+        : `Notified article ${analysis.articleId} via Telegram`,
+    );
     return 'sent';
   }
 

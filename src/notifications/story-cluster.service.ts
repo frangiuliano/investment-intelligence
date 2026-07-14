@@ -66,13 +66,18 @@ export class StoryClusterService {
     candidate: StoryCandidate,
     windowHours: number,
   ): Promise<MatchedStoryCluster | null> {
-    const since = new Date(Date.now() - windowHours * 60 * 60 * 1000);
+    const windowMs = windowHours * 60 * 60 * 1000;
+    const windowStart = new Date(candidate.referenceAt.getTime() - windowMs);
+    const windowEnd = new Date(candidate.referenceAt.getTime() + windowMs);
 
     const alerted = await this.newsAnalyses
       .createQueryBuilder('analysis')
       .innerJoinAndSelect('analysis.article', 'article')
       .innerJoin('article.notifications', 'notification')
-      .where('notification.sent_at >= :since', { since })
+      .where(
+        'COALESCE(article.published_at, analysis.analyzed_at) BETWEEN :windowStart AND :windowEnd',
+        { windowStart, windowEnd },
+      )
       .andWhere(`(notification.payload->>'suppressed') IS DISTINCT FROM 'true'`)
       .getMany();
 
@@ -97,6 +102,13 @@ export class StoryClusterService {
     }
 
     return null;
+  }
+
+  async findAlertedClusterId(articleId: string): Promise<string | null> {
+    const existing = await this.members.findOne({
+      where: { articleId, alerted: true },
+    });
+    return existing?.clusterId ?? null;
   }
 
   async ensureClusterForAlertedArticle(articleId: string): Promise<string> {
