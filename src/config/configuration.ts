@@ -6,6 +6,7 @@ import {
   DEFAULT_GEMINI_ANALYSIS_BATCH_SIZE,
   DEFAULT_GEMINI_MODEL,
   DEFAULT_GEMINI_REQUEST_DELAY_MS,
+  DEFAULT_STORY_CLUSTER_WINDOW_HOURS,
   parseFeedUrls,
   parseWatchlistTickers,
 } from './env.validation';
@@ -46,6 +47,9 @@ export type AppConfig = {
   watchlist: {
     tickers: string[];
   };
+  storyCluster: {
+    windowHours: number;
+  };
 };
 
 export default (): AppConfig => ({
@@ -80,5 +84,12 @@ export default (): AppConfig => ({
   },
   watchlist: {
     tickers: parseWatchlistTickers(process.env.WATCHLIST_TICKERS),
+  },
+  storyCluster: {
+    windowHours: parseInt(
+      process.env.STORY_CLUSTER_WINDOW_HOURS ??
+        String(DEFAULT_STORY_CLUSTER_WINDOW_HOURS),
+      10,
+    ),
   },
 });

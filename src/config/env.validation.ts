@@ -11,6 +11,8 @@ export const DEFAULT_GEMINI_ANALYSIS_BATCH_SIZE = 5;
 export const DEFAULT_APP_LOCALE = 'en' as const;
 export const ALLOWED_APP_LOCALES = ['en', 'es'] as const;
 export type AppLocale = (typeof ALLOWED_APP_LOCALES)[number];
+/** Hours within which matching stories collapse to one push alert. */
+export const DEFAULT_STORY_CLUSTER_WINDOW_HOURS = 24;
 
 export function parseFeedUrls(raw: string | undefined): string[] {
   if (!raw) {
@@ -111,4 +113,9 @@ export const envValidationSchema = Joi.object({
     .messages({
       'any.only': `APP_LOCALE must be one of: ${ALLOWED_APP_LOCALES.join(', ')}`,
     }),
+  STORY_CLUSTER_WINDOW_HOURS: Joi.number()
+    .integer()
+    .min(1)
+    .max(168)
+    .default(DEFAULT_STORY_CLUSTER_WINDOW_HOURS),
 });

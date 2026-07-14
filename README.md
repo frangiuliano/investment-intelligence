@@ -61,6 +61,7 @@ falta una variable obligatoria de runtime (mensaje explícito vía Joi).
 | `TELEGRAM_CHAT_ID` | Sí | Chat destino de alertas |
 | `RSS_FEED_URLS` | Sí | Feeds RSS (separados por coma) |
 | `COLLECTION_CRON_SCHEDULE` | No (default `*/15 * * * *`) | Cron del pipeline end-to-end |
+| `STORY_CLUSTER_WINDOW_HOURS` | No (default `24`) | Ventana para colapsar historias duplicadas en un solo push |
 | `WATCHLIST_TICKERS` | No | Filtro opcional de tickers para relevancia |
 
 `APP_LOCALE` define el idioma de salida de la app (un locale por deploy).
@@ -428,12 +429,37 @@ El módulo `notifications/` envía alertas al chat configurado con
 
 1. Busca análisis sin fila en `notifications`.
 2. Evalúa relevancia con `RelevanceService`.
-3. Si es relevante, formatea el mensaje (título, resumen, sentimiento,
+3. Si es relevante, aplica **clustering de historias** (ver abajo): si ya
+   hubo push de la misma historia en la ventana, suprime el envío.
+4. Si no es duplicado, formatea el mensaje (título, resumen, sentimiento,
    tipo de evento si no es `none`, tickers, URL) según `APP_LOCALE` y lo
    envía a Telegram. El cuerpo del resumen es el de `news_analysis` (ya en
    locale); no hay traducción extra.
-4. Tras envío exitoso, persiste en `notifications` (`channel: telegram`).
-5. No reenvía artículos ya notificados.
+5. Tras envío exitoso, persiste en `notifications` (`channel: telegram`) y
+   registra el artículo en `news_story_clusters` / members.
+6. No reenvía artículos ya notificados (ni push ni suprimidos por cluster).
+
+### Story clustering (duplicate stories)
+
+Varias fuentes RSS pueden contar el mismo hecho con distinta URL/hash.
+Eso no lo cubre el dedupe del collector. Antes del push, el servicio
+agrupa “misma historia” con una heurística explicable (sin embeddings):
+
+| Señal | Regla |
+|-------|--------|
+| Ventana | `publishedAt` (o `analyzedAt`) dentro de `STORY_CLUSTER_WINDOW_HOURS` (default **24h**, máx. 168) |
+| Tickers | ≥1 ticker en común (normalizados a mayúsculas) |
+| `event_type` | mismo valor, o ambos `none`/`other` |
+| Texto | Jaccard de tokens del **título** o del **summary** ≥ 0.35 |
+
+Comportamiento:
+
+- La **primera** alerta relevante del cluster sí puede enviarse por Telegram.
+- Artículos posteriores de la misma historia **no** generan un segundo push;
+  se persisten en `news_story_cluster_members` y una fila `notifications`
+  con `payload.suppressed: true` + `reason: duplicate_story` (para no
+  reintentar).
+- No reemplaza el dedupe por URL/`content_hash` del collector.
 
 Labels del mensaje (`en` / `es`): Title/Título, Summary/Resumen,
 Sentiment/Sentimiento, Event/Evento (omitido si `none`), Tickers, URL. El

@@ -3,6 +3,8 @@ import { config as loadEnv } from 'dotenv';
 import { DataSource } from 'typeorm';
 import { NewsAnalysis } from '../analysis/entities/news-analysis.entity';
 import { NewsArticle } from '../news/entities/news-article.entity';
+import { NewsStoryClusterMember } from '../notifications/entities/news-story-cluster-member.entity';
+import { NewsStoryCluster } from '../notifications/entities/news-story-cluster.entity';
 import { Notification } from '../notifications/entities/notification.entity';
 import { Holding } from '../portfolio/holdings/entities/holding.entity';
 import { WatchlistEntry } from '../portfolio/watchlist/entities/watchlist-entry.entity';
@@ -11,6 +13,7 @@ import { AddNewsAnalysisMateriality1752430000000 } from './migrations/1752430000
 import { CreateHoldings1752500000000 } from './migrations/1752500000000-CreateHoldings';
 import { CreateWatchlistEntries1752510000000 } from './migrations/1752510000000-CreateWatchlistEntries';
 import { AddNewsAnalysisEventType1752520000000 } from './migrations/1752520000000-AddNewsAnalysisEventType';
+import { CreateNewsStoryClusters1752530000000 } from './migrations/1752530000000-CreateNewsStoryClusters';
 
 loadEnv();
 
@@ -25,13 +28,22 @@ if (!databaseUrl) {
 export default new DataSource({
   type: 'postgres',
   url: databaseUrl,
-  entities: [NewsArticle, NewsAnalysis, Notification, Holding, WatchlistEntry],
+  entities: [
+    NewsArticle,
+    NewsAnalysis,
+    Notification,
+    Holding,
+    WatchlistEntry,
+    NewsStoryCluster,
+    NewsStoryClusterMember,
+  ],
   migrations: [
     InitialSchema1752180000000,
     AddNewsAnalysisMateriality1752430000000,
     CreateHoldings1752500000000,
     CreateWatchlistEntries1752510000000,
     AddNewsAnalysisEventType1752520000000,
+    CreateNewsStoryClusters1752530000000,
   ],
   synchronize: false,
   logging: false,

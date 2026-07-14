@@ -2,6 +2,8 @@ import { Logger } from '@nestjs/common';
 import { DataSource, QueryFailedError, Repository } from 'typeorm';
 import { NewsAnalysis } from '../analysis/entities/news-analysis.entity';
 import { NewsArticle } from '../news/entities/news-article.entity';
+import { NewsStoryClusterMember } from '../notifications/entities/news-story-cluster-member.entity';
+import { NewsStoryCluster } from '../notifications/entities/news-story-cluster.entity';
 import { Notification } from '../notifications/entities/notification.entity';
 import {
   Holding,
@@ -13,6 +15,7 @@ import { AddNewsAnalysisMateriality1752430000000 } from './migrations/1752430000
 import { CreateHoldings1752500000000 } from './migrations/1752500000000-CreateHoldings';
 import { CreateWatchlistEntries1752510000000 } from './migrations/1752510000000-CreateWatchlistEntries';
 import { AddNewsAnalysisEventType1752520000000 } from './migrations/1752520000000-AddNewsAnalysisEventType';
+import { CreateNewsStoryClusters1752530000000 } from './migrations/1752530000000-CreateNewsStoryClusters';
 import {
   DEFAULT_TEST_DATABASE_URL,
   resolveTestDatabaseUrl,
@@ -27,6 +30,8 @@ describe('Database schema (integration)', () => {
   let notifications: Repository<Notification>;
   let holdings: Repository<Holding>;
   let watchlistEntries: Repository<WatchlistEntry>;
+  let storyClusters: Repository<NewsStoryCluster>;
+  let storyClusterMembers: Repository<NewsStoryClusterMember>;
   let databaseUrl: string;
 
   beforeAll(async () => {
@@ -41,6 +46,8 @@ describe('Database schema (integration)', () => {
         Notification,
         Holding,
         WatchlistEntry,
+        NewsStoryCluster,
+        NewsStoryClusterMember,
       ],
       migrations: [
         InitialSchema1752180000000,
@@ -48,6 +55,7 @@ describe('Database schema (integration)', () => {
         CreateHoldings1752500000000,
         CreateWatchlistEntries1752510000000,
         AddNewsAnalysisEventType1752520000000,
+        CreateNewsStoryClusters1752530000000,
       ],
       synchronize: false,
       logging: false,
@@ -73,6 +81,8 @@ describe('Database schema (integration)', () => {
     notifications = dataSource.getRepository(Notification);
     holdings = dataSource.getRepository(Holding);
     watchlistEntries = dataSource.getRepository(WatchlistEntry);
+    storyClusters = dataSource.getRepository(NewsStoryCluster);
+    storyClusterMembers = dataSource.getRepository(NewsStoryClusterMember);
   }, 30_000);
 
   afterAll(async () => {
@@ -83,7 +93,7 @@ describe('Database schema (integration)', () => {
 
   beforeEach(async () => {
     await dataSource.query(
-      'TRUNCATE TABLE "notifications", "news_analysis", "news_articles", "holdings", "watchlist_entries" RESTART IDENTITY CASCADE',
+      'TRUNCATE TABLE "notifications", "news_story_cluster_members", "news_story_clusters", "news_analysis", "news_articles", "holdings", "watchlist_entries" RESTART IDENTITY CASCADE',
     );
   });
 
@@ -97,7 +107,9 @@ describe('Database schema (integration)', () => {
           'news_analysis',
           'notifications',
           'holdings',
-          'watchlist_entries'
+          'watchlist_entries',
+          'news_story_clusters',
+          'news_story_cluster_members'
         )
       ORDER BY table_name
     `);
@@ -106,6 +118,8 @@ describe('Database schema (integration)', () => {
       'holdings',
       'news_analysis',
       'news_articles',
+      'news_story_cluster_members',
+      'news_story_clusters',
       'notifications',
       'watchlist_entries',
     ]);
@@ -293,5 +307,37 @@ describe('Database schema (integration)', () => {
       }),
     );
     expect(recreated.id).not.toBe(entry.id);
+  });
+
+  it('should persist story cluster membership with unique article_id', async () => {
+    const article = await articles.save(
+      articles.create({
+        title: 'Cluster story',
+        url: 'https://example.com/cluster',
+        content: 'body',
+        source: 'example',
+        contentHash: 'hash-cluster',
+        publishedAt: null,
+      }),
+    );
+
+    const cluster = await storyClusters.save(storyClusters.create());
+    await storyClusterMembers.save(
+      storyClusterMembers.create({
+        clusterId: cluster.id,
+        articleId: article.id,
+        alerted: true,
+      }),
+    );
+
+    await expect(
+      storyClusterMembers.save(
+        storyClusterMembers.create({
+          clusterId: cluster.id,
+          articleId: article.id,
+          alerted: false,
+        }),
+      ),
+    ).rejects.toBeInstanceOf(QueryFailedError);
   });
 });
