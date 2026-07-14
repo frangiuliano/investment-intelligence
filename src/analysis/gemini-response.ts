@@ -1,5 +1,7 @@
 import { AppLocale } from '../config/env.validation';
 import {
+  EVENT_TYPE_VALUES,
+  EventType,
   MATERIALITY_VALUES,
   MAX_PROMPT_CONTENT_LENGTH,
   MAX_SUMMARY_LENGTH,
@@ -13,6 +15,7 @@ export type GeminiAnalysisResult = {
   sentiment: Sentiment;
   tickers: string[];
   materiality: Materiality;
+  eventType: EventType;
 };
 
 const SUMMARY_LANGUAGE_BY_LOCALE: Record<AppLocale, string> = {
@@ -45,6 +48,7 @@ export function buildAnalysisSystemPrompt(locale: AppLocale): string {
     '- sentiment: one of "positive", "negative", "neutral" for market/investor impact',
     '- tickers: array of stock ticker symbols mentioned (e.g. ["AAPL","MSFT"]); empty array if none',
     '- materiality: one of "low", "medium", "high" for how market-moving the news is (low = routine/noise or unverified rumor; medium = notable for investors; high = major catalyst or significant market impact). Do not invent prices; treat AI judgment as unverified.',
+    '- event_type: one of "ipo", "earnings", "m_and_a", "regulation", "other", "none" for the primary catalyst/event in the article. Use "ipo" for IPO/listing/debuts, "earnings" for results/guidance, "m_and_a" for mergers/acquisitions, "regulation" for material regulatory/policy action. Use "none" when there is no clear catalyst; "other" for notable events outside that list. Do not invent listing dates or unverified facts.',
     'Do not include markdown fences or extra keys.',
   ].join(' ');
 }
@@ -82,8 +86,9 @@ export function parseGeminiAnalysisText(raw: string): GeminiAnalysisResult {
   const sentiment = normalizeSentiment(parsed.sentiment);
   const tickers = normalizeTickers(parsed.tickers);
   const materiality = normalizeMateriality(parsed.materiality);
+  const eventType = normalizeEventType(parsed.event_type);
 
-  return { summary, sentiment, tickers, materiality };
+  return { summary, sentiment, tickers, materiality, eventType };
 }
 
 function extractJsonObject(raw: string): string {
@@ -163,6 +168,17 @@ function normalizeMateriality(value: unknown): Materiality {
     return normalized as Materiality;
   }
   throw new Error(`Gemini response has invalid materiality: ${value}`);
+}
+
+function normalizeEventType(value: unknown): EventType {
+  if (typeof value !== 'string') {
+    throw new Error('Gemini response missing event_type');
+  }
+  const normalized = value.trim().toLowerCase();
+  if ((EVENT_TYPE_VALUES as readonly string[]).includes(normalized)) {
+    return normalized as EventType;
+  }
+  throw new Error(`Gemini response has invalid event_type: ${value}`);
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

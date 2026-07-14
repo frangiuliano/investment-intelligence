@@ -19,3 +19,24 @@ export type Materiality = (typeof MATERIALITY_VALUES)[number];
 
 /** Materiality levels that can trigger a push alert (with other relevance rules). */
 export const ALERTABLE_MATERIALITY_VALUES = ['medium', 'high'] as const;
+
+export const EVENT_TYPE_VALUES = [
+  'ipo',
+  'earnings',
+  'm_and_a',
+  'regulation',
+  'other',
+  'none',
+] as const;
+export type EventType = (typeof EVENT_TYPE_VALUES)[number];
+
+/**
+ * High-priority catalysts that may trigger a push alert even with neutral
+ * sentiment (still require alertable materiality + tickers + universe match).
+ */
+export const CATALYST_EVENT_TYPES = [
+  'ipo',
+  'earnings',
+  'm_and_a',
+  'regulation',
+] as const;

@@ -7,6 +7,8 @@ export type TelegramAlertInput = {
   sentiment: string;
   tickers: string[];
   url: string;
+  /** Shown only when present and not `none`. */
+  eventType?: string;
 };
 
 type TelegramMessageLabels = {
@@ -14,6 +16,7 @@ type TelegramMessageLabels = {
   title: string;
   summary: string;
   sentiment: string;
+  eventType: string;
   tickers: string;
   url: string;
   noneTickers: string;
@@ -27,6 +30,7 @@ const LABELS_BY_LOCALE: Record<AppLocale, TelegramMessageLabels> = {
     title: 'Title',
     summary: 'Summary',
     sentiment: 'Sentiment',
+    eventType: 'Event',
     tickers: 'Tickers',
     url: 'URL',
     noneTickers: '(none)',
@@ -38,6 +42,7 @@ const LABELS_BY_LOCALE: Record<AppLocale, TelegramMessageLabels> = {
     title: 'Título',
     summary: 'Resumen',
     sentiment: 'Sentimiento',
+    eventType: 'Evento',
     tickers: 'Tickers',
     url: 'URL',
     noneTickers: '(ninguno)',
@@ -54,16 +59,26 @@ export function formatTelegramAlert(
   const labels = LABELS_BY_LOCALE[locale];
   const tickers =
     input.tickers.length > 0 ? input.tickers.join(', ') : labels.noneTickers;
+  const eventType = normalizeEventTypeForDisplay(input.eventType);
 
-  const message = [
+  const lines = [
     labels.alertHeader,
     '',
     `${labels.title}: ${sanitizeField(input.title)}`,
     `${labels.summary}: ${sanitizeField(input.summary)}`,
     `${labels.sentiment}: ${sanitizeField(input.sentiment)}`,
+  ];
+
+  if (eventType) {
+    lines.push(`${labels.eventType}: ${sanitizeField(eventType)}`);
+  }
+
+  lines.push(
     `${labels.tickers}: ${tickers}`,
     `${labels.url}: ${sanitizeField(input.url)}`,
-  ].join('\n');
+  );
+
+  const message = lines.join('\n');
 
   if (message.length <= TELEGRAM_MAX_MESSAGE_LENGTH) {
     return message;
@@ -75,6 +90,19 @@ export function formatTelegramAlert(
 export function formatTelegramTestMessage(locale: AppLocale = 'en'): string {
   const labels = LABELS_BY_LOCALE[locale];
   return [labels.testHeader, '', labels.testBody].join('\n');
+}
+
+function normalizeEventTypeForDisplay(
+  eventType: string | undefined,
+): string | null {
+  if (!eventType) {
+    return null;
+  }
+  const normalized = eventType.trim().toLowerCase();
+  if (!normalized || normalized === 'none') {
+    return null;
+  }
+  return normalized;
 }
 
 function sanitizeField(value: string): string {

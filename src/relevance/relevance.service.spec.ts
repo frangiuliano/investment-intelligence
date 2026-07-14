@@ -3,13 +3,15 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { NewsAnalysis } from '../analysis/entities/news-analysis.entity';
 import { Notification } from '../notifications/entities/notification.entity';
+import { HoldingsService } from '../portfolio/holdings/holdings.service';
 import { WatchlistService } from '../portfolio/watchlist/watchlist.service';
 import { RelevanceService } from './relevance.service';
 
 describe('RelevanceService', () => {
   let service: RelevanceService;
   let configGet: jest.Mock;
-  let listActiveSymbols: jest.Mock;
+  let listWatchlistSymbols: jest.Mock;
+  let listHoldingSymbols: jest.Mock;
   let analysisFindOne: jest.Mock;
   let notificationsExists: jest.Mock;
   let createQueryBuilder: jest.Mock;
@@ -17,7 +19,8 @@ describe('RelevanceService', () => {
 
   beforeEach(async () => {
     configGet = jest.fn().mockReturnValue([]);
-    listActiveSymbols = jest.fn().mockResolvedValue([]);
+    listWatchlistSymbols = jest.fn().mockResolvedValue([]);
+    listHoldingSymbols = jest.fn().mockResolvedValue([]);
     analysisFindOne = jest.fn();
     notificationsExists = jest.fn();
     getMany = jest.fn();
@@ -38,7 +41,11 @@ describe('RelevanceService', () => {
         },
         {
           provide: WatchlistService,
-          useValue: { listActiveSymbols },
+          useValue: { listActiveSymbols: listWatchlistSymbols },
+        },
+        {
+          provide: HoldingsService,
+          useValue: { listActiveSymbols: listHoldingSymbols },
         },
         {
           provide: getRepositoryToken(NewsAnalysis),
@@ -69,17 +76,64 @@ describe('RelevanceService', () => {
       });
     });
 
-    it('should return false when sentiment is neutral', () => {
+    it('should return false when sentiment is neutral without a catalyst', () => {
       const result = service.evaluate({
         sentiment: 'neutral',
         tickers: ['AAPL'],
         materiality: 'high',
+        eventType: 'none',
         alreadyNotified: false,
       });
 
       expect(result).toEqual({
         isRelevant: false,
         reason: 'neutral sentiment',
+      });
+    });
+
+    it('should return false when neutral with other/none does not open spam', () => {
+      expect(
+        service.evaluate({
+          sentiment: 'neutral',
+          tickers: ['AAPL'],
+          materiality: 'high',
+          eventType: 'other',
+          alreadyNotified: false,
+        }),
+      ).toEqual({
+        isRelevant: false,
+        reason: 'neutral sentiment',
+      });
+    });
+
+    it('should return true for neutral IPO catalyst with high materiality', () => {
+      const result = service.evaluate({
+        sentiment: 'neutral',
+        tickers: ['XYZ'],
+        materiality: 'high',
+        eventType: 'ipo',
+        alreadyNotified: false,
+        watchlistTickers: ['XYZ'],
+      });
+
+      expect(result).toEqual({
+        isRelevant: true,
+        reason: 'catalyst event with tickers and materiality',
+      });
+    });
+
+    it('should return false for catalyst with low materiality', () => {
+      const result = service.evaluate({
+        sentiment: 'neutral',
+        tickers: ['XYZ'],
+        materiality: 'low',
+        eventType: 'ipo',
+        alreadyNotified: false,
+      });
+
+      expect(result).toEqual({
+        isRelevant: false,
+        reason: 'low materiality',
       });
     });
 
@@ -226,19 +280,31 @@ describe('RelevanceService', () => {
   });
 
   describe('resolveWatchlistTickers', () => {
-    it('should prefer persisted watchlist when non-empty', async () => {
-      listActiveSymbols.mockResolvedValue(['AAPL', 'TSLA']);
-      configGet.mockReturnValue(['MSFT']);
+    it('should union watchlist and holdings symbols when either is non-empty', async () => {
+      listWatchlistSymbols.mockResolvedValue(['AAPL', 'TSLA']);
+      listHoldingSymbols.mockResolvedValue(['MSFT', 'AAPL']);
+      configGet.mockReturnValue(['GOOG']);
 
       await expect(service.resolveWatchlistTickers()).resolves.toEqual([
         'AAPL',
         'TSLA',
+        'MSFT',
       ]);
       expect(configGet).not.toHaveBeenCalled();
     });
 
-    it('should fall back to env watchlist when persisted is empty', async () => {
-      listActiveSymbols.mockResolvedValue([]);
+    it('should use holdings-only universe when watchlist is empty', async () => {
+      listWatchlistSymbols.mockResolvedValue([]);
+      listHoldingSymbols.mockResolvedValue(['XOM']);
+      configGet.mockReturnValue(['MSFT']);
+
+      await expect(service.resolveWatchlistTickers()).resolves.toEqual(['XOM']);
+      expect(configGet).not.toHaveBeenCalled();
+    });
+
+    it('should fall back to env watchlist when watchlist and holdings are empty', async () => {
+      listWatchlistSymbols.mockResolvedValue([]);
+      listHoldingSymbols.mockResolvedValue([]);
       configGet.mockReturnValue(['MSFT', 'GOOG']);
 
       await expect(service.resolveWatchlistTickers()).resolves.toEqual([
@@ -257,15 +323,16 @@ describe('RelevanceService', () => {
       expect(notificationsExists).not.toHaveBeenCalled();
     });
 
-    it('should load analysis and notification state then evaluate with persisted watchlist', async () => {
+    it('should load analysis and notification state then evaluate with persisted universe', async () => {
       analysisFindOne.mockResolvedValue({
         articleId: 'article-1',
         sentiment: 'positive',
         tickers: ['AAPL'],
         materiality: 'medium',
+        eventType: 'none',
       });
       notificationsExists.mockResolvedValue(false);
-      listActiveSymbols.mockResolvedValue(['AAPL']);
+      listWatchlistSymbols.mockResolvedValue(['AAPL']);
 
       await expect(service.evaluateArticle('article-1')).resolves.toEqual({
         isRelevant: true,
@@ -280,19 +347,38 @@ describe('RelevanceService', () => {
       });
     });
 
-    it('should return false when persisted watchlist does not match tickers', async () => {
+    it('should return false when persisted universe does not match tickers', async () => {
       analysisFindOne.mockResolvedValue({
         articleId: 'article-1',
         sentiment: 'positive',
         tickers: ['MSFT'],
         materiality: 'high',
+        eventType: 'none',
       });
       notificationsExists.mockResolvedValue(false);
-      listActiveSymbols.mockResolvedValue(['AAPL']);
+      listWatchlistSymbols.mockResolvedValue(['AAPL']);
 
       await expect(service.evaluateArticle('article-1')).resolves.toEqual({
         isRelevant: false,
         reason: 'no watchlist tickers',
+      });
+    });
+
+    it('should alert neutral earnings when ticker is only in holdings', async () => {
+      analysisFindOne.mockResolvedValue({
+        articleId: 'article-1',
+        sentiment: 'neutral',
+        tickers: ['XOM'],
+        materiality: 'high',
+        eventType: 'earnings',
+      });
+      notificationsExists.mockResolvedValue(false);
+      listWatchlistSymbols.mockResolvedValue([]);
+      listHoldingSymbols.mockResolvedValue(['XOM']);
+
+      await expect(service.evaluateArticle('article-1')).resolves.toEqual({
+        isRelevant: true,
+        reason: 'catalyst event with tickers and materiality',
       });
     });
   });
@@ -305,18 +391,21 @@ describe('RelevanceService', () => {
           sentiment: 'positive',
           tickers: ['AAPL'],
           materiality: 'high',
+          eventType: 'none',
         },
         {
           articleId: 'article-2',
           sentiment: 'neutral',
           tickers: ['MSFT'],
           materiality: 'high',
+          eventType: 'none',
         },
         {
           articleId: 'article-3',
           sentiment: 'negative',
           tickers: ['XOM'],
           materiality: 'low',
+          eventType: 'ipo',
         },
       ]);
       notificationsExists.mockResolvedValue(false);

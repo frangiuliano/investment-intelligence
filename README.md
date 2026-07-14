@@ -343,10 +343,12 @@ El módulo `analysis/` toma artículos de `news_articles` **sin** fila en
 1. Prompt estructurado a Gemini Flash (`GEMINI_MODEL`, default
    `gemini-3.1-flash-lite`) pidiendo JSON:
    `summary`, `sentiment` (`positive` | `negative` | `neutral`), `tickers`,
-   `materiality` (`low` | `medium` | `high`).
+   `materiality` (`low` | `medium` | `high`),
+   `event_type` (`ipo` | `earnings` | `m_and_a` | `regulation` | `other` |
+   `none`).
    El `summary` se pide y se guarda en el idioma de `APP_LOCALE` (`en` /
-   `es`); `sentiment`, `tickers` y `materiality` no se localizan. Cambiar
-   el locale no re-analiza filas históricas.
+   `es`); `sentiment`, `tickers`, `materiality` y `event_type` no se
+   localizan. Cambiar el locale no re-analiza filas históricas.
 2. Usa `GEMINI_API_KEY_FINANCE` (nunca la key del Reviewer).
 3. Procesa como máximo `GEMINI_ANALYSIS_BATCH_SIZE` artículos por corrida y
    espera `GEMINI_REQUEST_DELAY_MS` (default 12000) entre requests.
@@ -374,35 +376,46 @@ consume vía `NotificationsService`. `RelevanceService.evaluate()`
 devuelve `{ isRelevant, reason }` con estas reglas:
 
 1. Ya notificado → no relevante.
-2. Sentimiento `neutral` → no relevante.
-3. Sentimiento fuera de `positive` / `negative` / `neutral` → no relevante.
-4. Sin tickers → no relevante.
-5. Materialidad `low` (o inválida / ausente) → no relevante.
-6. Materialidad `medium` o `high`, sentimiento no neutral y ≥1 ticker →
-   relevante.
-7. Si la watchlist efectiva no está vacía, además hace falta al menos un
+2. Sentimiento fuera de `positive` / `negative` / `neutral` → no relevante.
+3. Sin tickers → no relevante.
+4. Materialidad `low` (o inválida / ausente) → no relevante.
+5. Sentimiento `neutral` **sin** catalizador prioritario → no relevante.
+6. Materialidad `medium` o `high` + ≥1 ticker + (sentimiento no neutral
+   **o** catalizador prioritario) → relevante.
+7. Si el universo del operador no está vacío, además hace falta al menos un
    ticker del análisis en esa lista.
 
-**Fuente de la watchlist (prioridad):**
+**Catalizadores prioritarios** (`event_type`): `ipo`, `earnings`,
+`m_and_a`, `regulation`. Pueden generar push **aunque** el sentimiento sea
+`neutral`, siempre con materialidad `medium`/`high` y overlap de universo.
+`other` y `none` **no** bypassean el filtro de sentimiento neutral (evitan
+spam).
 
-1. Filas activas en `watchlist_entries` (REST `/watchlist`) — si hay ≥1.
-2. Si la tabla está vacía, fallback a `WATCHLIST_TICKERS` (env), documentado
-   como transición; preferí editar la watchlist persistida.
+**Fuente del universo (prioridad):**
 
-`materiality` viene del análisis Gemini (`low` / `medium` / `high`) y se
-persiste en `news_analysis`. Es una señal no verificada del modelo: sirve
-para filtrar ruido, no para afirmar impacto de mercado. Filas previas a
-esta columna se migran con default `low` (no generan push hasta re-análisis).
+1. Unión de símbolos activos en `watchlist_entries` (REST `/watchlist`) y
+   `holdings` (REST `/holdings`) — si la unión tiene ≥1 símbolo.
+2. Si ambas tablas están vacías, fallback a `WATCHLIST_TICKERS` (env),
+   documentado como transición; preferí editar la watchlist/cartera
+   persistida.
+
+`materiality` y `event_type` vienen del análisis Gemini y se persisten en
+`news_analysis`. Son señales no verificadas del modelo: sirven para filtrar
+ruido y clasificar catalizadores, no para afirmar impacto de mercado ni
+recomendar comprá/vendé. Filas previas a estas columnas se migran con
+default `low` / `none` (no generan push de catalizador hasta re-análisis).
 
 Ejemplos:
 
 | Caso | ¿Alerta push? |
 |------|----------------|
-| `negative` + tickers + `high` | Sí (sujeto a watchlist) |
-| `positive` + tickers + `medium` | Sí (sujeto a watchlist) |
+| `negative` + tickers + `high` + `none` | Sí (sujeto a universo) |
+| `positive` + tickers + `medium` | Sí (sujeto a universo) |
 | `negative` + tickers + `low` | No |
 | `positive` + sin tickers + `high` | No |
-| `neutral` + tickers + `high` | No |
+| `neutral` + tickers + `high` + `none`/`other` | No |
+| `neutral` + ticker en watchlist/cartera + `high` + `ipo` | Sí |
+| `neutral` + `ipo` + `low` | No |
 
 `evaluateArticle(articleId)` carga `news_analysis` y consulta si ya existe
 fila en `notifications` para ese artículo.
@@ -416,14 +429,15 @@ El módulo `notifications/` envía alertas al chat configurado con
 1. Busca análisis sin fila en `notifications`.
 2. Evalúa relevancia con `RelevanceService`.
 3. Si es relevante, formatea el mensaje (título, resumen, sentimiento,
-   tickers, URL) según `APP_LOCALE` y lo envía a Telegram. El cuerpo del
-   resumen es el de `news_analysis` (ya en locale); no hay traducción extra.
+   tipo de evento si no es `none`, tickers, URL) según `APP_LOCALE` y lo
+   envía a Telegram. El cuerpo del resumen es el de `news_analysis` (ya en
+   locale); no hay traducción extra.
 4. Tras envío exitoso, persiste en `notifications` (`channel: telegram`).
 5. No reenvía artículos ya notificados.
 
 Labels del mensaje (`en` / `es`): Title/Título, Summary/Resumen,
-Sentiment/Sentimiento, Tickers, URL. El título y la URL del artículo RSS
-pueden quedar en el idioma de la fuente.
+Sentiment/Sentimiento, Event/Evento (omitido si `none`), Tickers, URL. El
+título y la URL del artículo RSS pueden quedar en el idioma de la fuente.
 
 Invocación local (one-shot, sin esperar al cron del pipeline):
 

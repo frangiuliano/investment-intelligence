@@ -12,6 +12,7 @@ import { InitialSchema1752180000000 } from './migrations/1752180000000-InitialSc
 import { AddNewsAnalysisMateriality1752430000000 } from './migrations/1752430000000-AddNewsAnalysisMateriality';
 import { CreateHoldings1752500000000 } from './migrations/1752500000000-CreateHoldings';
 import { CreateWatchlistEntries1752510000000 } from './migrations/1752510000000-CreateWatchlistEntries';
+import { AddNewsAnalysisEventType1752520000000 } from './migrations/1752520000000-AddNewsAnalysisEventType';
 import {
   DEFAULT_TEST_DATABASE_URL,
   resolveTestDatabaseUrl,
@@ -46,6 +47,7 @@ describe('Database schema (integration)', () => {
         AddNewsAnalysisMateriality1752430000000,
         CreateHoldings1752500000000,
         CreateWatchlistEntries1752510000000,
+        AddNewsAnalysisEventType1752520000000,
       ],
       synchronize: false,
       logging: false,
@@ -167,6 +169,7 @@ describe('Database schema (integration)', () => {
         sentiment: 'positive',
         tickers: ['AAPL'],
         materiality: 'high',
+        eventType: 'earnings',
         model: 'gemini-flash',
       }),
     );
@@ -181,6 +184,7 @@ describe('Database schema (integration)', () => {
 
     expect(analysis.articleId).toBe(article.id);
     expect(analysis.materiality).toBe('high');
+    expect(analysis.eventType).toBe('earnings');
     expect(notification.articleId).toBe(article.id);
 
     await expect(
@@ -191,6 +195,7 @@ describe('Database schema (integration)', () => {
           sentiment: 'neutral',
           tickers: [],
           materiality: 'low',
+          eventType: 'none',
           model: 'gemini-flash',
         }),
       ),

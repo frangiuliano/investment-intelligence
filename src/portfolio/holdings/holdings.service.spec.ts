@@ -120,6 +120,23 @@ describe('HoldingsService', () => {
     });
   });
 
+  it('should list unique active symbols', async () => {
+    find.mockResolvedValue([
+      { symbol: 'AAPL' },
+      { symbol: 'AAPL' },
+      { symbol: 'MSFT' },
+    ]);
+
+    await expect(service.listActiveSymbols()).resolves.toEqual([
+      'AAPL',
+      'MSFT',
+    ]);
+    expect(find).toHaveBeenCalledWith({
+      select: { symbol: true },
+      order: { symbol: 'ASC' },
+    });
+  });
+
   it('should throw NotFoundException when holding is missing', async () => {
     findOne.mockResolvedValue(null);
 
