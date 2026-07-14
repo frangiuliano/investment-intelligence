@@ -38,6 +38,7 @@ describe('NotificationsService', () => {
 
   const analysis = {
     articleId: 'article-1',
+    headline: '',
     sentiment: 'negative',
     summary: 'Crude fell on inventory data.',
     tickers: ['XOM'],
@@ -243,6 +244,7 @@ describe('NotificationsService', () => {
       };
       const secondAnalysis = {
         articleId: 'article-2',
+        headline: '',
         sentiment: 'negative',
         summary: 'Crude fell on inventory data from a second source.',
         tickers: ['XOM'],
@@ -298,6 +300,35 @@ describe('NotificationsService', () => {
       expect(message).not.toContain('Title:');
     });
 
+    it('should use persisted Spanish headline in Telegram alerts', async () => {
+      locale = 'es';
+      getMany.mockResolvedValue([
+        {
+          ...analysis,
+          headline: 'El petróleo baja por inventarios',
+        },
+      ]);
+
+      await service.notifyRelevant();
+
+      const [[message]] = sendMessage.mock.calls as [[string]];
+      expect(message).toContain('Título: El petróleo baja por inventarios');
+      expect(message).not.toContain('Título: Oil slides');
+      expect(save).toHaveBeenCalledWith({
+        articleId: 'article-1',
+        channel: TELEGRAM_CHANNEL,
+        payload: {
+          title: 'El petróleo baja por inventarios',
+          summary: 'Crude fell on inventory data.',
+          sentiment: 'negative',
+          tickers: ['XOM'],
+          url: 'https://news.example.com/oil',
+          eventType: 'none',
+          clusterId: 'cluster-1',
+        },
+      });
+    });
+
     it('should skip non-relevant articles without sending', async () => {
       evaluate.mockReturnValue({
         isRelevant: false,
@@ -341,6 +372,7 @@ describe('NotificationsService', () => {
       };
       const secondAnalysis = {
         articleId: 'article-2',
+        headline: '',
         sentiment: 'negative',
         summary: 'Crude fell on inventory data from a second source.',
         tickers: ['XOM'],

@@ -3,9 +3,25 @@ import {
   formatTelegramAlert,
   formatTelegramDigest,
   formatTelegramTestMessage,
+  resolveTelegramTitle,
 } from './telegram-message';
 
 describe('telegram-message', () => {
+  describe('resolveTelegramTitle', () => {
+    it('should prefer a non-empty localized headline', () => {
+      expect(resolveTelegramTitle('Petróleo baja', 'Oil slides')).toBe(
+        'Petróleo baja',
+      );
+    });
+
+    it('should fall back to the RSS title when headline is blank', () => {
+      expect(resolveTelegramTitle('', 'Oil slides')).toBe('Oil slides');
+      expect(resolveTelegramTitle('   ', 'Oil slides')).toBe('Oil slides');
+      expect(resolveTelegramTitle(null, 'Oil slides')).toBe('Oil slides');
+      expect(resolveTelegramTitle(undefined, 'Oil slides')).toBe('Oil slides');
+    });
+  });
+
   it('should format an English alert with title, summary, sentiment, tickers, and URL', () => {
     const message = formatTelegramAlert(
       {
@@ -27,10 +43,10 @@ describe('telegram-message', () => {
     expect(message).not.toContain('Event:');
   });
 
-  it('should format a Spanish alert with localized labels', () => {
+  it('should format a Spanish alert with localized labels and headline', () => {
     const message = formatTelegramAlert(
       {
-        title: 'Oil slides',
+        title: resolveTelegramTitle('El petróleo baja', 'Oil slides'),
         summary: 'El crudo cayó por inventarios.',
         sentiment: 'negative',
         tickers: ['XOM', 'CVX'],
@@ -40,7 +56,7 @@ describe('telegram-message', () => {
     );
 
     expect(message).toContain('Alerta de noticia relevante');
-    expect(message).toContain('Título: Oil slides');
+    expect(message).toContain('Título: El petróleo baja');
     expect(message).toContain('Resumen: El crudo cayó por inventarios.');
     expect(message).toContain('Sentimiento: negativo');
     expect(message).toContain('Tickers: XOM, CVX');
@@ -219,13 +235,13 @@ describe('telegram-message', () => {
     expect(message).toContain('https://news.example.com/oil');
   });
 
-  it('should format a Spanish digest with localized labels', () => {
+  it('should format a Spanish digest with localized labels and headline', () => {
     const { message, includedCount } = formatTelegramDigest(
       {
         lookbackHours: 168,
         items: [
           {
-            title: 'Oil slides',
+            title: resolveTelegramTitle('El petróleo baja', 'Oil slides'),
             summary: 'El crudo cayó.',
             sentiment: 'negative',
             materiality: 'high',
@@ -241,6 +257,7 @@ describe('telegram-message', () => {
     expect(includedCount).toBe(1);
     expect(message).toContain('Digesto de noticias (168h)');
     expect(message).toContain('1 ítems');
+    expect(message).toContain('1. El petróleo baja');
     expect(message).toContain('Materialidad: alta');
     expect(message).toContain('Sentimiento: negativo');
     expect(message).toContain('Evento: otro');

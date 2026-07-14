@@ -11,7 +11,11 @@ import {
 import { RelevanceService } from '../relevance/relevance.service';
 import { DigestItem } from './entities/digest-item.entity';
 import { DigestRun } from './entities/digest-run.entity';
-import { DigestItemInput, formatTelegramDigest } from './telegram-message';
+import {
+  DigestItemInput,
+  formatTelegramDigest,
+  resolveTelegramTitle,
+} from './telegram-message';
 import { TelegramApiError, TelegramClient } from './telegram.client';
 import { TELEGRAM_CHANNEL } from './telegram.constants';
 
@@ -195,7 +199,7 @@ export class DigestService {
 
     return {
       articleId: analysis.articleId,
-      title: article.title,
+      title: resolveTelegramTitle(analysis.headline, article.title),
       summary: analysis.summary,
       sentiment: analysis.sentiment,
       materiality: analysis.materiality,

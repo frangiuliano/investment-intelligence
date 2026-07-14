@@ -135,6 +135,15 @@ const EVENT_TYPE_DISPLAY_BY_LOCALE: Record<
   },
 };
 
+/** Prefer persisted localized headline; fall back to RSS title when blank. */
+export function resolveTelegramTitle(
+  headline: string | null | undefined,
+  rssTitle: string,
+): string {
+  const trimmed = headline?.trim();
+  return trimmed && trimmed.length > 0 ? trimmed : rssTitle;
+}
+
 export function formatTelegramAlert(
   input: TelegramAlertInput,
   locale: AppLocale = 'en',
