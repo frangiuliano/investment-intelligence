@@ -23,6 +23,7 @@ describe('telegram-message', () => {
     expect(message).toContain('Sentiment: negative');
     expect(message).toContain('Tickers: XOM, CVX');
     expect(message).toContain('URL: https://news.example.com/oil');
+    expect(message).not.toContain('Event:');
   });
 
   it('should format a Spanish alert with localized labels', () => {
@@ -43,6 +44,51 @@ describe('telegram-message', () => {
     expect(message).toContain('Sentimiento: negative');
     expect(message).toContain('Tickers: XOM, CVX');
     expect(message).toContain('URL: https://news.example.com/oil');
+    expect(message).not.toContain('Evento:');
+  });
+
+  it('should include event type when not none', () => {
+    const en = formatTelegramAlert(
+      {
+        title: 'IPO filing',
+        summary: 'Company files to go public.',
+        sentiment: 'neutral',
+        tickers: ['XYZ'],
+        url: 'https://news.example.com/ipo',
+        eventType: 'ipo',
+      },
+      'en',
+    );
+    expect(en).toContain('Event: ipo');
+
+    const es = formatTelegramAlert(
+      {
+        title: 'IPO filing',
+        summary: 'La compañía presenta su oferta.',
+        sentiment: 'neutral',
+        tickers: ['XYZ'],
+        url: 'https://news.example.com/ipo',
+        eventType: 'ipo',
+      },
+      'es',
+    );
+    expect(es).toContain('Evento: ipo');
+  });
+
+  it('should omit event type when none or missing', () => {
+    expect(
+      formatTelegramAlert(
+        {
+          title: 'A',
+          summary: 'B',
+          sentiment: 'positive',
+          tickers: ['AAPL'],
+          url: 'https://news.example.com/a',
+          eventType: 'none',
+        },
+        'en',
+      ),
+    ).not.toContain('Event:');
   });
 
   it('should use localized empty-tickers placeholder', () => {

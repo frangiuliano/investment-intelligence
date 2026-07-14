@@ -119,6 +119,7 @@ export class NotificationsService {
       sentiment: analysis.sentiment,
       tickers: analysis.tickers ?? [],
       materiality: analysis.materiality,
+      eventType: analysis.eventType,
       alreadyNotified,
       watchlistTickers,
     });
@@ -138,6 +139,7 @@ export class NotificationsService {
         sentiment: analysis.sentiment,
         tickers: analysis.tickers ?? [],
         url: article.url,
+        eventType: analysis.eventType,
       },
       locale,
     );
@@ -161,6 +163,7 @@ export class NotificationsService {
             sentiment: analysis.sentiment,
             tickers: analysis.tickers ?? [],
             url: article.url,
+            eventType: analysis.eventType,
           },
         }),
       );

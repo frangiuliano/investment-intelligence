@@ -34,6 +34,7 @@ describe('NotificationsService', () => {
     summary: 'Crude fell on inventory data.',
     tickers: ['XOM'],
     materiality: 'high',
+    eventType: 'none',
     article,
   };
 
@@ -120,6 +121,7 @@ describe('NotificationsService', () => {
           sentiment: 'negative',
           tickers: ['XOM'],
           url: 'https://news.example.com/oil',
+          eventType: 'none',
         },
       });
     });
