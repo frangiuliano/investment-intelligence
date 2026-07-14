@@ -25,7 +25,8 @@ describe('NotificationsService', () => {
   let toCandidate: jest.Mock;
   let findMatchInCandidates: jest.Mock;
   let findMatchingAlertedStory: jest.Mock;
-  let createAlertedCluster: jest.Mock;
+  let findAlertedClusterId: jest.Mock;
+  let ensureClusterForAlertedArticle: jest.Mock;
   let addSuppressedMember: jest.Mock;
 
   const article = {
@@ -78,7 +79,8 @@ describe('NotificationsService', () => {
     toCandidate = jest.fn().mockReturnValue(candidate);
     findMatchInCandidates = jest.fn().mockReturnValue(null);
     findMatchingAlertedStory = jest.fn().mockResolvedValue(null);
-    createAlertedCluster = jest.fn().mockResolvedValue('cluster-1');
+    findAlertedClusterId = jest.fn().mockResolvedValue(null);
+    ensureClusterForAlertedArticle = jest.fn().mockResolvedValue('cluster-1');
     addSuppressedMember = jest.fn().mockResolvedValue(undefined);
 
     const module: TestingModule = await Test.createTestingModule({
@@ -115,7 +117,8 @@ describe('NotificationsService', () => {
             toCandidate,
             findMatchInCandidates,
             findMatchingAlertedStory,
-            createAlertedCluster,
+            findAlertedClusterId,
+            ensureClusterForAlertedArticle,
             addSuppressedMember,
           },
         },
@@ -150,7 +153,7 @@ describe('NotificationsService', () => {
       expect(message).toContain('Sentiment: negative');
       expect(message).toContain('Tickers: XOM');
       expect(message).toContain('URL: https://news.example.com/oil');
-      expect(createAlertedCluster).toHaveBeenCalledWith('article-1');
+      expect(ensureClusterForAlertedArticle).toHaveBeenCalledWith('article-1');
       expect(save).toHaveBeenCalledWith({
         articleId: 'article-1',
         channel: TELEGRAM_CHANNEL,
@@ -162,6 +165,34 @@ describe('NotificationsService', () => {
           url: 'https://news.example.com/oil',
           eventType: 'none',
           clusterId: 'cluster-1',
+        },
+      });
+    });
+
+    it('should recover notification persist without re-sending Telegram when cluster already alerted', async () => {
+      findAlertedClusterId.mockResolvedValue('cluster-recovered');
+
+      const result = await service.notifyRelevant();
+
+      expect(result).toEqual({
+        candidates: 1,
+        sent: 1,
+        skipped: 0,
+        errors: 0,
+      });
+      expect(sendMessage).not.toHaveBeenCalled();
+      expect(ensureClusterForAlertedArticle).not.toHaveBeenCalled();
+      expect(save).toHaveBeenCalledWith({
+        articleId: 'article-1',
+        channel: TELEGRAM_CHANNEL,
+        payload: {
+          title: 'Oil slides',
+          summary: 'Crude fell on inventory data.',
+          sentiment: 'negative',
+          tickers: ['XOM'],
+          url: 'https://news.example.com/oil',
+          eventType: 'none',
+          clusterId: 'cluster-recovered',
         },
       });
     });
