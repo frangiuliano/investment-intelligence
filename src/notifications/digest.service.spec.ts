@@ -115,6 +115,7 @@ describe('DigestService', () => {
     return {
       id: 'analysis-1',
       articleId,
+      headline: '',
       summary: 'Medium impact note.',
       sentiment: 'neutral',
       tickers: ['AAPL'],
@@ -164,6 +165,21 @@ describe('DigestService', () => {
     expect(message).toContain('Apple note');
     expect(digestRuns.manager.transaction).toHaveBeenCalledTimes(1);
     expect(persistedArticleIds).toEqual([articleId]);
+  });
+
+  it('should prefer persisted headline over RSS title in the digest', async () => {
+    mockCandidates([
+      analysisFixture({
+        headline: 'Nota de Apple sobre resultados',
+      }),
+    ]);
+
+    await service.sendDigest();
+
+    const sentArgs = telegramClient.sendMessage.mock.calls[0] as [string];
+    const message = sentArgs[0];
+    expect(message).toContain('Nota de Apple sobre resultados');
+    expect(message).not.toContain('Apple note');
   });
 
   it('should persist only items that fit in the Telegram digest message', async () => {

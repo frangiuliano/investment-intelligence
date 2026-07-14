@@ -22,6 +22,7 @@ describe('gemini-response', () => {
     it('should parse a structured Gemini JSON payload', () => {
       const result = parseGeminiAnalysisText(
         JSON.stringify({
+          headline: 'Apple rises on earnings beat',
           summary: 'Apple rose after earnings.',
           sentiment: 'positive',
           tickers: ['aapl', 'MSFT', 'aapl', 'bad ticker!'],
@@ -31,6 +32,7 @@ describe('gemini-response', () => {
       );
 
       expect(result).toEqual({
+        headline: 'Apple rises on earnings beat',
         summary: 'Apple rose after earnings.',
         sentiment: 'positive',
         tickers: ['AAPL', 'MSFT'],
@@ -41,13 +43,29 @@ describe('gemini-response', () => {
 
     it('should parse JSON wrapped in markdown fences', () => {
       const result = parseGeminiAnalysisText(`\`\`\`json
-{"summary":"Mixed signals","sentiment":"neutral","tickers":[],"materiality":"low","event_type":"none"}
+{"headline":"Mixed signals","summary":"Mixed signals","sentiment":"neutral","tickers":[],"materiality":"low","event_type":"none"}
 \`\`\``);
 
+      expect(result.headline).toBe('Mixed signals');
       expect(result.sentiment).toBe('neutral');
       expect(result.tickers).toEqual([]);
       expect(result.materiality).toBe('low');
       expect(result.eventType).toBe('none');
+    });
+
+    it('should allow missing headline without failing the parse', () => {
+      const result = parseGeminiAnalysisText(
+        JSON.stringify({
+          summary: 'Apple rose after earnings.',
+          sentiment: 'positive',
+          tickers: ['AAPL'],
+          materiality: 'high',
+          event_type: 'earnings',
+        }),
+      );
+
+      expect(result.headline).toBe('');
+      expect(result.summary).toBe('Apple rose after earnings.');
     });
 
     it('should reject invalid sentiment values', () => {
@@ -120,10 +138,11 @@ describe('gemini-response', () => {
   });
 
   describe('buildAnalysisSystemPrompt', () => {
-    it('should instruct an English summary when locale is en', () => {
+    it('should instruct an English summary and headline when locale is en', () => {
       const prompt = buildAnalysisSystemPrompt('en');
 
-      expect(prompt).toContain('Write the summary in English.');
+      expect(prompt).toContain('Write the summary and headline in English.');
+      expect(prompt).toContain('short English user-facing title');
       expect(prompt).toContain('concise English summary');
       expect(prompt).toContain(
         'sentiment: one of "positive", "negative", "neutral"',
@@ -135,10 +154,11 @@ describe('gemini-response', () => {
       );
     });
 
-    it('should instruct a Spanish summary when locale is es', () => {
+    it('should instruct a Spanish summary and headline when locale is es', () => {
       const prompt = buildAnalysisSystemPrompt('es');
 
-      expect(prompt).toContain('Write the summary in Spanish.');
+      expect(prompt).toContain('Write the summary and headline in Spanish.');
+      expect(prompt).toContain('short Spanish user-facing title');
       expect(prompt).toContain('concise Spanish summary');
       expect(prompt).toContain(
         'sentiment: one of "positive", "negative", "neutral"',

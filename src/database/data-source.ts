@@ -17,6 +17,7 @@ import { CreateWatchlistEntries1752510000000 } from './migrations/1752510000000-
 import { AddNewsAnalysisEventType1752520000000 } from './migrations/1752520000000-AddNewsAnalysisEventType';
 import { CreateNewsStoryClusters1752530000000 } from './migrations/1752530000000-CreateNewsStoryClusters';
 import { CreateDigestTables1752540000000 } from './migrations/1752540000000-CreateDigestTables';
+import { AddNewsAnalysisHeadline1752550000000 } from './migrations/1752550000000-AddNewsAnalysisHeadline';
 
 loadEnv();
 
@@ -50,6 +51,7 @@ export default new DataSource({
     AddNewsAnalysisEventType1752520000000,
     CreateNewsStoryClusters1752530000000,
     CreateDigestTables1752540000000,
+    AddNewsAnalysisHeadline1752550000000,
   ],
   synchronize: false,
   logging: false,

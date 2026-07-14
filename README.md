@@ -68,10 +68,12 @@ falta una variable obligatoria de runtime (mensaje explícito vía Joi).
 
 `APP_LOCALE` define el idioma de salida de la app (un locale por deploy).
 Valores permitidos: `en`, `es` (default `en`). Si el valor no está permitido,
-la app **no arranca**. El análisis Gemini genera y persiste `summary` en ese
-idioma. Las alertas Telegram usan labels **y valores de display** en el mismo
-locale y reutilizan el `summary` ya persistido (sin traducir otra vez al
-enviar). No traduce títulos RSS ni contenido original de feeds.
+la app **no arranca**. El análisis Gemini genera y persiste `summary` y
+`headline` en ese idioma (mismo request JSON; sin segunda llamada). Las
+alertas y digestos Telegram usan labels **y valores de display** en el mismo
+locale, reutilizan el `summary` y muestran `headline` si existe (si está
+vacío — filas históricas — caen al título RSS). No re-analiza histórico ni
+traduce el cuerpo original del feed al notificar.
 
 **Códigos vs display:** en DB / relevance / clustering, `sentiment`,
 `materiality` y `event_type` se persisten y filtran solo como códigos en
@@ -351,15 +353,16 @@ El módulo `analysis/` toma artículos de `news_articles` **sin** fila en
 
 1. Prompt estructurado a Gemini Flash (`GEMINI_MODEL`, default
    `gemini-3.1-flash-lite`) pidiendo JSON:
-   `summary`, `sentiment` (`positive` | `negative` | `neutral`), `tickers`,
-   `materiality` (`low` | `medium` | `high`),
+   `headline`, `summary`, `sentiment` (`positive` | `negative` | `neutral`),
+   `tickers`, `materiality` (`low` | `medium` | `high`),
    `event_type` (`ipo` | `earnings` | `m_and_a` | `regulation` | `other` |
    `none`).
-   El `summary` se pide y se guarda en el idioma de `APP_LOCALE` (`en` /
-   `es`); `sentiment`, `tickers`, `materiality` y `event_type` se piden y
-   persisten como códigos en inglés. Telegram localiza solo el **display**
-   de esos valores (ver Notifications). Cambiar el locale no re-analiza
-   filas históricas.
+   `headline` y `summary` se piden y se guardan en el idioma de `APP_LOCALE`
+   (`en` / `es`); `sentiment`, `tickers`, `materiality` y `event_type` se
+   piden y persisten como códigos en inglés. Si Gemini omite `headline`, se
+   persiste vacío y Telegram usa el título RSS. Telegram localiza solo el
+   **display** de los enums (ver Notifications). Cambiar el locale no
+   re-analiza filas históricas.
 2. Usa `GEMINI_API_KEY_FINANCE` (nunca la key del Reviewer).
 3. Procesa como máximo `GEMINI_ANALYSIS_BATCH_SIZE` artículos por corrida y
    espera `GEMINI_REQUEST_DELAY_MS` (default 12000) entre requests.
@@ -443,8 +446,9 @@ El módulo `notifications/` envía alertas al chat configurado con
    hubo push de la misma historia en la ventana, suprime el envío.
 4. Si no es duplicado, formatea el mensaje (título, resumen, sentimiento,
    tipo de evento si no es `none`, tickers, URL) según `APP_LOCALE` y lo
-   envía a Telegram. El cuerpo del resumen es el de `news_analysis` (ya en
-   locale); no hay traducción extra.
+   envía a Telegram. El título preferido es `news_analysis.headline`; si
+   está vacío se usa el título RSS. El resumen es el de `news_analysis`
+   (ya en locale); no hay traducción extra ni llamada Gemini al notificar.
 5. Tras envío exitoso, persiste en `notifications` (`channel: telegram`) y
    registra el artículo en `news_story_clusters` / members.
 6. No reenvía artículos ya notificados (ni push ni suprimidos por cluster).
@@ -481,7 +485,9 @@ Valores de display localizados (código EN → label):
 | materialidad | `low` / `medium` / `high` | mismos códigos | baja / media / alta |
 | evento | `ipo` / `earnings` / `m_and_a` / `regulation` / `other` | mismos códigos | IPO / resultados / fusión/adquisición / regulación / otro |
 
-El título y la URL del artículo RSS pueden quedar en el idioma de la fuente.
+Si no hay `headline` (análisis previos a este campo), el título mostrado
+es el RSS (puede quedar en el idioma de la fuente). La URL del artículo
+también.
 
 Invocación local (one-shot, sin esperar al cron del pipeline):
 
@@ -515,6 +521,7 @@ Reglas:
   `(+N more omitted)` / `(+N más omitidos)`.
 - Respeta `APP_LOCALE` en los labels del mensaje y en el display de
   sentimiento / materialidad / evento (códigos EN en DB).
+- Usa `headline` localizado cuando existe; si no, el título RSS.
 - Si hay watchlist/holdings activos, solo incluye tickers de ese universo.
 
 ## Holdings (portfolio)

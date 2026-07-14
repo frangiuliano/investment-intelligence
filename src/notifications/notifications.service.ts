@@ -13,6 +13,7 @@ import {
 } from './story-similarity';
 import {
   formatTelegramAlert,
+  resolveTelegramTitle,
   formatTelegramTestMessage,
 } from './telegram-message';
 import { TelegramApiError, TelegramClient } from './telegram.client';
@@ -183,9 +184,10 @@ export class NotificationsService {
     }
 
     const locale = this.configService.getOrThrow<AppLocale>('locale');
+    const title = resolveTelegramTitle(analysis.headline, article.title);
     const message = formatTelegramAlert(
       {
-        title: article.title,
+        title,
         summary: analysis.summary,
         sentiment: analysis.sentiment,
         tickers: analysis.tickers ?? [],
@@ -238,7 +240,7 @@ export class NotificationsService {
     }
 
     const payload: Record<string, unknown> = {
-      title: article.title,
+      title: resolveTelegramTitle(analysis.headline, article.title),
       summary: analysis.summary,
       sentiment: analysis.sentiment,
       tickers: analysis.tickers ?? [],
