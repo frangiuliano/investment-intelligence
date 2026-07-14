@@ -2,9 +2,14 @@ export type TelegramChat = {
   id: number | string;
 };
 
+export type TelegramUser = {
+  id: number | string;
+};
+
 export type TelegramMessage = {
   message_id?: number;
   chat: TelegramChat;
+  from?: TelegramUser;
   text?: string;
 };
 
@@ -47,4 +52,10 @@ export function parseTelegramCommand(
   }
 
   return { type: 'unknown', raw: trimmed };
+}
+
+/** Telegram private chats use positive ids; groups/supergroups use negative. */
+export function isPrivateTelegramChatId(chatId: number | string): boolean {
+  const numeric = typeof chatId === 'number' ? chatId : Number(chatId);
+  return Number.isFinite(numeric) && numeric > 0;
 }

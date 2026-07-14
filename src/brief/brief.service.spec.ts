@@ -21,6 +21,7 @@ describe('BriefService', () => {
     holdings?: Awaited<ReturnType<HoldingsService['findBySymbol']>>;
     generateBrief?: jest.Mock;
     sendMessage?: jest.Mock;
+    save?: jest.Mock;
   }) {
     const holdingsService = {
       findBySymbol: jest.fn().mockResolvedValue(overrides?.holdings ?? []),
@@ -48,9 +49,11 @@ describe('BriefService', () => {
     };
 
     const create = jest.fn((value: Partial<ResearchBrief>) => value);
-    const save = jest.fn((value: ResearchBrief) =>
-      Promise.resolve({ ...saved, ...value }),
-    );
+    const save =
+      overrides?.save ??
+      jest.fn((value: ResearchBrief) =>
+        Promise.resolve({ ...saved, ...value }),
+      );
     const repository = {
       create,
       save,
@@ -119,7 +122,7 @@ describe('BriefService', () => {
     expect(sentCalls[0]?.[0]).toContain('not a sell or reduce instruction');
   });
 
-  it('returns usage message for invalid tickers without calling Gemini', async () => {
+  it('sends usage message for invalid tickers without calling Gemini', async () => {
     const { service, generateBrief, sendMessage } = createService();
 
     const result = await service.requestBrief('!!!');
@@ -127,10 +130,12 @@ describe('BriefService', () => {
     expect(result.ok).toBe(false);
     expect(result.message).toContain('/brief TICKER');
     expect(generateBrief).not.toHaveBeenCalled();
-    expect(sendMessage).not.toHaveBeenCalled();
+    expect(sendMessage).toHaveBeenCalledWith(
+      expect.stringContaining('/brief TICKER'),
+    );
   });
 
-  it('rejects concurrent brief requests', async () => {
+  it('sends busy message and rejects concurrent brief requests', async () => {
     const deferred: {
       resolve: ((value: BriefSections) => void) | null;
     } = { resolve: null };
@@ -148,11 +153,28 @@ describe('BriefService', () => {
 
     expect(second.ok).toBe(false);
     expect(second.message).toContain('already in progress');
+    expect(sendMessage).toHaveBeenCalledWith(
+      expect.stringContaining('already in progress'),
+    );
     expect(deferred.resolve).not.toBeNull();
 
     deferred.resolve?.(sections);
     const first = await firstPromise;
     expect(first.ok).toBe(true);
-    expect(sendMessage).toHaveBeenCalled();
+  });
+
+  it('reports delivery failure when Telegram send fails after persist', async () => {
+    const sendMessage = jest
+      .fn()
+      .mockRejectedValueOnce(new Error('telegram down'))
+      .mockResolvedValue(undefined);
+    const { service } = createService({ sendMessage });
+
+    const result = await service.requestBrief('AAPL');
+
+    expect(result.ok).toBe(false);
+    expect(result.brief?.symbol).toBe('AAPL');
+    expect(result.message).toContain('delivery failed');
+    expect(sendMessage).toHaveBeenCalledTimes(2);
   });
 });

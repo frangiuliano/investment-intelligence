@@ -7,7 +7,11 @@ import {
   formatBriefUsageMessage,
 } from '../brief/brief-message';
 import { TelegramClient } from '../notifications/telegram.client';
-import { parseTelegramCommand, TelegramUpdate } from './telegram-command';
+import {
+  isPrivateTelegramChatId,
+  parseTelegramCommand,
+  TelegramUpdate,
+} from './telegram-command';
 
 @Injectable()
 export class CommandRouterService {
@@ -25,6 +29,13 @@ export class CommandRouterService {
       return;
     }
 
+    if (!isPrivateTelegramChatId(message.chat.id)) {
+      this.logger.warn(
+        `Ignoring Telegram update from non-private chat ${String(message.chat.id)}`,
+      );
+      return;
+    }
+
     const allowedChatId =
       this.configService.getOrThrow<string>('telegram.chatId');
     const chatId = String(message.chat.id);
@@ -33,6 +44,20 @@ export class CommandRouterService {
         `Ignoring Telegram update from unauthorized chat ${chatId}`,
       );
       return;
+    }
+
+    const allowedUserIds = this.configService.getOrThrow<string[]>(
+      'telegram.allowedUserIds',
+    );
+    if (allowedUserIds.length > 0) {
+      const fromId =
+        message.from?.id !== undefined ? String(message.from.id) : '';
+      if (!fromId || !allowedUserIds.includes(fromId)) {
+        this.logger.warn(
+          `Ignoring Telegram update from unauthorized user ${fromId || '(missing)'}`,
+        );
+        return;
+      }
     }
 
     const locale = this.configService.getOrThrow<AppLocale>('locale');

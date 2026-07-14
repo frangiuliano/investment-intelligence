@@ -127,6 +127,12 @@ export function formatBriefErrorMessage(locale: AppLocale): string {
     : 'Could not generate the brief. Check logs or try again in a few minutes.';
 }
 
+export function formatBriefDeliveryErrorMessage(locale: AppLocale): string {
+  return locale === 'es'
+    ? 'El brief se generó y guardó, pero falló el envío a Telegram. Revisá logs o pedilo de nuevo.'
+    : 'The brief was generated and saved, but Telegram delivery failed. Check logs or request it again.';
+}
+
 export function formatBriefUsageMessage(locale: AppLocale): string {
   return locale === 'es'
     ? 'Uso: /brief TICKER (ej. /brief AAPL)'

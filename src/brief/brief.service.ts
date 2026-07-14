@@ -14,11 +14,12 @@ import { BRIEF_TICKER_PATTERN } from './brief.constants';
 import { BriefGeminiClient } from './brief-gemini.client';
 import {
   formatBriefBusyMessage,
+  formatBriefDeliveryErrorMessage,
   formatBriefErrorMessage,
   formatBriefMessage,
   formatBriefUsageMessage,
 } from './brief-message';
-import { BRIEF_PROMPT_VERSION } from './brief-prompt';
+import { BRIEF_PROMPT_VERSION, sanitizeHoldingNotes } from './brief-prompt';
 import { BriefHoldingContext, BriefHoldingLookup } from './brief.types';
 import { ResearchBrief } from './entities/research-brief.entity';
 
@@ -49,22 +50,19 @@ export class BriefService {
     try {
       symbol = this.normalizeSymbol(rawSymbol);
     } catch {
-      return {
-        brief: null,
-        message: formatBriefUsageMessage(locale),
-        ok: false,
-      };
+      const message = formatBriefUsageMessage(locale);
+      await this.safeSend(message);
+      return { brief: null, message, ok: false };
     }
 
     if (this.running) {
-      return {
-        brief: null,
-        message: formatBriefBusyMessage(locale),
-        ok: false,
-      };
+      const message = formatBriefBusyMessage(locale);
+      await this.safeSend(message);
+      return { brief: null, message, ok: false };
     }
 
     this.running = true;
+    let persistedBrief: ResearchBrief | null = null;
     try {
       const holdingLookup = await this.resolveHoldingContext(symbol);
       const holdingContext = this.toHoldingContext(holdingLookup);
@@ -73,7 +71,7 @@ export class BriefService {
         holding: holdingContext,
       });
 
-      const brief = await this.researchBriefsRepository.save(
+      persistedBrief = await this.researchBriefsRepository.save(
         this.researchBriefsRepository.create({
           symbol,
           locale,
@@ -92,21 +90,31 @@ export class BriefService {
         locale,
       );
 
-      await this.telegramClient.sendMessage(message);
-
-      return { brief, message, ok: true };
+      try {
+        await this.telegramClient.sendMessage(message);
+        return { brief: persistedBrief, message, ok: true };
+      } catch (sendError) {
+        const detail =
+          sendError instanceof Error ? sendError.message : String(sendError);
+        this.logger.error(
+          `Brief persisted for ${symbol} but Telegram delivery failed: ${detail}`,
+        );
+        const deliveryMessage = formatBriefDeliveryErrorMessage(locale);
+        await this.safeSend(deliveryMessage);
+        return {
+          brief: persistedBrief,
+          message: deliveryMessage,
+          ok: false,
+        };
+      }
     } catch (error) {
       const detail = error instanceof Error ? error.message : String(error);
       this.logger.error(`Brief request failed for ${symbol}: ${detail}`);
-      const message = formatBriefErrorMessage(locale);
-      try {
-        await this.telegramClient.sendMessage(message);
-      } catch (sendError) {
-        const sendDetail =
-          sendError instanceof Error ? sendError.message : String(sendError);
-        this.logger.error(`Failed to send brief error message: ${sendDetail}`);
-      }
-      return { brief: null, message, ok: false };
+      const message = persistedBrief
+        ? formatBriefDeliveryErrorMessage(locale)
+        : formatBriefErrorMessage(locale);
+      await this.safeSend(message);
+      return { brief: persistedBrief, message, ok: false };
     } finally {
       this.running = false;
     }
@@ -126,6 +134,16 @@ export class BriefService {
       throw new BadRequestException(result.message);
     }
     return result.brief;
+  }
+
+  private async safeSend(message: string): Promise<void> {
+    try {
+      await this.telegramClient.sendMessage(message);
+    } catch (sendError) {
+      const sendDetail =
+        sendError instanceof Error ? sendError.message : String(sendError);
+      this.logger.error(`Failed to send Telegram message: ${sendDetail}`);
+    }
   }
 
   private normalizeSymbol(symbol: string): string {
@@ -163,8 +181,9 @@ export class BriefService {
     const assetTypes = [
       ...new Set(holdings.map((holding) => holding.assetType)),
     ];
-    const notes =
-      holdings.map((holding) => holding.notes).find((note) => note) ?? null;
+    const notes = sanitizeHoldingNotes(
+      holdings.map((holding) => holding.notes).find((note) => note) ?? null,
+    );
 
     return {
       symbol,

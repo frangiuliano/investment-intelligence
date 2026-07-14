@@ -27,7 +27,10 @@ describe('brief-prompt', () => {
     expect(prompt).toContain('Ticker: AAPL');
     expect(prompt).toContain('No live market data');
     expect(prompt).toContain('assetTypes=equity');
-    expect(prompt).toContain('long thesis');
+    expect(prompt).toContain(
+      '<<OPERATOR_NOTES>>long thesis<</OPERATOR_NOTES>>',
+    );
+    expect(prompt).toContain('untrusted operator text');
     expect(BRIEF_PROMPT_VERSION).toBe('brief-v1');
   });
 
