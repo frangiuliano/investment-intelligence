@@ -4,11 +4,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import {
   ALERTABLE_MATERIALITY_VALUES,
+  CATALYST_EVENT_TYPES,
+  EVENT_TYPE_VALUES,
   MATERIALITY_VALUES,
   SENTIMENT_VALUES,
 } from '../analysis/gemini.constants';
 import { NewsAnalysis } from '../analysis/entities/news-analysis.entity';
 import { Notification } from '../notifications/entities/notification.entity';
+import { HoldingsService } from '../portfolio/holdings/holdings.service';
 import { WatchlistService } from '../portfolio/watchlist/watchlist.service';
 import type { RelevanceInput, RelevanceResult } from './relevance.types';
 
@@ -25,6 +28,7 @@ export class RelevanceService {
   constructor(
     private readonly configService: ConfigService,
     private readonly watchlistService: WatchlistService,
+    private readonly holdingsService: HoldingsService,
     @InjectRepository(NewsAnalysis)
     private readonly newsAnalyses: Repository<NewsAnalysis>,
     @InjectRepository(Notification)
@@ -32,13 +36,17 @@ export class RelevanceService {
   ) {}
 
   /**
-   * Persisted watchlist wins when non-empty; otherwise falls back to
-   * `WATCHLIST_TICKERS` (env) for transition compatibility.
+   * Operator universe: active watchlist ∪ holdings symbols.
+   * When both are empty, falls back to `WATCHLIST_TICKERS` (env).
    */
   async resolveWatchlistTickers(): Promise<string[]> {
-    const persisted = await this.watchlistService.listActiveSymbols();
-    if (persisted.length > 0) {
-      return persisted;
+    const [watchlist, holdings] = await Promise.all([
+      this.watchlistService.listActiveSymbols(),
+      this.holdingsService.listActiveSymbols(),
+    ]);
+    const universe = mergeUniqueSymbols(watchlist, holdings);
+    if (universe.length > 0) {
+      return universe;
     }
     return this.configService.get<string[]>('watchlist.tickers') ?? [];
   }
@@ -54,9 +62,6 @@ export class RelevanceService {
     }
 
     const sentiment = normalizeSentiment(input.sentiment);
-    if (sentiment === 'neutral') {
-      return { isRelevant: false, reason: 'neutral sentiment' };
-    }
     if (!(SENTIMENT_VALUES as readonly string[]).includes(sentiment)) {
       return { isRelevant: false, reason: 'invalid sentiment' };
     }
@@ -76,11 +81,27 @@ export class RelevanceService {
       return { isRelevant: false, reason: 'low materiality' };
     }
 
+    const eventType = normalizeEventType(input.eventType);
+    const isCatalyst = (CATALYST_EVENT_TYPES as readonly string[]).includes(
+      eventType,
+    );
+
+    if (sentiment === 'neutral' && !isCatalyst) {
+      return { isRelevant: false, reason: 'neutral sentiment' };
+    }
+
     if (watchlist.length > 0) {
       const matched = tickers.filter((ticker) => watchlist.includes(ticker));
       if (matched.length === 0) {
         return { isRelevant: false, reason: 'no watchlist tickers' };
       }
+    }
+
+    if (isCatalyst && sentiment === 'neutral') {
+      return {
+        isRelevant: true,
+        reason: 'catalyst event with tickers and materiality',
+      };
     }
 
     return {
@@ -107,6 +128,7 @@ export class RelevanceService {
         sentiment: analysis.sentiment,
         tickers: analysis.tickers ?? [],
         materiality: analysis.materiality,
+        eventType: analysis.eventType,
         alreadyNotified,
         watchlistTickers,
       });
@@ -144,6 +166,7 @@ export class RelevanceService {
       sentiment: analysis.sentiment,
       tickers: analysis.tickers ?? [],
       materiality: analysis.materiality,
+      eventType: analysis.eventType,
       alreadyNotified,
       watchlistTickers,
     });
@@ -168,6 +191,17 @@ function normalizeMateriality(materiality: string): string {
   return materiality.trim().toLowerCase();
 }
 
+function normalizeEventType(eventType: string | undefined): string {
+  if (eventType === undefined || eventType === null) {
+    return 'none';
+  }
+  const normalized = eventType.trim().toLowerCase();
+  if ((EVENT_TYPE_VALUES as readonly string[]).includes(normalized)) {
+    return normalized;
+  }
+  return 'none';
+}
+
 function normalizeTickers(tickers: string[]): string[] {
   const seen = new Set<string>();
   const result: string[] = [];
@@ -181,5 +215,21 @@ function normalizeTickers(tickers: string[]): string[] {
     result.push(ticker);
   }
 
+  return result;
+}
+
+function mergeUniqueSymbols(...lists: string[][]): string[] {
+  const seen = new Set<string>();
+  const result: string[] = [];
+  for (const list of lists) {
+    for (const raw of list) {
+      const symbol = raw.trim().toUpperCase();
+      if (!symbol || seen.has(symbol)) {
+        continue;
+      }
+      seen.add(symbol);
+      result.push(symbol);
+    }
+  }
   return result;
 }

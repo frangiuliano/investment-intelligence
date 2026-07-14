@@ -73,6 +73,23 @@ export class HoldingsService {
     });
   }
 
+  async listActiveSymbols(): Promise<string[]> {
+    const holdings = await this.holdingsRepository.find({
+      select: { symbol: true },
+      order: { symbol: 'ASC' },
+    });
+    const seen = new Set<string>();
+    const symbols: string[] = [];
+    for (const holding of holdings) {
+      if (seen.has(holding.symbol)) {
+        continue;
+      }
+      seen.add(holding.symbol);
+      symbols.push(holding.symbol);
+    }
+    return symbols;
+  }
+
   async findOne(id: string): Promise<Holding> {
     const holding = await this.holdingsRepository.findOne({ where: { id } });
     if (!holding) {
