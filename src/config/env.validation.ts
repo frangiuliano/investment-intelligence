@@ -80,6 +80,8 @@ export const envValidationSchema = Joi.object({
   GEMINI_API_KEY_REVIEWER: Joi.string().optional().allow(''),
   TELEGRAM_BOT_TOKEN: requiredSecret('TELEGRAM_BOT_TOKEN'),
   TELEGRAM_CHAT_ID: requiredSecret('TELEGRAM_CHAT_ID'),
+  /** Required for POST /telegram/webhook; leave empty to disable inbound webhook. */
+  TELEGRAM_WEBHOOK_SECRET: Joi.string().trim().allow('').optional().default(''),
   RSS_FEED_URLS: Joi.string()
     .required()
     .custom((value: string, helpers) => {

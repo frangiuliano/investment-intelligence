@@ -53,6 +53,23 @@ describe('envValidationSchema', () => {
     );
     expect(value.DIGEST_CRON_SCHEDULE).toBe(DEFAULT_DIGEST_CRON_SCHEDULE);
     expect(value.DIGEST_LOOKBACK_HOURS).toBe(DEFAULT_DIGEST_LOOKBACK_HOURS);
+    expect(
+      (result.value as ValidatedEnv & { TELEGRAM_WEBHOOK_SECRET: string })
+        .TELEGRAM_WEBHOOK_SECRET,
+    ).toBe('');
+  });
+
+  it('accepts an optional TELEGRAM_WEBHOOK_SECRET', () => {
+    const result = envValidationSchema.validate({
+      ...validEnv,
+      TELEGRAM_WEBHOOK_SECRET: '  webhook-secret  ',
+    });
+
+    expect(result.error).toBeUndefined();
+    expect(
+      (result.value as { TELEGRAM_WEBHOOK_SECRET: string })
+        .TELEGRAM_WEBHOOK_SECRET,
+    ).toBe('webhook-secret');
   });
 
   it('accepts APP_LOCALE=en and APP_LOCALE=es', () => {

@@ -39,6 +39,7 @@ export type AppConfig = {
   telegram: {
     botToken: string;
     chatId: string;
+    webhookSecret: string;
   };
   rss: {
     feedUrls: string[];
@@ -79,6 +80,7 @@ export default (): AppConfig => ({
   telegram: {
     botToken: (process.env.TELEGRAM_BOT_TOKEN ?? '').trim(),
     chatId: (process.env.TELEGRAM_CHAT_ID ?? '').trim(),
+    webhookSecret: (process.env.TELEGRAM_WEBHOOK_SECRET ?? '').trim(),
   },
   rss: {
     feedUrls: parseFeedUrls(process.env.RSS_FEED_URLS),
