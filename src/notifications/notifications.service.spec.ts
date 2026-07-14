@@ -171,6 +171,10 @@ describe('NotificationsService', () => {
 
     it('should recover notification persist without re-sending Telegram when cluster already alerted', async () => {
       findAlertedClusterId.mockResolvedValue('cluster-recovered');
+      findMatchingAlertedStory.mockResolvedValue({
+        clusterId: 'cluster-other',
+        matchedArticleId: 'article-other',
+      });
 
       const result = await service.notifyRelevant();
 
@@ -181,6 +185,8 @@ describe('NotificationsService', () => {
         errors: 0,
       });
       expect(sendMessage).not.toHaveBeenCalled();
+      expect(findMatchingAlertedStory).not.toHaveBeenCalled();
+      expect(addSuppressedMember).not.toHaveBeenCalled();
       expect(ensureClusterForAlertedArticle).not.toHaveBeenCalled();
       expect(save).toHaveBeenCalledWith({
         articleId: 'article-1',
@@ -195,6 +201,89 @@ describe('NotificationsService', () => {
           clusterId: 'cluster-recovered',
         },
       });
+    });
+
+    it('should suppress a sibling when a prior article left an alerted cluster without notification', async () => {
+      findMatchingAlertedStory.mockResolvedValue({
+        clusterId: 'cluster-a',
+        matchedArticleId: 'article-prior',
+      });
+
+      const result = await service.notifyRelevant();
+
+      expect(result).toEqual({
+        candidates: 1,
+        sent: 0,
+        skipped: 1,
+        errors: 0,
+      });
+      expect(sendMessage).not.toHaveBeenCalled();
+      expect(addSuppressedMember).toHaveBeenCalledWith(
+        'cluster-a',
+        'article-1',
+      );
+      expect(save).toHaveBeenCalledWith({
+        articleId: 'article-1',
+        channel: TELEGRAM_CHANNEL,
+        payload: {
+          suppressed: true,
+          reason: 'duplicate_story',
+          clusterId: 'cluster-a',
+          matchedArticleId: 'article-prior',
+        },
+      });
+    });
+
+    it('should keep siblings from pushing when notification persist fails after Telegram', async () => {
+      const secondArticle = {
+        id: 'article-2',
+        title: 'Oil slides after inventory surprise',
+        url: 'https://other.example.com/oil',
+        publishedAt: new Date('2026-07-14T11:00:00.000Z'),
+      };
+      const secondAnalysis = {
+        articleId: 'article-2',
+        sentiment: 'negative',
+        summary: 'Crude fell on inventory data from a second source.',
+        tickers: ['XOM'],
+        materiality: 'high',
+        eventType: 'none',
+        analyzedAt: new Date('2026-07-14T11:05:00.000Z'),
+        article: secondArticle,
+      };
+      const secondCandidate = {
+        articleId: 'article-2',
+        title: secondArticle.title,
+        summary: secondAnalysis.summary,
+        tickers: secondAnalysis.tickers,
+        eventType: secondAnalysis.eventType,
+        referenceAt: secondArticle.publishedAt,
+      };
+
+      getMany.mockResolvedValue([analysis, secondAnalysis]);
+      toCandidate
+        .mockReturnValueOnce(candidate)
+        .mockReturnValueOnce(secondCandidate);
+      save
+        .mockRejectedValueOnce(new Error('db down'))
+        .mockResolvedValueOnce({ id: 'notif-2' });
+      findMatchInCandidates
+        .mockReturnValueOnce(null)
+        .mockReturnValueOnce({ ...candidate, clusterId: 'cluster-1' });
+
+      const result = await service.notifyRelevant();
+
+      expect(result).toEqual({
+        candidates: 2,
+        sent: 0,
+        skipped: 1,
+        errors: 1,
+      });
+      expect(sendMessage).toHaveBeenCalledTimes(1);
+      expect(addSuppressedMember).toHaveBeenCalledWith(
+        'cluster-1',
+        'article-2',
+      );
     });
 
     it('should localize alert labels when APP_LOCALE is es', async () => {
