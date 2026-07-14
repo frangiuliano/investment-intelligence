@@ -9,6 +9,7 @@ import {
 } from '../analysis/gemini.constants';
 import { NewsAnalysis } from '../analysis/entities/news-analysis.entity';
 import { Notification } from '../notifications/entities/notification.entity';
+import { WatchlistService } from '../portfolio/watchlist/watchlist.service';
 import type { RelevanceInput, RelevanceResult } from './relevance.types';
 
 export type RelevanceRunResult = {
@@ -23,15 +24,30 @@ export class RelevanceService {
 
   constructor(
     private readonly configService: ConfigService,
+    private readonly watchlistService: WatchlistService,
     @InjectRepository(NewsAnalysis)
     private readonly newsAnalyses: Repository<NewsAnalysis>,
     @InjectRepository(Notification)
     private readonly notifications: Repository<Notification>,
   ) {}
 
+  /**
+   * Persisted watchlist wins when non-empty; otherwise falls back to
+   * `WATCHLIST_TICKERS` (env) for transition compatibility.
+   */
+  async resolveWatchlistTickers(): Promise<string[]> {
+    const persisted = await this.watchlistService.listActiveSymbols();
+    if (persisted.length > 0) {
+      return persisted;
+    }
+    return this.configService.get<string[]>('watchlist.tickers') ?? [];
+  }
+
   evaluate(input: RelevanceInput): RelevanceResult {
     const watchlist =
-      this.configService.get<string[]>('watchlist.tickers') ?? [];
+      input.watchlistTickers ??
+      this.configService.get<string[]>('watchlist.tickers') ??
+      [];
 
     if (input.alreadyNotified) {
       return { isRelevant: false, reason: 'already notified' };
@@ -75,6 +91,7 @@ export class RelevanceService {
 
   async evaluatePending(): Promise<RelevanceRunResult> {
     const analyses = await this.findUnnotifiedAnalyses();
+    const watchlistTickers = await this.resolveWatchlistTickers();
     const result: RelevanceRunResult = {
       candidates: analyses.length,
       relevant: 0,
@@ -91,6 +108,7 @@ export class RelevanceService {
         tickers: analysis.tickers ?? [],
         materiality: analysis.materiality,
         alreadyNotified,
+        watchlistTickers,
       });
 
       if (evaluation.isRelevant) {
@@ -120,12 +138,14 @@ export class RelevanceService {
     const alreadyNotified = await this.notifications.exists({
       where: { articleId },
     });
+    const watchlistTickers = await this.resolveWatchlistTickers();
 
     return this.evaluate({
       sentiment: analysis.sentiment,
       tickers: analysis.tickers ?? [],
       materiality: analysis.materiality,
       alreadyNotified,
+      watchlistTickers,
     });
   }
 

@@ -112,12 +112,15 @@ export class NotificationsService {
     const alreadyNotified = await this.notifications.exists({
       where: { articleId: analysis.articleId },
     });
+    const watchlistTickers =
+      await this.relevanceService.resolveWatchlistTickers();
 
     const relevance = this.relevanceService.evaluate({
       sentiment: analysis.sentiment,
       tickers: analysis.tickers ?? [],
       materiality: analysis.materiality,
       alreadyNotified,
+      watchlistTickers,
     });
 
     if (!relevance.isRelevant) {

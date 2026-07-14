@@ -13,6 +13,7 @@ describe('NotificationsService', () => {
   let service: NotificationsService;
   let sendMessage: jest.Mock;
   let evaluate: jest.Mock;
+  let resolveWatchlistTickers: jest.Mock;
   let createQueryBuilder: jest.Mock;
   let findOne: jest.Mock;
   let exists: jest.Mock;
@@ -43,6 +44,7 @@ describe('NotificationsService', () => {
       isRelevant: true,
       reason: 'non-neutral sentiment with tickers and materiality',
     });
+    resolveWatchlistTickers = jest.fn().mockResolvedValue([]);
     getMany = jest.fn().mockResolvedValue([analysis]);
     createQueryBuilder = jest.fn().mockReturnValue({
       innerJoinAndSelect: jest.fn().mockReturnThis(),
@@ -76,7 +78,7 @@ describe('NotificationsService', () => {
         },
         {
           provide: RelevanceService,
-          useValue: { evaluate },
+          useValue: { evaluate, resolveWatchlistTickers },
         },
         {
           provide: getRepositoryToken(NewsAnalysis),
