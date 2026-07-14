@@ -69,10 +69,16 @@ falta una variable obligatoria de runtime (mensaje explícito vía Joi).
 `APP_LOCALE` define el idioma de salida de la app (un locale por deploy).
 Valores permitidos: `en`, `es` (default `en`). Si el valor no está permitido,
 la app **no arranca**. El análisis Gemini genera y persiste `summary` en ese
-idioma. Las alertas Telegram usan labels en el mismo locale y reutilizan el
-`summary` ya persistido (sin traducir otra vez al enviar). No traduce títulos
-RSS ni contenido original de feeds. Sentimiento y tickers siguen siendo
-códigos independientes del idioma.
+idioma. Las alertas Telegram usan labels **y valores de display** en el mismo
+locale y reutilizan el `summary` ya persistido (sin traducir otra vez al
+enviar). No traduce títulos RSS ni contenido original de feeds.
+
+**Códigos vs display:** en DB / relevance / clustering, `sentiment`,
+`materiality` y `event_type` se persisten y filtran solo como códigos en
+inglés (`positive`, `medium`, `ipo`, …). En mensajes Telegram, esos códigos
+se muestran localizados según `APP_LOCALE` (p. ej. `es`: positivo / media /
+resultados); no se piden enums en español a Gemini ni se usan strings
+localizados en queries.
 
 **Importante:** creá **dos proyectos** en Google AI Studio / Google Cloud, cada
 uno con su API key. No reutilices la misma key entre Finance y Reviewer: el
@@ -350,8 +356,10 @@ El módulo `analysis/` toma artículos de `news_articles` **sin** fila en
    `event_type` (`ipo` | `earnings` | `m_and_a` | `regulation` | `other` |
    `none`).
    El `summary` se pide y se guarda en el idioma de `APP_LOCALE` (`en` /
-   `es`); `sentiment`, `tickers`, `materiality` y `event_type` no se
-   localizan. Cambiar el locale no re-analiza filas históricas.
+   `es`); `sentiment`, `tickers`, `materiality` y `event_type` se piden y
+   persisten como códigos en inglés. Telegram localiza solo el **display**
+   de esos valores (ver Notifications). Cambiar el locale no re-analiza
+   filas históricas.
 2. Usa `GEMINI_API_KEY_FINANCE` (nunca la key del Reviewer).
 3. Procesa como máximo `GEMINI_ANALYSIS_BATCH_SIZE` artículos por corrida y
    espera `GEMINI_REQUEST_DELAY_MS` (default 12000) entre requests.
@@ -464,8 +472,16 @@ Comportamiento:
 - No reemplaza el dedupe por URL/`content_hash` del collector.
 
 Labels del mensaje (`en` / `es`): Title/Título, Summary/Resumen,
-Sentiment/Sentimiento, Event/Evento (omitido si `none`), Tickers, URL. El
-título y la URL del artículo RSS pueden quedar en el idioma de la fuente.
+Sentiment/Sentimiento, Event/Evento (omitido si `none`), Tickers, URL.
+Valores de display localizados (código EN → label):
+
+| Campo | Códigos (DB) | Display `en` | Display `es` |
+|-------|--------------|--------------|--------------|
+| sentimiento | `positive` / `negative` / `neutral` | mismos códigos | positivo / negativo / neutral |
+| materialidad | `low` / `medium` / `high` | mismos códigos | baja / media / alta |
+| evento | `ipo` / `earnings` / `m_and_a` / `regulation` / `other` | mismos códigos | IPO / resultados / fusión/adquisición / regulación / otro |
+
+El título y la URL del artículo RSS pueden quedar en el idioma de la fuente.
 
 Invocación local (one-shot, sin esperar al cron del pipeline):
 
@@ -497,7 +513,8 @@ Reglas:
 - Si no hay candidatos → log + skip (sin mensaje vacío).
 - Mensaje único truncado al límite de Telegram; si no caben todos, footer
   `(+N more omitted)` / `(+N más omitidos)`.
-- Respeta `APP_LOCALE` en los labels del mensaje.
+- Respeta `APP_LOCALE` en los labels del mensaje y en el display de
+  sentimiento / materialidad / evento (códigos EN en DB).
 - Si hay watchlist/holdings activos, solo incluye tickers de ese universo.
 
 ## Holdings (portfolio)

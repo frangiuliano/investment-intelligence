@@ -85,6 +85,56 @@ const LABELS_BY_LOCALE: Record<AppLocale, TelegramMessageLabels> = {
   },
 };
 
+/** Display labels for persisted EN codes; locale only affects Telegram copy. */
+const SENTIMENT_DISPLAY_BY_LOCALE: Record<AppLocale, Record<string, string>> = {
+  en: {
+    positive: 'positive',
+    negative: 'negative',
+    neutral: 'neutral',
+  },
+  es: {
+    positive: 'positivo',
+    negative: 'negativo',
+    neutral: 'neutral',
+  },
+};
+
+const MATERIALITY_DISPLAY_BY_LOCALE: Record<
+  AppLocale,
+  Record<string, string>
+> = {
+  en: {
+    low: 'low',
+    medium: 'medium',
+    high: 'high',
+  },
+  es: {
+    low: 'baja',
+    medium: 'media',
+    high: 'alta',
+  },
+};
+
+const EVENT_TYPE_DISPLAY_BY_LOCALE: Record<
+  AppLocale,
+  Record<string, string>
+> = {
+  en: {
+    ipo: 'ipo',
+    earnings: 'earnings',
+    m_and_a: 'm_and_a',
+    regulation: 'regulation',
+    other: 'other',
+  },
+  es: {
+    ipo: 'IPO',
+    earnings: 'resultados',
+    m_and_a: 'fusión/adquisición',
+    regulation: 'regulación',
+    other: 'otro',
+  },
+};
+
 export function formatTelegramAlert(
   input: TelegramAlertInput,
   locale: AppLocale = 'en',
@@ -92,14 +142,14 @@ export function formatTelegramAlert(
   const labels = LABELS_BY_LOCALE[locale];
   const tickers =
     input.tickers.length > 0 ? input.tickers.join(', ') : labels.noneTickers;
-  const eventType = normalizeEventTypeForDisplay(input.eventType);
+  const eventType = localizeEventTypeForDisplay(input.eventType, locale);
 
   const lines = [
     labels.alertHeader,
     '',
     `${labels.title}: ${sanitizeField(input.title)}`,
     `${labels.summary}: ${sanitizeField(input.summary)}`,
-    `${labels.sentiment}: ${sanitizeField(input.sentiment)}`,
+    `${labels.sentiment}: ${localizeSentiment(input.sentiment, locale)}`,
   ];
 
   if (eventType) {
@@ -136,7 +186,7 @@ export function formatTelegramDigest(
 
   for (let index = 0; index < input.items.length; index += 1) {
     const item = input.items[index];
-    const block = formatDigestItemBlock(item, index + 1, labels);
+    const block = formatDigestItemBlock(item, index + 1, labels, locale);
     const remaining = input.items.length - (index + 1);
     const footer =
       remaining > 0 ? `\n\n(+${remaining} ${labels.digestMore})` : '';
@@ -151,7 +201,7 @@ export function formatTelegramDigest(
   }
 
   if (included === 0 && input.items.length > 0) {
-    const first = formatDigestItemBlock(input.items[0], 1, labels);
+    const first = formatDigestItemBlock(input.items[0], 1, labels, locale);
     const remaining = input.items.length - 1;
     const footer =
       remaining > 0 ? `\n\n(+${remaining} ${labels.digestMore})` : '';
@@ -182,14 +232,15 @@ function formatDigestItemBlock(
   item: DigestItemInput,
   index: number,
   labels: TelegramMessageLabels,
+  locale: AppLocale,
 ): string {
   const tickers =
     item.tickers.length > 0 ? item.tickers.join(', ') : labels.noneTickers;
-  const eventType = normalizeEventTypeForDisplay(item.eventType);
+  const eventType = localizeEventTypeForDisplay(item.eventType, locale);
   const summary = truncateField(sanitizeField(item.summary), 160);
   const lines = [
     `${index}. ${sanitizeField(item.title)}`,
-    `${labels.tickers}: ${tickers} · ${labels.materiality}: ${sanitizeField(item.materiality)} · ${labels.sentiment}: ${sanitizeField(item.sentiment)}`,
+    `${labels.tickers}: ${tickers} · ${labels.materiality}: ${localizeMateriality(item.materiality, locale)} · ${labels.sentiment}: ${localizeSentiment(item.sentiment, locale)}`,
   ];
   if (eventType) {
     lines.push(`${labels.eventType}: ${sanitizeField(eventType)}`);
@@ -205,8 +256,28 @@ function truncateField(value: string, maxLength: number): string {
   return `${value.slice(0, maxLength - 1)}…`;
 }
 
-function normalizeEventTypeForDisplay(
+function localizeSentiment(sentiment: string, locale: AppLocale): string {
+  const normalized = sentiment.trim().toLowerCase();
+  return (
+    SENTIMENT_DISPLAY_BY_LOCALE[locale][normalized] ?? sanitizeField(sentiment)
+  );
+}
+
+function localizeMateriality(materiality: string, locale: AppLocale): string {
+  const normalized = materiality.trim().toLowerCase();
+  return (
+    MATERIALITY_DISPLAY_BY_LOCALE[locale][normalized] ??
+    sanitizeField(materiality)
+  );
+}
+
+/**
+ * Returns localized display text, or null when the event should be omitted
+ * (`none` / missing). Unknown codes fall back to the raw normalized code.
+ */
+function localizeEventTypeForDisplay(
   eventType: string | undefined,
+  locale: AppLocale,
 ): string | null {
   if (!eventType) {
     return null;
@@ -215,7 +286,7 @@ function normalizeEventTypeForDisplay(
   if (!normalized || normalized === 'none') {
     return null;
   }
-  return normalized;
+  return EVENT_TYPE_DISPLAY_BY_LOCALE[locale][normalized] ?? normalized;
 }
 
 function sanitizeField(value: string): string {
