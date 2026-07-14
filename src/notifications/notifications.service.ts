@@ -158,18 +158,6 @@ export class NotificationsService {
       );
     }
 
-    const priorMatch = await this.storyClusterService.findMatchingAlertedStory(
-      candidate,
-      windowHours,
-    );
-    if (priorMatch) {
-      return this.suppressDuplicateStory(
-        analysis,
-        priorMatch.clusterId,
-        priorMatch.matchedArticleId,
-      );
-    }
-
     const existingClusterId =
       await this.storyClusterService.findAlertedClusterId(analysis.articleId);
     if (existingClusterId) {
@@ -179,6 +167,18 @@ export class NotificationsService {
         existingClusterId,
         alertedThisRun,
         { skipTelegram: true },
+      );
+    }
+
+    const priorMatch = await this.storyClusterService.findMatchingAlertedStory(
+      candidate,
+      windowHours,
+    );
+    if (priorMatch) {
+      return this.suppressDuplicateStory(
+        analysis,
+        priorMatch.clusterId,
+        priorMatch.matchedArticleId,
       );
     }
 
@@ -253,6 +253,7 @@ export class NotificationsService {
         }),
       );
     } catch (error) {
+      alertedThisRun.push({ ...candidate, clusterId });
       this.logger.error(
         options.skipTelegram
           ? `Recovered Telegram send for article ${analysis.articleId} but notification persist failed: ${errorMessage(error)}`

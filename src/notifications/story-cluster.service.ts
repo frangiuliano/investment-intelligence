@@ -73,12 +73,26 @@ export class StoryClusterService {
     const alerted = await this.newsAnalyses
       .createQueryBuilder('analysis')
       .innerJoinAndSelect('analysis.article', 'article')
-      .innerJoin('article.notifications', 'notification')
+      .leftJoin('article.notifications', 'notification')
+      .leftJoin(
+        NewsStoryClusterMember,
+        'member',
+        'member.article_id = article.id AND member.alerted = true',
+      )
       .where(
         'COALESCE(article.published_at, analysis.analyzed_at) BETWEEN :windowStart AND :windowEnd',
         { windowStart, windowEnd },
       )
-      .andWhere(`(notification.payload->>'suppressed') IS DISTINCT FROM 'true'`)
+      .andWhere('analysis.article_id != :candidateArticleId', {
+        candidateArticleId: candidate.articleId,
+      })
+      .andWhere(
+        `(member.id IS NOT NULL OR (
+          notification.id IS NOT NULL
+          AND (notification.payload->>'suppressed') IS DISTINCT FROM 'true'
+        ))`,
+      )
+      .distinct(true)
       .getMany();
 
     for (const analysis of alerted) {
