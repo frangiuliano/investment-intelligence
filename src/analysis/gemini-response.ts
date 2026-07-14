@@ -3,6 +3,7 @@ import {
   EVENT_TYPE_VALUES,
   EventType,
   MATERIALITY_VALUES,
+  MAX_HEADLINE_LENGTH,
   MAX_PROMPT_CONTENT_LENGTH,
   MAX_SUMMARY_LENGTH,
   Materiality,
@@ -11,6 +12,7 @@ import {
 } from './gemini.constants';
 
 export type GeminiAnalysisResult = {
+  headline: string;
   summary: string;
   sentiment: Sentiment;
   tickers: string[];
@@ -18,7 +20,7 @@ export type GeminiAnalysisResult = {
   eventType: EventType;
 };
 
-const SUMMARY_LANGUAGE_BY_LOCALE: Record<AppLocale, string> = {
+const LANGUAGE_BY_LOCALE: Record<AppLocale, string> = {
   en: 'English',
   es: 'Spanish',
 };
@@ -38,12 +40,13 @@ export function truncateForPrompt(
 }
 
 export function buildAnalysisSystemPrompt(locale: AppLocale): string {
-  const language = SUMMARY_LANGUAGE_BY_LOCALE[locale];
+  const language = LANGUAGE_BY_LOCALE[locale];
   return [
     'You are a financial news analyst.',
     'Analyze the article and respond with JSON only.',
-    `Write the summary in ${language}.`,
+    `Write the summary and headline in ${language}.`,
     'Required keys:',
+    `- headline: short ${language} user-facing title for the article (one line, no clickbait)`,
     `- summary: concise ${language} summary of the article (2-4 sentences)`,
     '- sentiment: one of "positive", "negative", "neutral" for market/investor impact',
     '- tickers: array of stock ticker symbols mentioned (e.g. ["AAPL","MSFT"]); empty array if none',
@@ -82,13 +85,14 @@ export function parseGeminiAnalysisText(raw: string): GeminiAnalysisResult {
     throw new Error('Gemini response JSON must be an object');
   }
 
+  const headline = normalizeHeadline(parsed.headline);
   const summary = normalizeSummary(parsed.summary);
   const sentiment = normalizeSentiment(parsed.sentiment);
   const tickers = normalizeTickers(parsed.tickers);
   const materiality = normalizeMateriality(parsed.materiality);
   const eventType = normalizeEventType(parsed.event_type);
 
-  return { summary, sentiment, tickers, materiality, eventType };
+  return { headline, summary, sentiment, tickers, materiality, eventType };
 }
 
 function extractJsonObject(raw: string): string {
@@ -105,6 +109,24 @@ function extractJsonObject(raw: string): string {
   }
 
   return trimmed;
+}
+
+/**
+ * Missing/blank headline is allowed so old or partial Gemini payloads still
+ * parse; Telegram falls back to the RSS title.
+ */
+function normalizeHeadline(value: unknown): string {
+  if (typeof value !== 'string') {
+    return '';
+  }
+  const headline = value.trim();
+  if (headline.length === 0) {
+    return '';
+  }
+  if (headline.length <= MAX_HEADLINE_LENGTH) {
+    return headline;
+  }
+  return headline.slice(0, MAX_HEADLINE_LENGTH);
 }
 
 function normalizeSummary(value: unknown): string {

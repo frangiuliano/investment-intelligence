@@ -56,6 +56,7 @@ describe('NewsAnalysisService', () => {
 
     geminiClient = {
       analyzeArticle: jest.fn().mockResolvedValue({
+        headline: 'Headline',
         summary: 'Summary',
         sentiment: 'positive',
         tickers: ['AAPL'],
@@ -143,6 +144,7 @@ describe('NewsAnalysisService', () => {
     expect(newsAnalyses.save).toHaveBeenCalledWith(
       expect.objectContaining({
         articleId: 'article-1',
+        headline: 'Headline',
         summary: 'Summary',
         sentiment: 'positive',
         tickers: ['AAPL'],
@@ -189,6 +191,7 @@ describe('NewsAnalysisService', () => {
         ),
       )
       .mockResolvedValueOnce({
+        headline: 'Recovered headline',
         summary: 'Recovered',
         sentiment: 'neutral',
         tickers: [],
@@ -196,6 +199,7 @@ describe('NewsAnalysisService', () => {
         eventType: 'none',
       })
       .mockResolvedValueOnce({
+        headline: 'Second headline',
         summary: 'Second ok',
         sentiment: 'positive',
         tickers: ['MSFT'],
@@ -260,6 +264,7 @@ describe('NewsAnalysisService', () => {
     geminiClient.analyzeArticle
       .mockRejectedValueOnce(new GeminiApiError('permanent', undefined, false))
       .mockResolvedValueOnce({
+        headline: 'Second headline',
         summary: 'Second ok',
         sentiment: 'positive',
         tickers: ['MSFT'],

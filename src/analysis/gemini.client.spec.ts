@@ -59,6 +59,7 @@ describe('GeminiClient', () => {
                 parts: [
                   {
                     text: JSON.stringify({
+                      headline: 'Oil prices fall on inventories',
                       summary: 'Oil prices fell.',
                       sentiment: 'negative',
                       tickers: ['XOM'],
@@ -81,6 +82,7 @@ describe('GeminiClient', () => {
     });
 
     expect(result).toEqual({
+      headline: 'Oil prices fall on inventories',
       summary: 'Oil prices fell.',
       sentiment: 'negative',
       tickers: ['XOM'],
@@ -101,11 +103,11 @@ describe('GeminiClient', () => {
     };
     expect(body.generationConfig.responseMimeType).toBe('application/json');
     expect(body.systemInstruction.parts[0]?.text).toContain(
-      'Write the summary in English.',
+      'Write the summary and headline in English.',
     );
   });
 
-  it('should instruct Spanish summary when APP_LOCALE is es', async () => {
+  it('should instruct Spanish summary and headline when APP_LOCALE is es', async () => {
     locale = 'es';
     fetchMock.mockResolvedValue({
       ok: true,
@@ -117,6 +119,7 @@ describe('GeminiClient', () => {
                 parts: [
                   {
                     text: JSON.stringify({
+                      headline: 'El petróleo baja por inventarios',
                       summary: 'El petróleo bajó.',
                       sentiment: 'negative',
                       tickers: ['XOM'],
@@ -143,7 +146,7 @@ describe('GeminiClient', () => {
       systemInstruction: { parts: Array<{ text: string }> };
     };
     expect(body.systemInstruction.parts[0]?.text).toContain(
-      'Write the summary in Spanish.',
+      'Write the summary and headline in Spanish.',
     );
   });
 

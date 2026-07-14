@@ -22,6 +22,9 @@ export class NewsAnalysis {
   @JoinColumn({ name: 'article_id' })
   article!: NewsArticle;
 
+  @Column({ type: 'text', default: '' })
+  headline!: string;
+
   @Column({ type: 'text' })
   summary!: string;
 

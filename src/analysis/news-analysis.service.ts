@@ -123,6 +123,7 @@ export class NewsAnalysisService {
       await this.newsAnalyses.save(
         this.newsAnalyses.create({
           articleId: article.id,
+          headline: analysis.headline,
           summary: analysis.summary,
           sentiment: analysis.sentiment,
           tickers: analysis.tickers,
