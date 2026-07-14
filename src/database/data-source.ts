@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import { config as loadEnv } from 'dotenv';
 import { DataSource } from 'typeorm';
 import { NewsAnalysis } from '../analysis/entities/news-analysis.entity';
+import { ResearchBrief } from '../brief/entities/research-brief.entity';
 import { NewsArticle } from '../news/entities/news-article.entity';
 import { NewsStoryClusterMember } from '../notifications/entities/news-story-cluster-member.entity';
 import { NewsStoryCluster } from '../notifications/entities/news-story-cluster.entity';
@@ -18,6 +19,7 @@ import { AddNewsAnalysisEventType1752520000000 } from './migrations/175252000000
 import { CreateNewsStoryClusters1752530000000 } from './migrations/1752530000000-CreateNewsStoryClusters';
 import { CreateDigestTables1752540000000 } from './migrations/1752540000000-CreateDigestTables';
 import { AddNewsAnalysisHeadline1752550000000 } from './migrations/1752550000000-AddNewsAnalysisHeadline';
+import { CreateResearchBriefs1752560000000 } from './migrations/1752560000000-CreateResearchBriefs';
 
 loadEnv();
 
@@ -42,6 +44,7 @@ export default new DataSource({
     NewsStoryClusterMember,
     DigestRun,
     DigestItem,
+    ResearchBrief,
   ],
   migrations: [
     InitialSchema1752180000000,
@@ -52,6 +55,7 @@ export default new DataSource({
     CreateNewsStoryClusters1752530000000,
     CreateDigestTables1752540000000,
     AddNewsAnalysisHeadline1752550000000,
+    CreateResearchBriefs1752560000000,
   ],
   synchronize: false,
   logging: false,
