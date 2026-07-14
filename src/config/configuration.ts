@@ -6,6 +6,8 @@ import {
   DEFAULT_GEMINI_ANALYSIS_BATCH_SIZE,
   DEFAULT_GEMINI_MODEL,
   DEFAULT_GEMINI_REQUEST_DELAY_MS,
+  DEFAULT_DIGEST_CRON_SCHEDULE,
+  DEFAULT_DIGEST_LOOKBACK_HOURS,
   DEFAULT_STORY_CLUSTER_WINDOW_HOURS,
   parseFeedUrls,
   parseWatchlistTickers,
@@ -50,6 +52,10 @@ export type AppConfig = {
   storyCluster: {
     windowHours: number;
   };
+  digest: {
+    cronSchedule: string;
+    lookbackHours: number;
+  };
 };
 
 export default (): AppConfig => ({
@@ -89,6 +95,15 @@ export default (): AppConfig => ({
     windowHours: parseInt(
       process.env.STORY_CLUSTER_WINDOW_HOURS ??
         String(DEFAULT_STORY_CLUSTER_WINDOW_HOURS),
+      10,
+    ),
+  },
+  digest: {
+    cronSchedule:
+      process.env.DIGEST_CRON_SCHEDULE?.trim() ?? DEFAULT_DIGEST_CRON_SCHEDULE,
+    lookbackHours: parseInt(
+      process.env.DIGEST_LOOKBACK_HOURS ??
+        String(DEFAULT_DIGEST_LOOKBACK_HOURS),
       10,
     ),
   },

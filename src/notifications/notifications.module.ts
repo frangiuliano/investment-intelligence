@@ -2,6 +2,9 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { NewsAnalysis } from '../analysis/entities/news-analysis.entity';
 import { RelevanceModule } from '../relevance/relevance.module';
+import { DigestService } from './digest.service';
+import { DigestItem } from './entities/digest-item.entity';
+import { DigestRun } from './entities/digest-run.entity';
 import { NewsStoryClusterMember } from './entities/news-story-cluster-member.entity';
 import { NewsStoryCluster } from './entities/news-story-cluster.entity';
 import { Notification } from './entities/notification.entity';
@@ -16,10 +19,17 @@ import { TelegramClient } from './telegram.client';
       NewsAnalysis,
       NewsStoryCluster,
       NewsStoryClusterMember,
+      DigestRun,
+      DigestItem,
     ]),
     RelevanceModule,
   ],
-  providers: [TelegramClient, StoryClusterService, NotificationsService],
-  exports: [TypeOrmModule, NotificationsService],
+  providers: [
+    TelegramClient,
+    StoryClusterService,
+    NotificationsService,
+    DigestService,
+  ],
+  exports: [TypeOrmModule, NotificationsService, DigestService],
 })
 export class NotificationsModule {}

@@ -11,6 +11,21 @@ export type TelegramAlertInput = {
   eventType?: string;
 };
 
+export type DigestItemInput = {
+  title: string;
+  summary: string;
+  sentiment: string;
+  materiality: string;
+  tickers: string[];
+  url: string;
+  eventType?: string;
+};
+
+export type TelegramDigestInput = {
+  lookbackHours: number;
+  items: DigestItemInput[];
+};
+
 type TelegramMessageLabels = {
   alertHeader: string;
   title: string;
@@ -22,6 +37,10 @@ type TelegramMessageLabels = {
   noneTickers: string;
   testHeader: string;
   testBody: string;
+  digestHeader: string;
+  digestCount: string;
+  materiality: string;
+  digestMore: string;
 };
 
 const LABELS_BY_LOCALE: Record<AppLocale, TelegramMessageLabels> = {
@@ -36,6 +55,10 @@ const LABELS_BY_LOCALE: Record<AppLocale, TelegramMessageLabels> = {
     noneTickers: '(none)',
     testHeader: 'Investment Intelligence — test notification',
     testBody: 'If you received this, Telegram is configured correctly.',
+    digestHeader: 'News digest',
+    digestCount: 'items',
+    materiality: 'Materiality',
+    digestMore: 'more omitted',
   },
   es: {
     alertHeader: 'Alerta de noticia relevante',
@@ -49,6 +72,10 @@ const LABELS_BY_LOCALE: Record<AppLocale, TelegramMessageLabels> = {
     testHeader: 'Investment Intelligence — notificación de prueba',
     testBody:
       'Si recibiste este mensaje, Telegram está configurado correctamente.',
+    digestHeader: 'Digesto de noticias',
+    digestCount: 'ítems',
+    materiality: 'Materialidad',
+    digestMore: 'más omitidos',
   },
 };
 
@@ -87,9 +114,83 @@ export function formatTelegramAlert(
   return `${message.slice(0, TELEGRAM_MAX_MESSAGE_LENGTH - 1)}…`;
 }
 
+export function formatTelegramDigest(
+  input: TelegramDigestInput,
+  locale: AppLocale = 'en',
+): string {
+  const labels = LABELS_BY_LOCALE[locale];
+  const header = [
+    `${labels.digestHeader} (${input.lookbackHours}h)`,
+    `${input.items.length} ${labels.digestCount}`,
+    '',
+  ].join('\n');
+
+  const blocks: string[] = [];
+  let included = 0;
+
+  for (let index = 0; index < input.items.length; index += 1) {
+    const item = input.items[index];
+    const block = formatDigestItemBlock(item, index + 1, labels);
+    const remaining = input.items.length - (index + 1);
+    const footer =
+      remaining > 0 ? `\n\n(+${remaining} ${labels.digestMore})` : '';
+    const candidate = [header, ...blocks, block].join('\n\n') + footer;
+
+    if (candidate.length > TELEGRAM_MAX_MESSAGE_LENGTH) {
+      break;
+    }
+
+    blocks.push(block);
+    included += 1;
+  }
+
+  if (included === 0 && input.items.length > 0) {
+    const first = formatDigestItemBlock(input.items[0], 1, labels);
+    const remaining = input.items.length - 1;
+    const footer =
+      remaining > 0 ? `\n\n(+${remaining} ${labels.digestMore})` : '';
+    const message = header + first + footer;
+    if (message.length <= TELEGRAM_MAX_MESSAGE_LENGTH) {
+      return message;
+    }
+    return `${message.slice(0, TELEGRAM_MAX_MESSAGE_LENGTH - 1)}…`;
+  }
+
+  const omitted = input.items.length - included;
+  const footer = omitted > 0 ? `\n\n(+${omitted} ${labels.digestMore})` : '';
+  return [header, ...blocks].join('\n\n') + footer;
+}
+
 export function formatTelegramTestMessage(locale: AppLocale = 'en'): string {
   const labels = LABELS_BY_LOCALE[locale];
   return [labels.testHeader, '', labels.testBody].join('\n');
+}
+
+function formatDigestItemBlock(
+  item: DigestItemInput,
+  index: number,
+  labels: TelegramMessageLabels,
+): string {
+  const tickers =
+    item.tickers.length > 0 ? item.tickers.join(', ') : labels.noneTickers;
+  const eventType = normalizeEventTypeForDisplay(item.eventType);
+  const summary = truncateField(sanitizeField(item.summary), 160);
+  const lines = [
+    `${index}. ${sanitizeField(item.title)}`,
+    `${labels.tickers}: ${tickers} · ${labels.materiality}: ${sanitizeField(item.materiality)} · ${labels.sentiment}: ${sanitizeField(item.sentiment)}`,
+  ];
+  if (eventType) {
+    lines.push(`${labels.eventType}: ${sanitizeField(eventType)}`);
+  }
+  lines.push(summary, sanitizeField(item.url));
+  return lines.join('\n');
+}
+
+function truncateField(value: string, maxLength: number): string {
+  if (value.length <= maxLength) {
+    return value;
+  }
+  return `${value.slice(0, maxLength - 1)}…`;
 }
 
 function normalizeEventTypeForDisplay(
