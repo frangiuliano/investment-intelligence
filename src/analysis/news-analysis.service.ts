@@ -127,6 +127,7 @@ export class NewsAnalysisService {
           sentiment: analysis.sentiment,
           tickers: analysis.tickers,
           materiality: analysis.materiality,
+          eventType: analysis.eventType,
           model,
         }),
       );

@@ -34,6 +34,9 @@ export class NewsAnalysis {
   @Column({ type: 'varchar', length: 32 })
   materiality!: string;
 
+  @Column({ name: 'event_type', type: 'varchar', length: 32 })
+  eventType!: string;
+
   @Column({ type: 'varchar', length: 128 })
   model!: string;
 

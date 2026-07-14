@@ -63,6 +63,7 @@ describe('GeminiClient', () => {
                       sentiment: 'negative',
                       tickers: ['XOM'],
                       materiality: 'medium',
+                      event_type: 'none',
                     }),
                   },
                 ],
@@ -84,6 +85,7 @@ describe('GeminiClient', () => {
       sentiment: 'negative',
       tickers: ['XOM'],
       materiality: 'medium',
+      eventType: 'none',
     });
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
@@ -119,6 +121,7 @@ describe('GeminiClient', () => {
                       sentiment: 'negative',
                       tickers: ['XOM'],
                       materiality: 'high',
+                      event_type: 'none',
                     }),
                   },
                 ],

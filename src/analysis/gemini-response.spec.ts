@@ -26,6 +26,7 @@ describe('gemini-response', () => {
           sentiment: 'positive',
           tickers: ['aapl', 'MSFT', 'aapl', 'bad ticker!'],
           materiality: 'high',
+          event_type: 'earnings',
         }),
       );
 
@@ -34,17 +35,19 @@ describe('gemini-response', () => {
         sentiment: 'positive',
         tickers: ['AAPL', 'MSFT'],
         materiality: 'high',
+        eventType: 'earnings',
       });
     });
 
     it('should parse JSON wrapped in markdown fences', () => {
       const result = parseGeminiAnalysisText(`\`\`\`json
-{"summary":"Mixed signals","sentiment":"neutral","tickers":[],"materiality":"low"}
+{"summary":"Mixed signals","sentiment":"neutral","tickers":[],"materiality":"low","event_type":"none"}
 \`\`\``);
 
       expect(result.sentiment).toBe('neutral');
       expect(result.tickers).toEqual([]);
       expect(result.materiality).toBe('low');
+      expect(result.eventType).toBe('none');
     });
 
     it('should reject invalid sentiment values', () => {
@@ -55,6 +58,7 @@ describe('gemini-response', () => {
             sentiment: 'bullish',
             tickers: [],
             materiality: 'medium',
+            event_type: 'none',
           }),
         ),
       ).toThrow(/invalid sentiment/i);
@@ -68,6 +72,7 @@ describe('gemini-response', () => {
             sentiment: 'positive',
             tickers: ['AAPL'],
             materiality: 'critical',
+            event_type: 'none',
           }),
         ),
       ).toThrow(/invalid materiality/i);
@@ -80,9 +85,37 @@ describe('gemini-response', () => {
             summary: 'x',
             sentiment: 'positive',
             tickers: ['AAPL'],
+            event_type: 'none',
           }),
         ),
       ).toThrow(/missing materiality/i);
+    });
+
+    it('should reject invalid event_type values', () => {
+      expect(() =>
+        parseGeminiAnalysisText(
+          JSON.stringify({
+            summary: 'x',
+            sentiment: 'positive',
+            tickers: ['AAPL'],
+            materiality: 'high',
+            event_type: 'spacex_launch',
+          }),
+        ),
+      ).toThrow(/invalid event_type/i);
+    });
+
+    it('should reject missing event_type', () => {
+      expect(() =>
+        parseGeminiAnalysisText(
+          JSON.stringify({
+            summary: 'x',
+            sentiment: 'positive',
+            tickers: ['AAPL'],
+            materiality: 'high',
+          }),
+        ),
+      ).toThrow(/missing event_type/i);
     });
   });
 
@@ -97,6 +130,9 @@ describe('gemini-response', () => {
       );
       expect(prompt).toContain('tickers: array of stock ticker symbols');
       expect(prompt).toContain('materiality: one of "low", "medium", "high"');
+      expect(prompt).toContain(
+        'event_type: one of "ipo", "earnings", "m_and_a", "regulation", "other", "none"',
+      );
     });
 
     it('should instruct a Spanish summary when locale is es', () => {
@@ -109,6 +145,9 @@ describe('gemini-response', () => {
       );
       expect(prompt).toContain('tickers: array of stock ticker symbols');
       expect(prompt).toContain('materiality: one of "low", "medium", "high"');
+      expect(prompt).toContain(
+        'event_type: one of "ipo", "earnings", "m_and_a", "regulation", "other", "none"',
+      );
       expect(prompt).not.toContain('concise English summary');
     });
   });

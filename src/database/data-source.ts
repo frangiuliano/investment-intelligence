@@ -10,6 +10,7 @@ import { InitialSchema1752180000000 } from './migrations/1752180000000-InitialSc
 import { AddNewsAnalysisMateriality1752430000000 } from './migrations/1752430000000-AddNewsAnalysisMateriality';
 import { CreateHoldings1752500000000 } from './migrations/1752500000000-CreateHoldings';
 import { CreateWatchlistEntries1752510000000 } from './migrations/1752510000000-CreateWatchlistEntries';
+import { AddNewsAnalysisEventType1752520000000 } from './migrations/1752520000000-AddNewsAnalysisEventType';
 
 loadEnv();
 
@@ -30,6 +31,7 @@ export default new DataSource({
     AddNewsAnalysisMateriality1752430000000,
     CreateHoldings1752500000000,
     CreateWatchlistEntries1752510000000,
+    AddNewsAnalysisEventType1752520000000,
   ],
   synchronize: false,
   logging: false,

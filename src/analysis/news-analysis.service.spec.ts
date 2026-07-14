@@ -60,6 +60,7 @@ describe('NewsAnalysisService', () => {
         sentiment: 'positive',
         tickers: ['AAPL'],
         materiality: 'high',
+        eventType: 'none',
       }),
     };
 
@@ -146,6 +147,7 @@ describe('NewsAnalysisService', () => {
         sentiment: 'positive',
         tickers: ['AAPL'],
         materiality: 'high',
+        eventType: 'none',
         model: GEMINI_FLASH_MODEL,
       }),
     );
@@ -191,12 +193,14 @@ describe('NewsAnalysisService', () => {
         sentiment: 'neutral',
         tickers: [],
         materiality: 'low',
+        eventType: 'none',
       })
       .mockResolvedValueOnce({
         summary: 'Second ok',
         sentiment: 'positive',
         tickers: ['MSFT'],
         materiality: 'medium',
+        eventType: 'earnings',
       });
 
     const setTimeoutSpy = jest.spyOn(global, 'setTimeout');
@@ -260,6 +264,7 @@ describe('NewsAnalysisService', () => {
         sentiment: 'positive',
         tickers: ['MSFT'],
         materiality: 'medium',
+        eventType: 'earnings',
       });
 
     const firstPromise = service.analyzePending();
