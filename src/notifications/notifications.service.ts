@@ -6,6 +6,11 @@ import { NewsAnalysis } from '../analysis/entities/news-analysis.entity';
 import { AppLocale } from '../config/env.validation';
 import { RelevanceService } from '../relevance/relevance.service';
 import { Notification } from './entities/notification.entity';
+import { StoryClusterService } from './story-cluster.service';
+import {
+  DEFAULT_STORY_CLUSTER_WINDOW_HOURS,
+  StoryCandidate,
+} from './story-similarity';
 import {
   formatTelegramAlert,
   formatTelegramTestMessage,
@@ -31,6 +36,7 @@ export class NotificationsService {
     private readonly configService: ConfigService,
     private readonly telegramClient: TelegramClient,
     private readonly relevanceService: RelevanceService,
+    private readonly storyClusterService: StoryClusterService,
     @InjectRepository(NewsAnalysis)
     private readonly newsAnalyses: Repository<NewsAnalysis>,
     @InjectRepository(Notification)
@@ -52,13 +58,14 @@ export class NotificationsService {
       skipped: 0,
       errors: 0,
     };
+    const alertedThisRun: Array<StoryCandidate & { clusterId: string }> = [];
 
     try {
       const analyses = await this.findUnnotifiedAnalyses();
       result.candidates = analyses.length;
 
       for (const analysis of analyses) {
-        const outcome = await this.notifyAnalysis(analysis);
+        const outcome = await this.notifyAnalysis(analysis, alertedThisRun);
         result[outcome] += 1;
       }
 
@@ -82,7 +89,7 @@ export class NotificationsService {
       return 'skipped';
     }
 
-    return this.notifyAnalysis(analysis);
+    return this.notifyAnalysis(analysis, []);
   }
 
   async sendTestMessage(): Promise<void> {
@@ -103,6 +110,7 @@ export class NotificationsService {
 
   private async notifyAnalysis(
     analysis: NewsAnalysis,
+    alertedThisRun: Array<StoryCandidate & { clusterId: string }>,
   ): Promise<NotifyArticleResult> {
     const article = analysis.article;
     if (!article) {
@@ -131,6 +139,37 @@ export class NotificationsService {
       return 'skipped';
     }
 
+    const candidate = this.storyClusterService.toCandidate(analysis);
+    if (!candidate) {
+      return 'skipped';
+    }
+
+    const windowHours = this.resolveWindowHours();
+    const sameRunMatch = this.storyClusterService.findMatchInCandidates(
+      candidate,
+      alertedThisRun,
+      windowHours,
+    );
+    if (sameRunMatch) {
+      return this.suppressDuplicateStory(
+        analysis,
+        sameRunMatch.clusterId,
+        sameRunMatch.articleId,
+      );
+    }
+
+    const priorMatch = await this.storyClusterService.findMatchingAlertedStory(
+      candidate,
+      windowHours,
+    );
+    if (priorMatch) {
+      return this.suppressDuplicateStory(
+        analysis,
+        priorMatch.clusterId,
+        priorMatch.matchedArticleId,
+      );
+    }
+
     const locale = this.configService.getOrThrow<AppLocale>('locale');
     const message = formatTelegramAlert(
       {
@@ -152,7 +191,11 @@ export class NotificationsService {
       return 'errors';
     }
 
+    let clusterId: string;
     try {
+      clusterId = await this.storyClusterService.createAlertedCluster(
+        analysis.articleId,
+      );
       await this.notifications.save(
         this.notifications.create({
           articleId: analysis.articleId,
@@ -164,6 +207,7 @@ export class NotificationsService {
             tickers: analysis.tickers ?? [],
             url: article.url,
             eventType: analysis.eventType,
+            clusterId,
           },
         }),
       );
@@ -174,8 +218,58 @@ export class NotificationsService {
       return 'errors';
     }
 
+    alertedThisRun.push({ ...candidate, clusterId });
     this.logger.log(`Notified article ${analysis.articleId} via Telegram`);
     return 'sent';
+  }
+
+  private async suppressDuplicateStory(
+    analysis: NewsAnalysis,
+    clusterId: string,
+    matchedArticleId: string,
+  ): Promise<NotifyArticleResult> {
+    try {
+      await this.storyClusterService.addSuppressedMember(
+        clusterId,
+        analysis.articleId,
+      );
+      await this.notifications.save(
+        this.notifications.create({
+          articleId: analysis.articleId,
+          channel: TELEGRAM_CHANNEL,
+          payload: {
+            suppressed: true,
+            reason: 'duplicate_story',
+            clusterId,
+            matchedArticleId,
+          },
+        }),
+      );
+    } catch (error) {
+      this.logger.error(
+        `Failed to suppress duplicate story for article ${analysis.articleId}: ${errorMessage(error)}`,
+      );
+      return 'errors';
+    }
+
+    this.logger.log(
+      `Suppressed duplicate story alert for article ${analysis.articleId} (matched ${matchedArticleId}, cluster ${clusterId})`,
+    );
+    return 'skipped';
+  }
+
+  private resolveWindowHours(): number {
+    const configured = this.configService.get<number>(
+      'storyCluster.windowHours',
+    );
+    if (
+      typeof configured === 'number' &&
+      Number.isFinite(configured) &&
+      configured > 0
+    ) {
+      return configured;
+    }
+    return DEFAULT_STORY_CLUSTER_WINDOW_HOURS;
   }
 }
 
