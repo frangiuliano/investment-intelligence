@@ -294,7 +294,7 @@ describe('NotificationsService', () => {
       const [[message]] = sendMessage.mock.calls as [[string]];
       expect(message).toContain('Título: Oil slides');
       expect(message).toContain('Resumen: Crude fell on inventory data.');
-      expect(message).toContain('Sentimiento: negative');
+      expect(message).toContain('Sentimiento: negativo');
       expect(message).not.toContain('Title:');
     });
 

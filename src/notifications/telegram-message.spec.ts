@@ -42,13 +42,13 @@ describe('telegram-message', () => {
     expect(message).toContain('Alerta de noticia relevante');
     expect(message).toContain('Título: Oil slides');
     expect(message).toContain('Resumen: El crudo cayó por inventarios.');
-    expect(message).toContain('Sentimiento: negative');
+    expect(message).toContain('Sentimiento: negativo');
     expect(message).toContain('Tickers: XOM, CVX');
     expect(message).toContain('URL: https://news.example.com/oil');
     expect(message).not.toContain('Evento:');
   });
 
-  it('should include event type when not none', () => {
+  it('should include localized event type when not none', () => {
     const en = formatTelegramAlert(
       {
         title: 'IPO filing',
@@ -73,7 +73,38 @@ describe('telegram-message', () => {
       },
       'es',
     );
-    expect(es).toContain('Evento: ipo');
+    expect(es).toContain('Evento: IPO');
+    expect(es).toContain('Sentimiento: neutral');
+  });
+
+  it('should localize earnings and m_and_a event types in Spanish', () => {
+    expect(
+      formatTelegramAlert(
+        {
+          title: 'Results',
+          summary: 'Beat estimates.',
+          sentiment: 'positive',
+          tickers: ['AAPL'],
+          url: 'https://news.example.com/earn',
+          eventType: 'earnings',
+        },
+        'es',
+      ),
+    ).toContain('Evento: resultados');
+
+    expect(
+      formatTelegramAlert(
+        {
+          title: 'Deal',
+          summary: 'Acquisition announced.',
+          sentiment: 'positive',
+          tickers: ['XYZ'],
+          url: 'https://news.example.com/ma',
+          eventType: 'm_and_a',
+        },
+        'es',
+      ),
+    ).toContain('Evento: fusión/adquisición');
   });
 
   it('should omit event type when none or missing', () => {
@@ -210,8 +241,9 @@ describe('telegram-message', () => {
     expect(includedCount).toBe(1);
     expect(message).toContain('Digesto de noticias (168h)');
     expect(message).toContain('1 ítems');
-    expect(message).toContain('Materialidad: high');
-    expect(message).toContain('Evento: other');
+    expect(message).toContain('Materialidad: alta');
+    expect(message).toContain('Sentimiento: negativo');
+    expect(message).toContain('Evento: otro');
   });
 
   it('should omit overflow items with a count footer under Telegram limit', () => {
