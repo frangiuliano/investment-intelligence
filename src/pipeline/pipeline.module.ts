@@ -5,6 +5,7 @@ import { NewsAnalysis } from '../analysis/entities/news-analysis.entity';
 import { AnalysisModule } from '../analysis/analysis.module';
 import { NewsArticle } from '../news/entities/news-article.entity';
 import { NewsModule } from '../news/news.module';
+import { DigestScheduler } from '../notifications/digest.scheduler';
 import { Notification } from '../notifications/entities/notification.entity';
 import { NotificationsModule } from '../notifications/notifications.module';
 import { RelevanceModule } from '../relevance/relevance.module';
@@ -23,7 +24,12 @@ import { StatusController } from './status.controller';
     NotificationsModule,
   ],
   controllers: [StatusController],
-  providers: [PipelineService, PipelineScheduler, PipelineStatusService],
+  providers: [
+    PipelineService,
+    PipelineScheduler,
+    DigestScheduler,
+    PipelineStatusService,
+  ],
   exports: [PipelineService],
 })
 export class PipelineModule {}

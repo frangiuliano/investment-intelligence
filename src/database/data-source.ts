@@ -5,6 +5,8 @@ import { NewsAnalysis } from '../analysis/entities/news-analysis.entity';
 import { NewsArticle } from '../news/entities/news-article.entity';
 import { NewsStoryClusterMember } from '../notifications/entities/news-story-cluster-member.entity';
 import { NewsStoryCluster } from '../notifications/entities/news-story-cluster.entity';
+import { DigestItem } from '../notifications/entities/digest-item.entity';
+import { DigestRun } from '../notifications/entities/digest-run.entity';
 import { Notification } from '../notifications/entities/notification.entity';
 import { Holding } from '../portfolio/holdings/entities/holding.entity';
 import { WatchlistEntry } from '../portfolio/watchlist/entities/watchlist-entry.entity';
@@ -14,6 +16,7 @@ import { CreateHoldings1752500000000 } from './migrations/1752500000000-CreateHo
 import { CreateWatchlistEntries1752510000000 } from './migrations/1752510000000-CreateWatchlistEntries';
 import { AddNewsAnalysisEventType1752520000000 } from './migrations/1752520000000-AddNewsAnalysisEventType';
 import { CreateNewsStoryClusters1752530000000 } from './migrations/1752530000000-CreateNewsStoryClusters';
+import { CreateDigestTables1752540000000 } from './migrations/1752540000000-CreateDigestTables';
 
 loadEnv();
 
@@ -36,6 +39,8 @@ export default new DataSource({
     WatchlistEntry,
     NewsStoryCluster,
     NewsStoryClusterMember,
+    DigestRun,
+    DigestItem,
   ],
   migrations: [
     InitialSchema1752180000000,
@@ -44,6 +49,7 @@ export default new DataSource({
     CreateWatchlistEntries1752510000000,
     AddNewsAnalysisEventType1752520000000,
     CreateNewsStoryClusters1752530000000,
+    CreateDigestTables1752540000000,
   ],
   synchronize: false,
   logging: false,

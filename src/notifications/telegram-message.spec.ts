@@ -1,6 +1,7 @@
 import { TELEGRAM_MAX_MESSAGE_LENGTH } from './telegram.constants';
 import {
   formatTelegramAlert,
+  formatTelegramDigest,
   formatTelegramTestMessage,
 } from './telegram-message';
 
@@ -156,6 +157,86 @@ describe('telegram-message', () => {
     expect(formatTelegramTestMessage('es')).toContain('notificación de prueba');
     expect(formatTelegramTestMessage('es')).toContain(
       'Telegram está configurado correctamente',
+    );
+  });
+
+  it('should format an English digest with lookback and item count', () => {
+    const { message, includedCount } = formatTelegramDigest(
+      {
+        lookbackHours: 24,
+        items: [
+          {
+            title: 'Oil slides',
+            summary: 'Crude fell on inventory data.',
+            sentiment: 'negative',
+            materiality: 'medium',
+            tickers: ['XOM'],
+            url: 'https://news.example.com/oil',
+          },
+        ],
+      },
+      'en',
+    );
+
+    expect(includedCount).toBe(1);
+    expect(message).toContain('News digest (24h)');
+    expect(message).toContain('1 items');
+    expect(message).toContain('1. Oil slides');
+    expect(message).toContain('Tickers: XOM');
+    expect(message).toContain('Materiality: medium');
+    expect(message).toContain('Sentiment: negative');
+    expect(message).toContain('https://news.example.com/oil');
+  });
+
+  it('should format a Spanish digest with localized labels', () => {
+    const { message, includedCount } = formatTelegramDigest(
+      {
+        lookbackHours: 168,
+        items: [
+          {
+            title: 'Oil slides',
+            summary: 'El crudo cayó.',
+            sentiment: 'negative',
+            materiality: 'high',
+            tickers: ['XOM'],
+            url: 'https://news.example.com/oil',
+            eventType: 'other',
+          },
+        ],
+      },
+      'es',
+    );
+
+    expect(includedCount).toBe(1);
+    expect(message).toContain('Digesto de noticias (168h)');
+    expect(message).toContain('1 ítems');
+    expect(message).toContain('Materialidad: high');
+    expect(message).toContain('Evento: other');
+  });
+
+  it('should omit overflow items with a count footer under Telegram limit', () => {
+    const items = Array.from({ length: 40 }, (_, index) => ({
+      title: `Story ${index + 1} ${'title '.repeat(20)}`,
+      summary: 'summary '.repeat(30),
+      sentiment: 'positive',
+      materiality: 'medium',
+      tickers: ['AAPL', 'MSFT'],
+      url: `https://news.example.com/${index + 1}`,
+    }));
+
+    const { message, includedCount } = formatTelegramDigest(
+      { lookbackHours: 24, items },
+      'en',
+    );
+
+    expect(message.length).toBeLessThanOrEqual(TELEGRAM_MAX_MESSAGE_LENGTH);
+    expect(message).toContain('News digest (24h)');
+    expect(message).toContain('40 items');
+    expect(message).toMatch(/\(\+\d+ more omitted\)/);
+    expect(includedCount).toBeGreaterThan(0);
+    expect(includedCount).toBeLessThan(items.length);
+    expect(message).toContain(
+      `(+${items.length - includedCount} more omitted)`,
     );
   });
 });

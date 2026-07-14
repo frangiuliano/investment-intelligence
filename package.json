@@ -26,6 +26,7 @@
     "analysis:once": "ts-node -r tsconfig-paths/register scripts/run-analysis-once.ts",
     "telegram:test": "ts-node -r tsconfig-paths/register scripts/run-telegram-test.ts",
     "telegram:notify-once": "ts-node -r tsconfig-paths/register scripts/run-telegram-notify-once.ts",
+    "telegram:digest-once": "ts-node -r tsconfig-paths/register scripts/run-digest-once.ts",
     "pipeline:once": "ts-node -r tsconfig-paths/register scripts/run-pipeline-once.ts",
     "verify:lockfile": "bash scripts/verify-lockfile.sh"
   },
