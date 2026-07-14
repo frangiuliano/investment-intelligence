@@ -426,6 +426,53 @@ describe('NotificationsService', () => {
       expect(save).not.toHaveBeenCalled();
     });
 
+    it('should persist notification when cluster persist fails after Telegram', async () => {
+      ensureClusterForAlertedArticle.mockRejectedValue(
+        new Error('cluster db down'),
+      );
+
+      const result = await service.notifyRelevant();
+
+      expect(result).toEqual({
+        candidates: 1,
+        sent: 1,
+        skipped: 0,
+        errors: 0,
+      });
+      expect(sendMessage).toHaveBeenCalledTimes(1);
+      expect(save).toHaveBeenCalledWith({
+        articleId: 'article-1',
+        channel: TELEGRAM_CHANNEL,
+        payload: {
+          title: 'Oil slides',
+          summary: 'Crude fell on inventory data.',
+          sentiment: 'negative',
+          tickers: ['XOM'],
+          url: 'https://news.example.com/oil',
+          eventType: 'none',
+          clusterPersistFailed: true,
+        },
+      });
+    });
+
+    it('should not send Telegram again on a later run after cluster-fail notification persist', async () => {
+      ensureClusterForAlertedArticle.mockRejectedValue(
+        new Error('cluster db down'),
+      );
+      getMany.mockResolvedValueOnce([analysis]).mockResolvedValueOnce([]);
+
+      await service.notifyRelevant();
+      const second = await service.notifyRelevant();
+
+      expect(sendMessage).toHaveBeenCalledTimes(1);
+      expect(second).toEqual({
+        candidates: 0,
+        sent: 0,
+        skipped: 0,
+        errors: 0,
+      });
+    });
+
     it('should not send again while a run is in progress', async () => {
       let release!: () => void;
       const gate = new Promise<void>((resolve) => {
