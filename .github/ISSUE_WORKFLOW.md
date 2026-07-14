@@ -53,7 +53,9 @@ Follow-up de locale (display + headline) vive en #49–#50 (`order-22` /
 ## Orden de ejecución post-MVP (v1) — research bot
 
 Criterio de producto (Finance Advisor): menos alertas de mayor calidad;
-hipótesis de research, **no** órdenes comprá/vendé; sin trading automático.
+hipótesis de research; sin trading automático. Posturas etiquetadas
+(`enter`/`avoid`/`hold`/…) solo con datos de mercado reales + disclaimer
+(#55–#56); nunca como orden de broker.
 
 | Orden | Issue | Título |
 |-------|-------|--------|
@@ -68,6 +70,12 @@ hipótesis de research, **no** órdenes comprá/vendé; sin trading automático.
 | 24 | #32 | Brief on-demand educativo (TA/FA) por Telegram |
 | 25 | #33 | Journal de hipótesis de research |
 | 26 | #34 | Review de hipótesis (mensual o a pedido) |
+| 28 | #55 | Integrar fuente mínima de datos de mercado (OHLCV) |
+| 29 | #56 | Brief con postura accionable relativa a holdings |
+| 30 | #57 | Enviar chart de análisis técnico en imagen por Telegram |
+
+`#55` puede arrancar en paralelo al journal (#33) tras mergear #32; `#56`
+requiere #55; `#57` es deseo (prioridad baja).
 
 ## Orden de ejecución (v2) — dashboard
 
@@ -76,12 +84,15 @@ hipótesis de research, **no** órdenes comprá/vendé; sin trading automático.
 | 27 | #35 | Dashboard de lectura (historial, cartera, reviews) |
 
 **No empezar #35** hasta estabilizar el loop del bot (#26–#34) y el follow-up
-de locale (#49–#50). Obligatorio `/arch` antes.
+de locale (#49–#50). Obligatorio `/arch` antes. Los issues #55–#57 no
+bloquean el dashboard, pero charts en dashboard no reemplazan #57.
 
 ## Fuera de backlog (explícito)
 
 - Trading automático / ejecución de órdenes.
-- Señales buy/sell/hold presentadas como consejo de inversión.
+- Señales buy/sell presentadas como **orden de broker** o consejo regulado
+  sin disclaimer / sin datos de mercado (las posturas etiquetadas de #56
+  son hipótesis de research para operador single-tenant).
 - Backtesting “científico” con promesa de edge (fase futura aparte, si aplica).
 
 ## Gemini: dos proyectos / API keys
