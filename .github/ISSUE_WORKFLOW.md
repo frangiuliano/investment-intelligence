@@ -47,6 +47,9 @@ Usar el label `order-NN`, no el número de issue de GitHub:
 No empezar v1 de producto (desde #26) hasta cerrar #7. #25 solo depende del
 collector (#1) y es prioridad baja.
 
+Follow-up de locale (display + headline) vive en #49–#50 (`order-22` /
+`order-23`), **antes** de briefs (#32) y del dashboard (#35).
+
 ## Orden de ejecución post-MVP (v1) — research bot
 
 Criterio de producto (Finance Advisor): menos alertas de mayor calidad;
@@ -60,18 +63,20 @@ hipótesis de research, **no** órdenes comprá/vendé; sin trading automático.
 | 19 | #30 | Taxonomía de eventos y alertas de catalizadores |
 | 20 | #29 | Clusterizar historias duplicadas en una sola alerta |
 | 21 | #31 | Digesto diario/semanal por Telegram |
-| 22 | #32 | Brief on-demand educativo (TA/FA) por Telegram |
-| 23 | #33 | Journal de hipótesis de research |
-| 24 | #34 | Review de hipótesis (mensual o a pedido) |
+| 22 | #49 | Localizar valores de display (sentimiento, materialidad, evento) en Telegram |
+| 23 | #50 | Generar headline localizado en el mismo análisis Gemini y usarlo en Telegram |
+| 24 | #32 | Brief on-demand educativo (TA/FA) por Telegram |
+| 25 | #33 | Journal de hipótesis de research |
+| 26 | #34 | Review de hipótesis (mensual o a pedido) |
 
 ## Orden de ejecución (v2) — dashboard
 
 | Orden | Issue | Título |
 |-------|-------|--------|
-| 25 | #35 | Dashboard de lectura (historial, cartera, reviews) |
+| 27 | #35 | Dashboard de lectura (historial, cartera, reviews) |
 
-**No empezar #35** hasta estabilizar el loop del bot (#26–#34). Obligatorio
-`/arch` antes.
+**No empezar #35** hasta estabilizar el loop del bot (#26–#34) y el follow-up
+de locale (#49–#50). Obligatorio `/arch` antes.
 
 ## Fuera de backlog (explícito)
 
@@ -97,6 +102,7 @@ No compartir la misma key entre ambos: el free tier es por proyecto.
 |------|--------|----------------|
 | Pre-scaffold | Architect | Antes del issue #8 |
 | Ideas de alertas / features de research | Finance Advisor (`/fin`) | Consultas de dominio; no crea Issues |
+| Locale display / headline | — | #49–#50 siguen el ADR implícito Arch (códigos EN + display; headline en el mismo JSON) |
 | Holdings / brief / journal / precios | Architect (`/arch`) | Antes de #27, #32, #33, #34 (si hay fuente de precios), #35 |
 | Rúbrica de review de hipótesis | Finance Advisor (`/fin`) | Antes o durante #34 |
 | CI setup | DevOps | Antes o durante issue #10 |
