@@ -203,16 +203,17 @@ export class NotificationsService {
       return 'errors';
     }
 
-    let clusterId: string;
+    let clusterId: string | null = null;
+    let clusterPersistFailed = false;
     try {
       clusterId = await this.storyClusterService.ensureClusterForAlertedArticle(
         analysis.articleId,
       );
     } catch (error) {
+      clusterPersistFailed = true;
       this.logger.error(
         `Telegram sent for article ${analysis.articleId} but cluster persist failed: ${errorMessage(error)}`,
       );
-      return 'errors';
     }
 
     return this.persistAlertNotification(
@@ -220,20 +221,35 @@ export class NotificationsService {
       candidate,
       clusterId,
       alertedThisRun,
-      { skipTelegram: false },
+      { skipTelegram: false, clusterPersistFailed },
     );
   }
 
   private async persistAlertNotification(
     analysis: NewsAnalysis,
     candidate: StoryCandidate,
-    clusterId: string,
+    clusterId: string | null,
     alertedThisRun: Array<StoryCandidate & { clusterId: string }>,
-    options: { skipTelegram: boolean },
+    options: { skipTelegram: boolean; clusterPersistFailed?: boolean },
   ): Promise<NotifyArticleResult> {
     const article = analysis.article;
     if (!article) {
       return 'skipped';
+    }
+
+    const payload: Record<string, unknown> = {
+      title: article.title,
+      summary: analysis.summary,
+      sentiment: analysis.sentiment,
+      tickers: analysis.tickers ?? [],
+      url: article.url,
+      eventType: analysis.eventType,
+    };
+    if (clusterId) {
+      payload.clusterId = clusterId;
+    }
+    if (options.clusterPersistFailed) {
+      payload.clusterPersistFailed = true;
     }
 
     try {
@@ -241,19 +257,13 @@ export class NotificationsService {
         this.notifications.create({
           articleId: analysis.articleId,
           channel: TELEGRAM_CHANNEL,
-          payload: {
-            title: article.title,
-            summary: analysis.summary,
-            sentiment: analysis.sentiment,
-            tickers: analysis.tickers ?? [],
-            url: article.url,
-            eventType: analysis.eventType,
-            clusterId,
-          },
+          payload,
         }),
       );
     } catch (error) {
-      alertedThisRun.push({ ...candidate, clusterId });
+      if (clusterId) {
+        alertedThisRun.push({ ...candidate, clusterId });
+      }
       this.logger.error(
         options.skipTelegram
           ? `Recovered Telegram send for article ${analysis.articleId} but notification persist failed: ${errorMessage(error)}`
@@ -262,11 +272,15 @@ export class NotificationsService {
       return 'errors';
     }
 
-    alertedThisRun.push({ ...candidate, clusterId });
+    if (clusterId) {
+      alertedThisRun.push({ ...candidate, clusterId });
+    }
     this.logger.log(
-      options.skipTelegram
-        ? `Recovered notification persist for article ${analysis.articleId} (skipped duplicate Telegram send)`
-        : `Notified article ${analysis.articleId} via Telegram`,
+      options.clusterPersistFailed
+        ? `Notified article ${analysis.articleId} via Telegram (cluster persist failed; notification saved to prevent re-push)`
+        : options.skipTelegram
+          ? `Recovered notification persist for article ${analysis.articleId} (skipped duplicate Telegram send)`
+          : `Notified article ${analysis.articleId} via Telegram`,
     );
     return 'sent';
   }
