@@ -4,6 +4,7 @@ import {
   DEFAULT_GEMINI_ANALYSIS_BATCH_SIZE,
   DEFAULT_GEMINI_MODEL,
   DEFAULT_GEMINI_REQUEST_DELAY_MS,
+  DEFAULT_STORY_CLUSTER_WINDOW_HOURS,
   envValidationSchema,
   parseWatchlistTickers,
 } from './env.validation';
@@ -24,6 +25,7 @@ type ValidatedEnv = {
   GEMINI_REQUEST_DELAY_MS: number;
   GEMINI_MODEL: string;
   GEMINI_ANALYSIS_BATCH_SIZE: number;
+  STORY_CLUSTER_WINDOW_HOURS: number;
 };
 
 describe('envValidationSchema', () => {
@@ -41,6 +43,9 @@ describe('envValidationSchema', () => {
     expect(value.GEMINI_MODEL).toBe(DEFAULT_GEMINI_MODEL);
     expect(value.GEMINI_ANALYSIS_BATCH_SIZE).toBe(
       DEFAULT_GEMINI_ANALYSIS_BATCH_SIZE,
+    );
+    expect(value.STORY_CLUSTER_WINDOW_HOURS).toBe(
+      DEFAULT_STORY_CLUSTER_WINDOW_HOURS,
     );
   });
 

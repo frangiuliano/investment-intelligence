@@ -6,6 +6,7 @@ import { AppLocale } from '../config/env.validation';
 import { RelevanceService } from '../relevance/relevance.service';
 import { Notification } from './entities/notification.entity';
 import { NotificationsService } from './notifications.service';
+import { StoryClusterService } from './story-cluster.service';
 import { TelegramClient } from './telegram.client';
 import { TELEGRAM_CHANNEL } from './telegram.constants';
 
@@ -21,11 +22,17 @@ describe('NotificationsService', () => {
   let save: jest.Mock;
   let getMany: jest.Mock;
   let locale: AppLocale;
+  let toCandidate: jest.Mock;
+  let findMatchInCandidates: jest.Mock;
+  let findMatchingAlertedStory: jest.Mock;
+  let createAlertedCluster: jest.Mock;
+  let addSuppressedMember: jest.Mock;
 
   const article = {
     id: 'article-1',
     title: 'Oil slides',
     url: 'https://news.example.com/oil',
+    publishedAt: new Date('2026-07-14T10:00:00.000Z'),
   };
 
   const analysis = {
@@ -35,7 +42,17 @@ describe('NotificationsService', () => {
     tickers: ['XOM'],
     materiality: 'high',
     eventType: 'none',
+    analyzedAt: new Date('2026-07-14T10:05:00.000Z'),
     article,
+  };
+
+  const candidate = {
+    articleId: 'article-1',
+    title: article.title,
+    summary: analysis.summary,
+    tickers: analysis.tickers,
+    eventType: analysis.eventType,
+    referenceAt: article.publishedAt,
   };
 
   beforeEach(async () => {
@@ -58,6 +75,11 @@ describe('NotificationsService', () => {
     exists = jest.fn().mockResolvedValue(false);
     create = jest.fn((value: unknown) => value);
     save = jest.fn().mockResolvedValue({ id: 'notif-1' });
+    toCandidate = jest.fn().mockReturnValue(candidate);
+    findMatchInCandidates = jest.fn().mockReturnValue(null);
+    findMatchingAlertedStory = jest.fn().mockResolvedValue(null);
+    createAlertedCluster = jest.fn().mockResolvedValue('cluster-1');
+    addSuppressedMember = jest.fn().mockResolvedValue(undefined);
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -71,6 +93,12 @@ describe('NotificationsService', () => {
               }
               throw new Error(`Unexpected config key: ${key}`);
             },
+            get: (key: string) => {
+              if (key === 'storyCluster.windowHours') {
+                return 24;
+              }
+              return undefined;
+            },
           },
         },
         {
@@ -80,6 +108,16 @@ describe('NotificationsService', () => {
         {
           provide: RelevanceService,
           useValue: { evaluate, resolveWatchlistTickers },
+        },
+        {
+          provide: StoryClusterService,
+          useValue: {
+            toCandidate,
+            findMatchInCandidates,
+            findMatchingAlertedStory,
+            createAlertedCluster,
+            addSuppressedMember,
+          },
         },
         {
           provide: getRepositoryToken(NewsAnalysis),
@@ -112,6 +150,7 @@ describe('NotificationsService', () => {
       expect(message).toContain('Sentiment: negative');
       expect(message).toContain('Tickers: XOM');
       expect(message).toContain('URL: https://news.example.com/oil');
+      expect(createAlertedCluster).toHaveBeenCalledWith('article-1');
       expect(save).toHaveBeenCalledWith({
         articleId: 'article-1',
         channel: TELEGRAM_CHANNEL,
@@ -122,6 +161,7 @@ describe('NotificationsService', () => {
           tickers: ['XOM'],
           url: 'https://news.example.com/oil',
           eventType: 'none',
+          clusterId: 'cluster-1',
         },
       });
     });
@@ -169,6 +209,86 @@ describe('NotificationsService', () => {
       expect(sendMessage).not.toHaveBeenCalled();
       expect(evaluate).toHaveBeenCalledWith(
         expect.objectContaining({ alreadyNotified: true }),
+      );
+    });
+
+    it('should suppress a duplicate story without a second Telegram send', async () => {
+      const secondArticle = {
+        id: 'article-2',
+        title: 'Oil slides after inventory surprise',
+        url: 'https://other.example.com/oil',
+        publishedAt: new Date('2026-07-14T11:00:00.000Z'),
+      };
+      const secondAnalysis = {
+        articleId: 'article-2',
+        sentiment: 'negative',
+        summary: 'Crude fell on inventory data from a second source.',
+        tickers: ['XOM'],
+        materiality: 'high',
+        eventType: 'none',
+        analyzedAt: new Date('2026-07-14T11:05:00.000Z'),
+        article: secondArticle,
+      };
+      const secondCandidate = {
+        articleId: 'article-2',
+        title: secondArticle.title,
+        summary: secondAnalysis.summary,
+        tickers: secondAnalysis.tickers,
+        eventType: secondAnalysis.eventType,
+        referenceAt: secondArticle.publishedAt,
+      };
+
+      getMany.mockResolvedValue([analysis, secondAnalysis]);
+      toCandidate
+        .mockReturnValueOnce(candidate)
+        .mockReturnValueOnce(secondCandidate);
+      findMatchInCandidates
+        .mockReturnValueOnce(null)
+        .mockReturnValueOnce({ ...candidate, clusterId: 'cluster-1' });
+
+      const result = await service.notifyRelevant();
+
+      expect(result).toEqual({
+        candidates: 2,
+        sent: 1,
+        skipped: 1,
+        errors: 0,
+      });
+      expect(sendMessage).toHaveBeenCalledTimes(1);
+      expect(addSuppressedMember).toHaveBeenCalledWith(
+        'cluster-1',
+        'article-2',
+      );
+      expect(save).toHaveBeenCalledWith({
+        articleId: 'article-2',
+        channel: TELEGRAM_CHANNEL,
+        payload: {
+          suppressed: true,
+          reason: 'duplicate_story',
+          clusterId: 'cluster-1',
+          matchedArticleId: 'article-1',
+        },
+      });
+    });
+
+    it('should suppress when a prior alerted story matches', async () => {
+      findMatchingAlertedStory.mockResolvedValue({
+        clusterId: 'cluster-prior',
+        matchedArticleId: 'article-prior',
+      });
+
+      const result = await service.notifyRelevant();
+
+      expect(result).toEqual({
+        candidates: 1,
+        sent: 0,
+        skipped: 1,
+        errors: 0,
+      });
+      expect(sendMessage).not.toHaveBeenCalled();
+      expect(addSuppressedMember).toHaveBeenCalledWith(
+        'cluster-prior',
+        'article-1',
       );
     });
 
