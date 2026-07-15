@@ -31,7 +31,7 @@ export class HypothesesController {
   @Patch(':id/close')
   async close(
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() body: CloseHypothesisInput,
+    @Body() body?: CloseHypothesisInput,
   ) {
     return this.hypothesesService.close(id, body);
   }

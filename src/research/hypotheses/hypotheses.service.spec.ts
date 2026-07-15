@@ -138,6 +138,26 @@ describe('HypothesesService', () => {
     expect(changes.closeNote).toBe('Evidence changed.');
   });
 
+  it('should close an open hypothesis without a request body', async () => {
+    const closedHypothesis = {
+      ...sampleHypothesis,
+      status: HypothesisStatus.CLOSED,
+      closedAt: new Date('2026-07-15T13:00:00.000Z'),
+      closeNote: null,
+    };
+    update.mockResolvedValue({ affected: 1 });
+    findOne.mockResolvedValue(closedHypothesis);
+
+    await expect(
+      service.close(sampleHypothesis.id, undefined),
+    ).resolves.toEqual(closedHypothesis);
+    const [, changes] = update.mock.calls[0] as [
+      { id: string; status: HypothesisStatus },
+      Partial<Hypothesis>,
+    ];
+    expect(changes.closeNote).toBeNull();
+  });
+
   it('should reject closing an already closed hypothesis', async () => {
     update.mockResolvedValue({ affected: 0 });
     findOne.mockResolvedValue({

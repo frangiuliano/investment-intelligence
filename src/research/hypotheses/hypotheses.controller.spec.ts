@@ -62,4 +62,14 @@ describe('HypothesesController', () => {
     });
     expect(close).toHaveBeenCalledWith(sampleHypothesis.id, body);
   });
+
+  it('should close a hypothesis without a request body', async () => {
+    await expect(
+      controller.close(sampleHypothesis.id, undefined),
+    ).resolves.toEqual({
+      ...sampleHypothesis,
+      status: 'closed',
+    });
+    expect(close).toHaveBeenCalledWith(sampleHypothesis.id, undefined);
+  });
 });

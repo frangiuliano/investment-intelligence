@@ -79,7 +79,10 @@ export class HypothesesService {
     return hypothesis;
   }
 
-  async close(id: string, input: CloseHypothesisInput): Promise<Hypothesis> {
+  async close(
+    id: string,
+    input: CloseHypothesisInput = {},
+  ): Promise<Hypothesis> {
     const closeNote = this.normalizeOptionalText(
       input.closeNote,
       'closeNote',
