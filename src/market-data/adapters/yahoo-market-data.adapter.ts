@@ -76,7 +76,10 @@ export class YahooMarketDataAdapter implements MarketDataPort {
       return this.parseResponse(
         symbol,
         timeframe,
-        (await response.json()) as YahooChartResponse,
+        await readJsonWithAbort<YahooChartResponse>(
+          response,
+          controller.signal,
+        ),
       );
     } catch (error) {
       if (error instanceof MarketDataUnavailableError) {
@@ -189,6 +192,36 @@ function invalidResponse(
     'invalid_response',
     `Yahoo returned invalid market data: ${detail}`,
   );
+}
+
+function readJsonWithAbort<T>(
+  response: Response,
+  signal: AbortSignal,
+): Promise<T> {
+  if (signal.aborted) {
+    return Promise.reject(createAbortError());
+  }
+
+  return new Promise<T>((resolve, reject) => {
+    const onAbort = () => reject(createAbortError());
+    signal.addEventListener('abort', onAbort, { once: true });
+    (response.json() as Promise<T>).then(
+      (value) => {
+        signal.removeEventListener('abort', onAbort);
+        resolve(value);
+      },
+      (error: unknown) => {
+        signal.removeEventListener('abort', onAbort);
+        reject(error instanceof Error ? error : new Error(String(error)));
+      },
+    );
+  });
+}
+
+function createAbortError(): Error {
+  const error = new Error('Market data response aborted');
+  error.name = 'AbortError';
+  return error;
 }
 
 function isAbortError(error: unknown): boolean {

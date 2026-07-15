@@ -21,6 +21,7 @@ describe('YahooMarketDataAdapter', () => {
   });
 
   afterEach(() => {
+    jest.useRealTimers();
     global.fetch = originalFetch;
     jest.restoreAllMocks();
   });
@@ -140,6 +141,25 @@ describe('YahooMarketDataAdapter', () => {
       reason: 'timeout',
       symbol: 'AAPL',
     });
+  });
+
+  it('times out when the provider response body never completes', async () => {
+    jest.useFakeTimers();
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: jest.fn().mockReturnValue(new Promise(() => undefined)),
+    });
+
+    const request = adapter.getSeries('AAPL', '1d');
+    const expectation = expect(request).rejects.toMatchObject({
+      reason: 'timeout',
+      symbol: 'AAPL',
+    });
+    await Promise.resolve();
+    await jest.advanceTimersByTimeAsync(10_000);
+
+    await expectation;
   });
 
   it('maps provider HTTP failures without exposing a response body', async () => {
