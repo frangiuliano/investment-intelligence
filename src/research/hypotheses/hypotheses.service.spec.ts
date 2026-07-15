@@ -1,0 +1,161 @@
+import {
+  BadRequestException,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import {
+  Hypothesis,
+  HypothesisBias,
+  HypothesisSource,
+  HypothesisStatus,
+} from './entities/hypothesis.entity';
+import { HypothesesService } from './hypotheses.service';
+
+describe('HypothesesService', () => {
+  let service: HypothesesService;
+  let findOne: jest.Mock;
+  let find: jest.Mock;
+  let create: jest.Mock;
+  let save: jest.Mock;
+  let update: jest.Mock;
+
+  const sampleHypothesis: Hypothesis = {
+    id: '11111111-1111-4111-8111-111111111111',
+    symbol: 'AAPL',
+    bias: HypothesisBias.BULLISH,
+    thesis: 'Services growth supports margins.',
+    invalidation: 'Services growth falls below 5%.',
+    horizonDays: 90,
+    status: HypothesisStatus.OPEN,
+    source: HypothesisSource.MANUAL,
+    sourceRefId: null,
+    closedAt: null,
+    closeNote: null,
+    createdAt: new Date('2026-07-15T12:00:00.000Z'),
+    updatedAt: new Date('2026-07-15T12:00:00.000Z'),
+  };
+
+  beforeEach(async () => {
+    findOne = jest.fn();
+    find = jest.fn();
+    create = jest.fn((entity: unknown) => entity);
+    save = jest.fn((entity: Partial<Hypothesis>) =>
+      Promise.resolve({ ...sampleHypothesis, ...entity }),
+    );
+    update = jest.fn();
+
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        HypothesesService,
+        {
+          provide: getRepositoryToken(Hypothesis),
+          useValue: { findOne, find, create, save, update },
+        },
+      ],
+    }).compile();
+
+    service = module.get(HypothesesService);
+  });
+
+  it('should create an open manual hypothesis with normalized fields', async () => {
+    const hypothesis = await service.create({
+      symbol: ' aapl ',
+      bias: 'bullish',
+      thesis: '  Services growth supports margins. ',
+      invalidation: ' Services growth falls below 5%. ',
+      horizonDays: 90,
+    });
+
+    expect(create).toHaveBeenCalledWith({
+      symbol: 'AAPL',
+      bias: HypothesisBias.BULLISH,
+      thesis: 'Services growth supports margins.',
+      invalidation: 'Services growth falls below 5%.',
+      horizonDays: 90,
+      status: HypothesisStatus.OPEN,
+      source: HypothesisSource.MANUAL,
+      sourceRefId: null,
+      closedAt: null,
+      closeNote: null,
+    });
+    expect(hypothesis.status).toBe(HypothesisStatus.OPEN);
+  });
+
+  it('should list open hypotheses by default', async () => {
+    find.mockResolvedValue([sampleHypothesis]);
+
+    await expect(service.findAll()).resolves.toEqual([sampleHypothesis]);
+    expect(find).toHaveBeenCalledWith({
+      where: { status: HypothesisStatus.OPEN },
+      order: { createdAt: 'DESC' },
+    });
+  });
+
+  it('should reject invalid bias and horizon values', async () => {
+    const input = {
+      symbol: 'AAPL',
+      bias: 'buy',
+      thesis: 'Thesis',
+      invalidation: 'Invalidation',
+      horizonDays: 0,
+    };
+
+    await expect(service.create(input)).rejects.toBeInstanceOf(
+      BadRequestException,
+    );
+    await expect(
+      service.create({ ...input, bias: 'watch' }),
+    ).rejects.toBeInstanceOf(BadRequestException);
+  });
+
+  it('should close an open hypothesis with an optional note', async () => {
+    const closedHypothesis = {
+      ...sampleHypothesis,
+      status: HypothesisStatus.CLOSED,
+      closedAt: new Date('2026-07-15T13:00:00.000Z'),
+      closeNote: 'Evidence changed.',
+    };
+    update.mockResolvedValue({ affected: 1 });
+    findOne.mockResolvedValue(closedHypothesis);
+
+    await expect(
+      service.close(sampleHypothesis.id, {
+        closeNote: ' Evidence changed. ',
+      }),
+    ).resolves.toEqual(closedHypothesis);
+    const [criteria, changes] = update.mock.calls[0] as [
+      { id: string; status: HypothesisStatus },
+      Partial<Hypothesis>,
+    ];
+    expect(criteria).toEqual({
+      id: sampleHypothesis.id,
+      status: HypothesisStatus.OPEN,
+    });
+    expect(changes.status).toBe(HypothesisStatus.CLOSED);
+    expect(changes.closedAt).toBeInstanceOf(Date);
+    expect(changes.closeNote).toBe('Evidence changed.');
+  });
+
+  it('should reject closing an already closed hypothesis', async () => {
+    update.mockResolvedValue({ affected: 0 });
+    findOne.mockResolvedValue({
+      ...sampleHypothesis,
+      status: HypothesisStatus.CLOSED,
+    });
+
+    await expect(service.close(sampleHypothesis.id, {})).rejects.toBeInstanceOf(
+      ConflictException,
+    );
+  });
+
+  it('should throw NotFoundException when closing a missing hypothesis', async () => {
+    update.mockResolvedValue({ affected: 0 });
+    findOne.mockResolvedValue(null);
+
+    await expect(service.close(sampleHypothesis.id, {})).rejects.toBeInstanceOf(
+      NotFoundException,
+    );
+  });
+});

@@ -9,6 +9,7 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { PipelineModule } from './pipeline/pipeline.module';
 import { PortfolioModule } from './portfolio/portfolio.module';
 import { RelevanceModule } from './relevance/relevance.module';
+import { ResearchModule } from './research/research.module';
 import { TelegramBotModule } from './telegram-bot/telegram-bot.module';
 
 @Module({
@@ -23,6 +24,7 @@ import { TelegramBotModule } from './telegram-bot/telegram-bot.module';
     PipelineModule,
     PortfolioModule,
     BriefModule,
+    ResearchModule,
     TelegramBotModule,
   ],
 })
