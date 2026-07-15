@@ -5,6 +5,7 @@ import { HealthModule } from './health/health.module';
 import { NewsModule } from './news/news.module';
 import { AnalysisModule } from './analysis/analysis.module';
 import { BriefModule } from './brief/brief.module';
+import { MarketDataModule } from './market-data/market-data.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { PipelineModule } from './pipeline/pipeline.module';
 import { PortfolioModule } from './portfolio/portfolio.module';
@@ -24,6 +25,7 @@ import { TelegramBotModule } from './telegram-bot/telegram-bot.module';
     PipelineModule,
     PortfolioModule,
     BriefModule,
+    MarketDataModule,
     ResearchModule,
     TelegramBotModule,
   ],
