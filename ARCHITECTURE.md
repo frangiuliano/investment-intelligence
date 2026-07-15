@@ -24,6 +24,7 @@ Mapa de módulos del backend NestJS y su relación con el backlog del MVP.
 | `portfolio/` | Implementado | Holdings + watchlist (`/holdings`, `/watchlist`) | #27, #28 |
 | `brief/` | Implementado | Briefs educativos on-demand (Gemini, persistencia) | #32 |
 | `telegram-bot/` | Implementado | Inbound Telegram (`/brief`, webhook/poll) | #32 |
+| `research/` | Implementado | Journal de hipótesis; reviews como extensión futura | #33, #34 |
 
 ## Diagrama de dependencias (MVP)
 
@@ -37,6 +38,7 @@ pipeline
 portfolio  ← holdings + watchlist (REST CRUD; base para briefs/journal)
 brief      ← Gemini on-demand + research_briefs (consume holdings + Telegram outbound)
 telegram-bot ← inbound webhook/commands → brief
+research   ← hypotheses (REST create/list/close; reviews futuras separadas)
 
 database ← TypeORM DataSource + entidades de dominio
 config   ← global
@@ -55,6 +57,9 @@ health   ← database (ping vía DataSource)
 - `research_briefs` guarda sections JSON fijas (`overview`, `fundamental`,
   `technical`, `risks`, `invalidation`, `disclaimer`) + `prompt_version`.
   Sin cotización en vivo en v1.
+- `hypotheses` guarda tesis, invalidación, horizonte, sesgo acotado y origen.
+  `source_ref_id` es un UUID opaco sin FK porque puede referir a un brief o una
+  alerta. El cierre registra `closed_at` y una nota opcional.
 
 ## Health check
 

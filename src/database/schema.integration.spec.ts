@@ -1,6 +1,7 @@
 import { Logger } from '@nestjs/common';
 import { DataSource, QueryFailedError, Repository } from 'typeorm';
 import { NewsAnalysis } from '../analysis/entities/news-analysis.entity';
+import { ResearchBrief } from '../brief/entities/research-brief.entity';
 import { NewsArticle } from '../news/entities/news-article.entity';
 import { DigestItem } from '../notifications/entities/digest-item.entity';
 import { DigestRun } from '../notifications/entities/digest-run.entity';
@@ -12,6 +13,12 @@ import {
   HoldingAssetType,
 } from '../portfolio/holdings/entities/holding.entity';
 import { WatchlistEntry } from '../portfolio/watchlist/entities/watchlist-entry.entity';
+import {
+  Hypothesis,
+  HypothesisBias,
+  HypothesisSource,
+  HypothesisStatus,
+} from '../research/hypotheses/entities/hypothesis.entity';
 import { InitialSchema1752180000000 } from './migrations/1752180000000-InitialSchema';
 import { AddNewsAnalysisMateriality1752430000000 } from './migrations/1752430000000-AddNewsAnalysisMateriality';
 import { CreateHoldings1752500000000 } from './migrations/1752500000000-CreateHoldings';
@@ -20,6 +27,8 @@ import { AddNewsAnalysisEventType1752520000000 } from './migrations/175252000000
 import { CreateNewsStoryClusters1752530000000 } from './migrations/1752530000000-CreateNewsStoryClusters';
 import { CreateDigestTables1752540000000 } from './migrations/1752540000000-CreateDigestTables';
 import { AddNewsAnalysisHeadline1752550000000 } from './migrations/1752550000000-AddNewsAnalysisHeadline';
+import { CreateResearchBriefs1752560000000 } from './migrations/1752560000000-CreateResearchBriefs';
+import { CreateHypotheses1752570000000 } from './migrations/1752570000000-CreateHypotheses';
 import {
   DEFAULT_TEST_DATABASE_URL,
   resolveTestDatabaseUrl,
@@ -38,6 +47,8 @@ describe('Database schema (integration)', () => {
   let storyClusterMembers: Repository<NewsStoryClusterMember>;
   let digestRuns: Repository<DigestRun>;
   let digestItems: Repository<DigestItem>;
+  let researchBriefs: Repository<ResearchBrief>;
+  let hypotheses: Repository<Hypothesis>;
   let databaseUrl: string;
 
   beforeAll(async () => {
@@ -56,6 +67,8 @@ describe('Database schema (integration)', () => {
         NewsStoryClusterMember,
         DigestRun,
         DigestItem,
+        ResearchBrief,
+        Hypothesis,
       ],
       migrations: [
         InitialSchema1752180000000,
@@ -66,6 +79,8 @@ describe('Database schema (integration)', () => {
         CreateNewsStoryClusters1752530000000,
         CreateDigestTables1752540000000,
         AddNewsAnalysisHeadline1752550000000,
+        CreateResearchBriefs1752560000000,
+        CreateHypotheses1752570000000,
       ],
       synchronize: false,
       logging: false,
@@ -95,6 +110,8 @@ describe('Database schema (integration)', () => {
     storyClusterMembers = dataSource.getRepository(NewsStoryClusterMember);
     digestRuns = dataSource.getRepository(DigestRun);
     digestItems = dataSource.getRepository(DigestItem);
+    researchBriefs = dataSource.getRepository(ResearchBrief);
+    hypotheses = dataSource.getRepository(Hypothesis);
   }, 30_000);
 
   afterAll(async () => {
@@ -105,7 +122,7 @@ describe('Database schema (integration)', () => {
 
   beforeEach(async () => {
     await dataSource.query(
-      'TRUNCATE TABLE "digest_items", "digest_runs", "notifications", "news_story_cluster_members", "news_story_clusters", "news_analysis", "news_articles", "holdings", "watchlist_entries" RESTART IDENTITY CASCADE',
+      'TRUNCATE TABLE "hypotheses", "research_briefs", "digest_items", "digest_runs", "notifications", "news_story_cluster_members", "news_story_clusters", "news_analysis", "news_articles", "holdings", "watchlist_entries" RESTART IDENTITY CASCADE',
     );
   });
 
@@ -123,7 +140,9 @@ describe('Database schema (integration)', () => {
           'news_story_clusters',
           'news_story_cluster_members',
           'digest_runs',
-          'digest_items'
+          'digest_items',
+          'research_briefs',
+          'hypotheses'
         )
       ORDER BY table_name
     `);
@@ -132,11 +151,13 @@ describe('Database schema (integration)', () => {
       'digest_items',
       'digest_runs',
       'holdings',
+      'hypotheses',
       'news_analysis',
       'news_articles',
       'news_story_cluster_members',
       'news_story_clusters',
       'notifications',
+      'research_briefs',
       'watchlist_entries',
     ]);
   });
@@ -397,5 +418,75 @@ describe('Database schema (integration)', () => {
         }),
       ),
     ).rejects.toBeInstanceOf(QueryFailedError);
+  });
+
+  it('should persist research hypotheses and enforce journal constraints', async () => {
+    const hypothesis = await hypotheses.save(
+      hypotheses.create({
+        symbol: 'AAPL',
+        bias: HypothesisBias.BULLISH,
+        thesis: 'Services growth supports margins.',
+        invalidation: 'Services growth falls below 5%.',
+        horizonDays: 90,
+        status: HypothesisStatus.OPEN,
+        source: HypothesisSource.MANUAL,
+        sourceRefId: null,
+        closedAt: null,
+        closeNote: null,
+      }),
+    );
+
+    expect(hypothesis.id).toBeDefined();
+    expect(hypothesis.status).toBe(HypothesisStatus.OPEN);
+
+    await expect(
+      hypotheses.save(
+        hypotheses.create({
+          symbol: 'MSFT',
+          bias: HypothesisBias.WATCH,
+          thesis: 'Cloud growth may reaccelerate.',
+          invalidation: 'Cloud growth remains flat.',
+          horizonDays: 0,
+          status: HypothesisStatus.OPEN,
+          source: HypothesisSource.BRIEF,
+          sourceRefId: null,
+          closedAt: null,
+          closeNote: null,
+        }),
+      ),
+    ).rejects.toBeInstanceOf(QueryFailedError);
+
+    const brief = await researchBriefs.save(
+      researchBriefs.create({
+        symbol: 'AAPL',
+        locale: 'en',
+        sections: {
+          overview: 'Overview',
+          fundamental: 'Fundamental',
+          technical: 'Technical',
+          risks: 'Risk',
+          invalidation: 'Invalidation',
+          disclaimer: 'Research only.',
+        },
+        promptVersion: 'v1',
+        holdingId: null,
+      }),
+    );
+
+    const fromBrief = await hypotheses.save(
+      hypotheses.create({
+        symbol: 'AAPL',
+        bias: HypothesisBias.WATCH,
+        thesis: 'Track the brief thesis.',
+        invalidation: 'Brief assumptions change.',
+        horizonDays: 30,
+        status: HypothesisStatus.OPEN,
+        source: HypothesisSource.BRIEF,
+        sourceRefId: brief.id,
+        closedAt: null,
+        closeNote: null,
+      }),
+    );
+    expect(fromBrief.sourceRefId).toBe(brief.id);
   });
 });
