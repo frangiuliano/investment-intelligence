@@ -116,7 +116,16 @@ export class YahooMarketDataAdapter implements MarketDataPort {
       );
     }
 
-    const result = payload.chart?.result?.[0];
+    const results = payload.chart?.result;
+    if (results === null || (Array.isArray(results) && results.length === 0)) {
+      throw new MarketDataUnavailableError(
+        requestedSymbol,
+        'not_found',
+        `Yahoo returned no market data for ${requestedSymbol}`,
+      );
+    }
+
+    const result = results?.[0];
     const quote = result?.indicators?.quote?.[0];
     if (!result || !quote || !result.timestamp) {
       throw invalidResponse(requestedSymbol, 'missing chart data');

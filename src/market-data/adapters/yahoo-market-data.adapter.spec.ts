@@ -102,6 +102,26 @@ describe('YahooMarketDataAdapter', () => {
     });
   });
 
+  it.each([null, []])(
+    'maps an empty Yahoo result %p to a typed not-found error',
+    async (result) => {
+      global.fetch = jest.fn().mockResolvedValue(
+        mockResponse(200, {
+          chart: {
+            result,
+            error: null,
+          },
+        }),
+      );
+
+      await expect(adapter.getSeries('UNKNOWN', '1d')).rejects.toMatchObject({
+        name: 'MarketDataUnavailableError',
+        reason: 'not_found',
+        symbol: 'UNKNOWN',
+      });
+    },
+  );
+
   it('rejects responses without complete OHLCV bars', async () => {
     global.fetch = jest.fn().mockResolvedValue(
       mockResponse(200, {
