@@ -6,6 +6,8 @@ import {
   DEFAULT_GEMINI_ANALYSIS_BATCH_SIZE,
   DEFAULT_GEMINI_MODEL,
   DEFAULT_GEMINI_REQUEST_DELAY_MS,
+  DEFAULT_MARKET_DATA_PROVIDER,
+  DEFAULT_MARKET_DATA_TIMEOUT_MS,
   DEFAULT_STORY_CLUSTER_WINDOW_HOURS,
   envValidationSchema,
   parseWatchlistTickers,
@@ -30,6 +32,8 @@ type ValidatedEnv = {
   STORY_CLUSTER_WINDOW_HOURS: number;
   DIGEST_CRON_SCHEDULE: string;
   DIGEST_LOOKBACK_HOURS: number;
+  MARKET_DATA_PROVIDER: string;
+  MARKET_DATA_TIMEOUT_MS: number;
 };
 
 describe('envValidationSchema', () => {
@@ -53,6 +57,8 @@ describe('envValidationSchema', () => {
     );
     expect(value.DIGEST_CRON_SCHEDULE).toBe(DEFAULT_DIGEST_CRON_SCHEDULE);
     expect(value.DIGEST_LOOKBACK_HOURS).toBe(DEFAULT_DIGEST_LOOKBACK_HOURS);
+    expect(value.MARKET_DATA_PROVIDER).toBe(DEFAULT_MARKET_DATA_PROVIDER);
+    expect(value.MARKET_DATA_TIMEOUT_MS).toBe(DEFAULT_MARKET_DATA_TIMEOUT_MS);
     expect(
       (result.value as ValidatedEnv & { TELEGRAM_WEBHOOK_SECRET: string })
         .TELEGRAM_WEBHOOK_SECRET,
@@ -177,6 +183,28 @@ describe('envValidationSchema', () => {
     });
 
     expect(error).toBeUndefined();
+  });
+
+  it('rejects unsupported market data providers', () => {
+    const { error } = envValidationSchema.validate({
+      ...validEnv,
+      MARKET_DATA_PROVIDER: 'unknown',
+    });
+
+    expect(error).toBeDefined();
+    expect(error?.message).toContain('MARKET_DATA_PROVIDER');
+  });
+
+  it('rejects market data timeouts outside the supported range', () => {
+    for (const timeout of [999, 30_001]) {
+      const { error } = envValidationSchema.validate({
+        ...validEnv,
+        MARKET_DATA_TIMEOUT_MS: timeout,
+      });
+
+      expect(error).toBeDefined();
+      expect(error?.message).toContain('MARKET_DATA_TIMEOUT_MS');
+    }
   });
 });
 

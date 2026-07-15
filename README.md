@@ -57,6 +57,8 @@ falta una variable obligatoria de runtime (mensaje explícito vía Joi).
 | `GEMINI_MODEL` | No (default `gemini-3.1-flash-lite`) | Modelo Gemini para análisis |
 | `GEMINI_REQUEST_DELAY_MS` | No (default `12000`) | Delay entre requests a Gemini |
 | `GEMINI_ANALYSIS_BATCH_SIZE` | No (default `5`) | Máx. artículos por corrida de análisis |
+| `MARKET_DATA_PROVIDER` | No (default `yahoo`) | Provider de OHLCV histórico; solo `yahoo` en v1 |
+| `MARKET_DATA_TIMEOUT_MS` | No (default `10000`) | Timeout del provider (1000–30000 ms) |
 | `TELEGRAM_BOT_TOKEN` | Sí | Bot de alertas |
 | `TELEGRAM_CHAT_ID` | Sí | Chat destino de alertas |
 | `TELEGRAM_WEBHOOK_SECRET` | No (default vacío) | Secret del webhook inbound (`/brief`); vacío = webhook off |
@@ -698,8 +700,37 @@ npm run migration:run
 npm run brief:once -- AAPL
 ```
 
-Límites: 1 brief a la vez; no hay charts; no es asesoramiento de inversión;
-no hay fuente de precios en vivo (issue futuro).
+Límites: 1 brief a la vez; no hay charts; no es asesoramiento de inversión.
+El brief todavía no consume automáticamente market data; esa integración
+corresponde al issue #56.
+
+## Market data OHLCV
+
+`market-data/` expone barras históricas diarias mediante `MarketDataService`.
+El adapter v1 usa el endpoint chart público de Yahoo Finance y retorna símbolo,
+timeframe, barras OHLCV, fecha de consulta y `source`. No hay fallback con
+precios hardcodeados: ticker inexistente, timeout, HTTP error o respuesta sin
+barras completas producen `MarketDataUnavailableError`.
+
+Smoke local:
+
+```bash
+# Requiere las variables normales de boot y PostgreSQL disponible.
+npm run market-data:once -- AAPL
+```
+
+El JSON esperado incluye `source: "yahoo-finance-chart"`, `timeframe: "1d"`,
+`bars` mayor a cero y `firstBar` / `lastBar` con `open`, `high`, `low`, `close`
+y `volume`. Para validar el error explícito:
+
+```bash
+npm run market-data:once -- THISDOESNOTEXIST
+```
+
+Límites: ventana fija de seis meses, barras diarias, sin cotización en tiempo
+real, cache ni SLA. Yahoo no requiere API key en v1, pero puede aplicar rate
+limits o cambiar el endpoint; el port permite reemplazar el adapter sin
+cambiar los consumidores.
 
 ## Testing
 

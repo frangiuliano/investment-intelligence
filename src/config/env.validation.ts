@@ -17,6 +17,8 @@ export const DEFAULT_STORY_CLUSTER_WINDOW_HOURS = 24;
 export const DEFAULT_DIGEST_CRON_SCHEDULE = '0 12 * * *';
 /** Lookback window for digest candidates (hours). Use 168 + weekly cron for weekly digests. */
 export const DEFAULT_DIGEST_LOOKBACK_HOURS = 24;
+export const DEFAULT_MARKET_DATA_PROVIDER = 'yahoo' as const;
+export const DEFAULT_MARKET_DATA_TIMEOUT_MS = 10_000;
 
 export function parseFeedUrls(raw: string | undefined): string[] {
   if (!raw) {
@@ -157,4 +159,14 @@ export const envValidationSchema = Joi.object({
     .min(1)
     .max(168)
     .default(DEFAULT_DIGEST_LOOKBACK_HOURS),
+  MARKET_DATA_PROVIDER: Joi.string()
+    .trim()
+    .lowercase()
+    .valid(DEFAULT_MARKET_DATA_PROVIDER)
+    .default(DEFAULT_MARKET_DATA_PROVIDER),
+  MARKET_DATA_TIMEOUT_MS: Joi.number()
+    .integer()
+    .min(1_000)
+    .max(30_000)
+    .default(DEFAULT_MARKET_DATA_TIMEOUT_MS),
 });

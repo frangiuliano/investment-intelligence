@@ -8,6 +8,8 @@ import {
   DEFAULT_GEMINI_REQUEST_DELAY_MS,
   DEFAULT_DIGEST_CRON_SCHEDULE,
   DEFAULT_DIGEST_LOOKBACK_HOURS,
+  DEFAULT_MARKET_DATA_PROVIDER,
+  DEFAULT_MARKET_DATA_TIMEOUT_MS,
   DEFAULT_STORY_CLUSTER_WINDOW_HOURS,
   parseFeedUrls,
   parseTelegramAllowedUserIds,
@@ -58,6 +60,10 @@ export type AppConfig = {
   digest: {
     cronSchedule: string;
     lookbackHours: number;
+  };
+  marketData: {
+    provider: typeof DEFAULT_MARKET_DATA_PROVIDER;
+    timeoutMs: number;
   };
 };
 
@@ -111,6 +117,15 @@ export default (): AppConfig => ({
     lookbackHours: parseInt(
       process.env.DIGEST_LOOKBACK_HOURS ??
         String(DEFAULT_DIGEST_LOOKBACK_HOURS),
+      10,
+    ),
+  },
+  marketData: {
+    provider: (process.env.MARKET_DATA_PROVIDER?.trim().toLowerCase() ||
+      DEFAULT_MARKET_DATA_PROVIDER) as typeof DEFAULT_MARKET_DATA_PROVIDER,
+    timeoutMs: parseInt(
+      process.env.MARKET_DATA_TIMEOUT_MS ??
+        String(DEFAULT_MARKET_DATA_TIMEOUT_MS),
       10,
     ),
   },
