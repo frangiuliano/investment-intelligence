@@ -179,9 +179,10 @@ npm run migration:show
 npm run migration:revert
 ```
 
-Tras un Postgres limpio, `migration:run` crea `news_articles`,
-`news_analysis`, `notifications` y `holdings` (unique en `url` / `content_hash`,
-FKs con `ON DELETE CASCADE`, soft-delete en holdings).
+Tras un Postgres limpio, `migration:run` crea las tablas de noticias, análisis,
+notificaciones, cartera, briefs e hipótesis de research (unique en `url` /
+`content_hash`, FKs con `ON DELETE CASCADE` donde corresponde y soft-delete en
+holdings/watchlist).
 
 ## Scripts npm
 
@@ -598,6 +599,48 @@ curl -s -o /dev/null -w "%{http_code}\n" -X DELETE http://localhost:3000/watchli
 Con watchlist persistida no vacía, `RelevanceService` **ignora**
 `WATCHLIST_TICKERS` y solo alerta si el análisis intersecta esos símbolos.
 Si la tabla está vacía, sigue valiendo el env como fallback de transición.
+
+## Journal de hipótesis de research
+
+El módulo `research/` registra tesis explícitas para revisarlas después. Una
+hipótesis es memoria de research: **no** representa una orden de broker ni una
+recomendación de compra/venta.
+
+Campos principales:
+
+- `bias`: `bullish`, `bearish` o `watch`.
+- `horizonDays`: horizonte positivo expresado en días.
+- `status`: `open` al crear; pasa a `closed` mediante el endpoint de cierre.
+- `source`: `manual` (default), `brief` o `alert`.
+- `sourceRefId`: UUID opcional y opaco del brief/alerta de origen. No es una FK
+  porque puede referenciar distintos tipos de registro.
+
+```bash
+# Crear una hipótesis manual
+curl -s -X POST http://localhost:3000/hypotheses \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "symbol":"AAPL",
+    "bias":"bullish",
+    "thesis":"Services growth supports margins.",
+    "invalidation":"Services growth falls below 5%.",
+    "horizonDays":90
+  }' | jq
+
+# Listar abiertas (open es el filtro default)
+curl -s 'http://localhost:3000/hypotheses?status=open' | jq
+
+# Cerrar con nota opcional
+curl -s -X PATCH http://localhost:3000/hypotheses/<id>/close \
+  -H 'Content-Type: application/json' \
+  -d '{"closeNote":"Evidence changed."}' | jq
+
+# Listar cerradas
+curl -s 'http://localhost:3000/hypotheses?status=closed' | jq
+```
+
+El cierre es irreversible desde esta API. Un segundo intento devuelve `409`;
+un identificador inexistente devuelve `404`.
 
 ## Brief on-demand (`/brief`)
 
