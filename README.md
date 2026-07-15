@@ -59,6 +59,8 @@ falta una variable obligatoria de runtime (mensaje explícito vía Joi).
 | `GEMINI_ANALYSIS_BATCH_SIZE` | No (default `5`) | Máx. artículos por corrida de análisis |
 | `TELEGRAM_BOT_TOKEN` | Sí | Bot de alertas |
 | `TELEGRAM_CHAT_ID` | Sí | Chat destino de alertas |
+| `TELEGRAM_WEBHOOK_SECRET` | No (default vacío) | Secret del webhook inbound (`/brief`); vacío = webhook off |
+| `TELEGRAM_ALLOWED_USER_IDS` | No | Allowlist opcional de user ids para comandos inbound |
 | `RSS_FEED_URLS` | Sí | Feeds RSS (separados por coma) |
 | `COLLECTION_CRON_SCHEDULE` | No (default `*/15 * * * *`) | Cron del pipeline end-to-end |
 | `DIGEST_CRON_SCHEDULE` | No (default `0 12 * * *`) | Cron del digesto Telegram (diario 12:00 UTC) |
@@ -596,6 +598,65 @@ curl -s -o /dev/null -w "%{http_code}\n" -X DELETE http://localhost:3000/watchli
 Con watchlist persistida no vacía, `RelevanceService` **ignora**
 `WATCHLIST_TICKERS` y solo alerta si el análisis intersecta esos símbolos.
 Si la tabla está vacía, sigue valiendo el env como fallback de transición.
+
+## Brief on-demand (`/brief`)
+
+Brief educativo TA/FA a pedido (modo research, **no** señales comprá/vendé).
+Usa `GEMINI_API_KEY_FINANCE` + `APP_LOCALE`. **Sin cotización en vivo en
+v1** — el mensaje lo declara explícitamente y no inventa precios como
+verificados.
+
+| Pieza | Rol |
+|-------|-----|
+| `brief/` | Prompt Gemini propio, persistencia en `research_briefs`, formato Telegram |
+| `telegram-bot/` | Inbound: `POST /telegram/webhook` + router `/brief` `/help` |
+| Holdings | Si el ticker está en cartera, agrega **contexto** (nunca “vendé”) |
+
+Secciones JSON fijas: `overview`, `fundamental`, `technical`, `risks`,
+`invalidation`, `disclaimer`.
+
+### Pedir un brief
+
+**Producción (webhook HTTPS):**
+
+1. Seteá `TELEGRAM_WEBHOOK_SECRET` (string largo aleatorio).
+2. Registrá el webhook con el mismo secret:
+
+```bash
+curl -s "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/setWebhook" \
+  -d "url=https://YOUR_PUBLIC_HOST/telegram/webhook" \
+  -d "secret_token=$TELEGRAM_WEBHOOK_SECRET"
+```
+
+3. En Telegram, al chat **privado** de `TELEGRAM_CHAT_ID`: `/brief AAPL`
+
+Seguridad inbound:
+
+- Preferí chat 1:1 (`TELEGRAM_CHAT_ID` > 0). Chats de grupo (`id` negativo)
+  se ignoran.
+- Opcional: `TELEGRAM_ALLOWED_USER_IDS` para restringir quién puede mandar
+  comandos dentro del chat permitido.
+- El webhook responde `200` de inmediato y procesa en background; dedupe por
+  `update_id` en memoria (proceso único).
+- Updates de otros chats / usuarios se ignoran. Sin secret → `401`.
+
+**Local sin HTTPS (long polling):**
+
+```bash
+curl -s "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/deleteWebhook"
+npm run telegram:poll
+# luego en Telegram: /brief AAPL
+```
+
+**One-shot (sin inbound):**
+
+```bash
+npm run migration:run
+npm run brief:once -- AAPL
+```
+
+Límites: 1 brief a la vez; no hay charts; no es asesoramiento de inversión;
+no hay fuente de precios en vivo (issue futuro).
 
 ## Testing
 

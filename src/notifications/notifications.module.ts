@@ -30,6 +30,6 @@ import { TelegramClient } from './telegram.client';
     NotificationsService,
     DigestService,
   ],
-  exports: [TypeOrmModule, NotificationsService, DigestService],
+  exports: [TypeOrmModule, TelegramClient, NotificationsService, DigestService],
 })
 export class NotificationsModule {}

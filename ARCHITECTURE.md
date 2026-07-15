@@ -22,6 +22,8 @@ Mapa de módulos del backend NestJS y su relación con el backlog del MVP.
 | `notifications/` | Implementado | Alertas Telegram | #4 |
 | `pipeline/` | Implementado | Cron end-to-end + `GET /status` | #7 |
 | `portfolio/` | Implementado | Holdings + watchlist (`/holdings`, `/watchlist`) | #27, #28 |
+| `brief/` | Implementado | Briefs educativos on-demand (Gemini, persistencia) | #32 |
+| `telegram-bot/` | Implementado | Inbound Telegram (`/brief`, webhook/poll) | #32 |
 
 ## Diagrama de dependencias (MVP)
 
@@ -33,6 +35,8 @@ pipeline
   └── notifications
 
 portfolio  ← holdings + watchlist (REST CRUD; base para briefs/journal)
+brief      ← Gemini on-demand + research_briefs (consume holdings + Telegram outbound)
+telegram-bot ← inbound webhook/commands → brief
 
 database ← TypeORM DataSource + entidades de dominio
 config   ← global
@@ -48,6 +52,9 @@ health   ← database (ping vía DataSource)
   parcial activo (`WHERE deleted_at IS NULL`).
 - Relevancia: watchlist persistida (si no vacía) prevalece sobre
   `WATCHLIST_TICKERS` (env fallback).
+- `research_briefs` guarda sections JSON fijas (`overview`, `fundamental`,
+  `technical`, `risks`, `invalidation`, `disclaimer`) + `prompt_version`.
+  Sin cotización en vivo en v1.
 
 ## Health check
 

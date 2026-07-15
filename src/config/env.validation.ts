@@ -49,6 +49,25 @@ export function parseWatchlistTickers(raw: string | undefined): string[] {
   return tickers;
 }
 
+/** Comma-separated Telegram user ids (positive integers as strings). */
+export function parseTelegramAllowedUserIds(raw: string | undefined): string[] {
+  if (!raw) {
+    return [];
+  }
+
+  const seen = new Set<string>();
+  const ids: string[] = [];
+  for (const part of raw.split(',')) {
+    const id = part.trim();
+    if (!id || !/^\d+$/.test(id) || seen.has(id)) {
+      continue;
+    }
+    seen.add(id);
+    ids.push(id);
+  }
+  return ids;
+}
+
 const requiredSecret = (name: string) =>
   Joi.string()
     .trim()
@@ -80,6 +99,13 @@ export const envValidationSchema = Joi.object({
   GEMINI_API_KEY_REVIEWER: Joi.string().optional().allow(''),
   TELEGRAM_BOT_TOKEN: requiredSecret('TELEGRAM_BOT_TOKEN'),
   TELEGRAM_CHAT_ID: requiredSecret('TELEGRAM_CHAT_ID'),
+  /** Required for POST /telegram/webhook; leave empty to disable inbound webhook. */
+  TELEGRAM_WEBHOOK_SECRET: Joi.string().trim().allow('').optional().default(''),
+  /**
+   * Optional allowlist of Telegram user ids for inbound commands.
+   * Empty = any member of TELEGRAM_CHAT_ID (groups still rejected by id < 0).
+   */
+  TELEGRAM_ALLOWED_USER_IDS: Joi.string().optional().allow(''),
   RSS_FEED_URLS: Joi.string()
     .required()
     .custom((value: string, helpers) => {

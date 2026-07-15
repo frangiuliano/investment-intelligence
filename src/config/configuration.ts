@@ -10,6 +10,7 @@ import {
   DEFAULT_DIGEST_LOOKBACK_HOURS,
   DEFAULT_STORY_CLUSTER_WINDOW_HOURS,
   parseFeedUrls,
+  parseTelegramAllowedUserIds,
   parseWatchlistTickers,
 } from './env.validation';
 
@@ -39,6 +40,8 @@ export type AppConfig = {
   telegram: {
     botToken: string;
     chatId: string;
+    webhookSecret: string;
+    allowedUserIds: string[];
   };
   rss: {
     feedUrls: string[];
@@ -79,6 +82,10 @@ export default (): AppConfig => ({
   telegram: {
     botToken: (process.env.TELEGRAM_BOT_TOKEN ?? '').trim(),
     chatId: (process.env.TELEGRAM_CHAT_ID ?? '').trim(),
+    webhookSecret: (process.env.TELEGRAM_WEBHOOK_SECRET ?? '').trim(),
+    allowedUserIds: parseTelegramAllowedUserIds(
+      process.env.TELEGRAM_ALLOWED_USER_IDS,
+    ),
   },
   rss: {
     feedUrls: parseFeedUrls(process.env.RSS_FEED_URLS),
