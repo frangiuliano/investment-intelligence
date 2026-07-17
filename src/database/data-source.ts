@@ -12,6 +12,8 @@ import { Notification } from '../notifications/entities/notification.entity';
 import { Holding } from '../portfolio/holdings/entities/holding.entity';
 import { WatchlistEntry } from '../portfolio/watchlist/entities/watchlist-entry.entity';
 import { Hypothesis } from '../research/hypotheses/entities/hypothesis.entity';
+import { HypothesisReviewRun } from '../research/reviews/entities/hypothesis-review-run.entity';
+import { HypothesisReview } from '../research/reviews/entities/hypothesis-review.entity';
 import { InitialSchema1752180000000 } from './migrations/1752180000000-InitialSchema';
 import { AddNewsAnalysisMateriality1752430000000 } from './migrations/1752430000000-AddNewsAnalysisMateriality';
 import { CreateHoldings1752500000000 } from './migrations/1752500000000-CreateHoldings';
@@ -22,6 +24,7 @@ import { CreateDigestTables1752540000000 } from './migrations/1752540000000-Crea
 import { AddNewsAnalysisHeadline1752550000000 } from './migrations/1752550000000-AddNewsAnalysisHeadline';
 import { CreateResearchBriefs1752560000000 } from './migrations/1752560000000-CreateResearchBriefs';
 import { CreateHypotheses1752570000000 } from './migrations/1752570000000-CreateHypotheses';
+import { CreateHypothesisReviews1752580000000 } from './migrations/1752580000000-CreateHypothesisReviews';
 
 loadEnv();
 
@@ -48,6 +51,8 @@ export default new DataSource({
     DigestItem,
     ResearchBrief,
     Hypothesis,
+    HypothesisReviewRun,
+    HypothesisReview,
   ],
   migrations: [
     InitialSchema1752180000000,
@@ -60,6 +65,7 @@ export default new DataSource({
     AddNewsAnalysisHeadline1752550000000,
     CreateResearchBriefs1752560000000,
     CreateHypotheses1752570000000,
+    CreateHypothesisReviews1752580000000,
   ],
   synchronize: false,
   logging: false,
