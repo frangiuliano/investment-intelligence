@@ -14,6 +14,8 @@ import {
   BriefStance,
 } from './brief.types';
 
+const OPERATOR_NOTES_DELIMITER_PATTERN = /<<\s*\/?\s*OPERATOR_NOTES\s*>>/gi;
+
 export function sanitizeHoldingNotes(notes: string | null): string | null {
   if (!notes) {
     return null;
@@ -22,10 +24,14 @@ export function sanitizeHoldingNotes(notes: string | null): string | null {
   if (trimmed.length === 0) {
     return null;
   }
-  if (trimmed.length <= BRIEF_MAX_HOLDING_NOTES_LENGTH) {
-    return trimmed;
+  const neutralized = trimmed.replace(
+    OPERATOR_NOTES_DELIMITER_PATTERN,
+    '[operator-notes]',
+  );
+  if (neutralized.length <= BRIEF_MAX_HOLDING_NOTES_LENGTH) {
+    return neutralized;
   }
-  return `${trimmed.slice(0, BRIEF_MAX_HOLDING_NOTES_LENGTH)}…`;
+  return `${neutralized.slice(0, BRIEF_MAX_HOLDING_NOTES_LENGTH)}…`;
 }
 
 const LANGUAGE_BY_LOCALE: Record<AppLocale, string> = {
@@ -145,18 +151,11 @@ export function parseBriefResponseText(
     };
   }
 
-  const stance = parseRequiredStance(parsed.stance);
-  const allowed = allowedStancesForHolding(options.hasHolding);
-  if (!(allowed as readonly string[]).includes(stance)) {
-    throw new Error(
-      `Brief Gemini stance "${stance}" is not allowed for holding=${options.hasHolding}`,
-    );
-  }
-
+  const stanceFields = tryParseStanceFields(parsed, options.hasHolding);
   return {
     sections,
-    stance,
-    stanceRationale: normalizeStanceRationale(parsed.stance_rationale),
+    stance: stanceFields.stance,
+    stanceRationale: stanceFields.stanceRationale,
   };
 }
 
@@ -167,16 +166,30 @@ export function parseBriefSectionsText(raw: string): BriefSections {
   }).sections;
 }
 
-function parseRequiredStance(value: unknown): BriefStance {
-  if (!isBriefStance(value)) {
-    throw new Error('Brief Gemini response missing or invalid stance');
+function tryParseStanceFields(
+  parsed: Record<string, unknown>,
+  hasHolding: boolean,
+): { stance: BriefStance | null; stanceRationale: string | null } {
+  if (!isBriefStance(parsed.stance)) {
+    return { stance: null, stanceRationale: null };
   }
-  return value;
+
+  const allowed = allowedStancesForHolding(hasHolding);
+  if (!(allowed as readonly string[]).includes(parsed.stance)) {
+    return { stance: null, stanceRationale: null };
+  }
+
+  const rationale = normalizeStanceRationale(parsed.stance_rationale);
+  if (!rationale) {
+    return { stance: null, stanceRationale: null };
+  }
+
+  return { stance: parsed.stance, stanceRationale: rationale };
 }
 
-function normalizeStanceRationale(value: unknown): string {
+function normalizeStanceRationale(value: unknown): string | null {
   if (typeof value !== 'string' || value.trim().length === 0) {
-    throw new Error('Brief Gemini response missing stance_rationale');
+    return null;
   }
   const trimmed = value.trim();
   if (trimmed.length <= BRIEF_MAX_STANCE_RATIONALE_LENGTH) {
