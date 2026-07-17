@@ -25,6 +25,7 @@ import { AddNewsAnalysisHeadline1752550000000 } from './migrations/1752550000000
 import { CreateResearchBriefs1752560000000 } from './migrations/1752560000000-CreateResearchBriefs';
 import { CreateHypotheses1752570000000 } from './migrations/1752570000000-CreateHypotheses';
 import { CreateHypothesisReviews1752580000000 } from './migrations/1752580000000-CreateHypothesisReviews';
+import { AddResearchBriefStance1752590000000 } from './migrations/1752590000000-AddResearchBriefStance';
 
 loadEnv();
 
@@ -66,6 +67,7 @@ export default new DataSource({
     CreateResearchBriefs1752560000000,
     CreateHypotheses1752570000000,
     CreateHypothesisReviews1752580000000,
+    AddResearchBriefStance1752590000000,
   ],
   synchronize: false,
   logging: false,
