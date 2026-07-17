@@ -1,3 +1,4 @@
+import { TELEGRAM_MAX_MESSAGE_LENGTH } from '../notifications/telegram.constants';
 import {
   formatBriefHelpMessage,
   formatBriefMessage,
@@ -63,6 +64,34 @@ describe('brief-message', () => {
     expect(message).toContain('No se emitió postura');
     expect(message).not.toContain('Postura de research');
     expect(message).toContain('Qué invalidaría la tesis');
+  });
+
+  it('keeps disclaimer and closing banner when body exceeds Telegram limit', () => {
+    const longSection = 'x'.repeat(2_000);
+    const message = formatBriefMessage(
+      {
+        symbol: 'AAPL',
+        sections: {
+          overview: longSection,
+          fundamental: longSection,
+          technical: longSection,
+          risks: longSection,
+          invalidation: longSection,
+          disclaimer: 'MUST-KEEP-DISCLAIMER not investment advice',
+        },
+        holding: null,
+        stance: 'watch',
+        stanceRationale: 'y'.repeat(1_500),
+        marketSource: 'yahoo-finance-chart',
+        marketAsOf: new Date('2026-07-17T15:00:00.000Z'),
+      },
+      'en',
+    );
+
+    expect(message.length).toBeLessThanOrEqual(TELEGRAM_MAX_MESSAGE_LENGTH);
+    expect(message).toContain('MUST-KEEP-DISCLAIMER not investment advice');
+    expect(message).toContain('Not a broker order');
+    expect(message.endsWith('Not a broker order.')).toBe(true);
   });
 
   it('returns localized help and usage strings that mention labeled stance', () => {

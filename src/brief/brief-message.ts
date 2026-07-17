@@ -16,7 +16,7 @@ type BriefMessageLabels = {
   marketAttached: string;
   stance: string;
   stanceRationale: string;
-  insufficientMarketData: string;
+  stanceUnavailable: string;
   researchHypothesisBanner: string;
 };
 
@@ -58,8 +58,8 @@ const LABELS_BY_LOCALE: Record<AppLocale, BriefMessageLabels> = {
     marketAttached: 'Market data attached from provider',
     stance: 'Research stance',
     stanceRationale: 'Stance rationale',
-    insufficientMarketData:
-      'Insufficient market data to issue a stance. Educational sections only — no invented prices or posture.',
+    stanceUnavailable:
+      'A labeled stance could not be validated for this brief. Educational sections only — no invented posture.',
     researchHypothesisBanner:
       'Labeled stance is a research hypothesis for the operator only. Not investment advice. Not a broker order.',
   },
@@ -79,8 +79,8 @@ const LABELS_BY_LOCALE: Record<AppLocale, BriefMessageLabels> = {
     marketAttached: 'Datos de mercado adjuntos del proveedor',
     stance: 'Postura de research',
     stanceRationale: 'Justificación de la postura',
-    insufficientMarketData:
-      'Datos de mercado insuficientes para emitir una postura. Solo secciones educativas — sin precios ni postura inventados.',
+    stanceUnavailable:
+      'No se pudo validar una postura etiquetada para este brief. Solo secciones educativas — sin postura inventada.',
     researchHypothesisBanner:
       'La postura etiquetada es una hipótesis de research para el operador. No es asesoramiento de inversión ni una orden de broker.',
   },
@@ -101,66 +101,9 @@ export function formatBriefMessage(
   locale: AppLocale,
 ): string {
   const labels = LABELS_BY_LOCALE[locale];
-  const lines = [`${labels.header}: ${input.symbol}`, ''];
-
-  if (input.stance) {
-    lines.push(labels.researchHypothesisBanner, '');
-    lines.push(`${labels.stance}: ${STANCE_LABELS[locale][input.stance]}`);
-    if (input.stanceRationale) {
-      lines.push(`${labels.stanceRationale}:`, input.stanceRationale);
-    }
-    if (input.marketSource) {
-      const asOf =
-        input.marketAsOf instanceof Date ? input.marketAsOf.toISOString() : '';
-      lines.push(
-        `${labels.marketAttached}: ${input.marketSource}${
-          asOf ? ` @ ${asOf}` : ''
-        }`,
-      );
-    }
-    lines.push('');
-  } else {
-    lines.push(
-      input.marketSource ? labels.insufficientMarketData : labels.noLivePrices,
-      '',
-    );
-  }
-
-  lines.push(
-    `${labels.overview}:`,
-    input.sections.overview,
-    '',
-    `${labels.fundamental}:`,
-    input.sections.fundamental,
-    '',
-    `${labels.technical}:`,
-    input.sections.technical,
-    '',
-    `${labels.risks}:`,
-    input.sections.risks,
-    '',
-    `${labels.invalidation}:`,
-    input.sections.invalidation,
-  );
-
-  if (input.holding) {
-    lines.push(
-      '',
-      `${labels.holdingContext}:`,
-      labels.holdingPresent,
-      `assetTypes: ${input.holding.assetTypes.join(', ') || '(none)'}`,
-    );
-    if (input.holding.notes) {
-      lines.push(`notes: ${input.holding.notes}`);
-    }
-  }
-
-  lines.push('', `${labels.disclaimer}:`, input.sections.disclaimer);
-  if (input.stance) {
-    lines.push('', labels.researchHypothesisBanner);
-  }
-
-  return truncateMessage(lines.join('\n'));
+  const footer = buildDisclaimerFooter(input, labels);
+  const body = buildBriefBody(input, labels, locale);
+  return joinBodyWithReservedFooter(body, footer);
 }
 
 export function formatBriefHelpMessage(locale: AppLocale): string {
@@ -209,7 +152,97 @@ export function formatBriefUsageMessage(locale: AppLocale): string {
     : 'Usage: /brief TICKER (e.g. /brief AAPL)';
 }
 
-function truncateMessage(text: string): string {
+function buildDisclaimerFooter(
+  input: FormatBriefInput,
+  labels: BriefMessageLabels,
+): string {
+  const lines = [`${labels.disclaimer}:`, input.sections.disclaimer];
+  if (input.stance) {
+    lines.push('', labels.researchHypothesisBanner);
+  }
+  return lines.join('\n');
+}
+
+function buildBriefBody(
+  input: FormatBriefInput,
+  labels: BriefMessageLabels,
+  locale: AppLocale,
+): string {
+  const lines = [`${labels.header}: ${input.symbol}`, ''];
+
+  if (input.stance) {
+    lines.push(labels.researchHypothesisBanner, '');
+    lines.push(`${labels.stance}: ${STANCE_LABELS[locale][input.stance]}`);
+    if (input.stanceRationale) {
+      lines.push(`${labels.stanceRationale}:`, input.stanceRationale);
+    }
+    if (input.marketSource) {
+      const asOf =
+        input.marketAsOf instanceof Date ? input.marketAsOf.toISOString() : '';
+      lines.push(
+        `${labels.marketAttached}: ${input.marketSource}${
+          asOf ? ` @ ${asOf}` : ''
+        }`,
+      );
+    }
+    lines.push('');
+  } else {
+    lines.push(
+      input.marketSource ? labels.stanceUnavailable : labels.noLivePrices,
+      '',
+    );
+  }
+
+  lines.push(
+    `${labels.overview}:`,
+    input.sections.overview,
+    '',
+    `${labels.fundamental}:`,
+    input.sections.fundamental,
+    '',
+    `${labels.technical}:`,
+    input.sections.technical,
+    '',
+    `${labels.risks}:`,
+    input.sections.risks,
+    '',
+    `${labels.invalidation}:`,
+    input.sections.invalidation,
+  );
+
+  if (input.holding) {
+    lines.push(
+      '',
+      `${labels.holdingContext}:`,
+      labels.holdingPresent,
+      `assetTypes: ${input.holding.assetTypes.join(', ') || '(none)'}`,
+    );
+    if (input.holding.notes) {
+      lines.push(`notes: ${input.holding.notes}`);
+    }
+  }
+
+  return lines.join('\n');
+}
+
+function joinBodyWithReservedFooter(body: string, footer: string): string {
+  const separator = '\n\n';
+  const reserved = footer.length + separator.length;
+  const maxBodyLength = TELEGRAM_MAX_MESSAGE_LENGTH - reserved;
+
+  if (maxBodyLength <= 0) {
+    return truncateToLimit(footer);
+  }
+
+  const fittedBody =
+    body.length <= maxBodyLength
+      ? body
+      : `${body.slice(0, Math.max(0, maxBodyLength - 1))}…`;
+
+  return `${fittedBody}${separator}${footer}`;
+}
+
+function truncateToLimit(text: string): string {
   if (text.length <= TELEGRAM_MAX_MESSAGE_LENGTH) {
     return text;
   }

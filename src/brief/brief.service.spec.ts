@@ -262,6 +262,33 @@ describe('BriefService', () => {
     );
   });
 
+  it('persists educational brief with null stance when Gemini stance is invalid', async () => {
+    const generateBrief = jest.fn().mockResolvedValue({
+      sections,
+      stance: null,
+      stanceRationale: null,
+    } satisfies BriefGenerationResult);
+    const { service, save, sendMessage } = createService({ generateBrief });
+
+    const result = await service.requestBrief('AAPL');
+
+    expect(result.ok).toBe(true);
+    expect(save).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sections,
+        stance: null,
+        stanceRationale: null,
+        marketSource: 'yahoo-finance-chart',
+      }),
+    );
+    expect(sendMessage).toHaveBeenCalledWith(
+      expect.stringContaining('could not be validated'),
+    );
+    expect(sendMessage).toHaveBeenCalledWith(
+      expect.stringContaining('disclaimer not advice'),
+    );
+  });
+
   it('sends usage message for invalid tickers without calling Gemini', async () => {
     const { service, generateBrief, sendMessage, getSeries } = createService();
 
