@@ -29,6 +29,7 @@
     "telegram:digest-once": "ts-node -r tsconfig-paths/register scripts/run-digest-once.ts",
     "telegram:poll": "ts-node -r tsconfig-paths/register scripts/run-telegram-poll.ts",
     "brief:once": "ts-node -r tsconfig-paths/register scripts/run-brief-once.ts",
+    "review:once": "ts-node -r tsconfig-paths/register scripts/run-review-once.ts",
     "market-data:once": "ts-node -r tsconfig-paths/register scripts/run-market-data-once.ts",
     "pipeline:once": "ts-node -r tsconfig-paths/register scripts/run-pipeline-once.ts",
     "verify:lockfile": "bash scripts/verify-lockfile.sh"

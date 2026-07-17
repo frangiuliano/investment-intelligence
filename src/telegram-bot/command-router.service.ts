@@ -7,6 +7,8 @@ import {
   formatBriefUsageMessage,
 } from '../brief/brief-message';
 import { TelegramClient } from '../notifications/telegram.client';
+import { formatReviewUsageMessage } from '../research/reviews/review-message';
+import { ReviewsService } from '../research/reviews/reviews.service';
 import {
   isPrivateTelegramChatId,
   parseTelegramCommand,
@@ -20,6 +22,7 @@ export class CommandRouterService {
   constructor(
     private readonly configService: ConfigService,
     private readonly briefService: BriefService,
+    private readonly reviewsService: ReviewsService,
     private readonly telegramClient: TelegramClient,
   ) {}
 
@@ -75,6 +78,21 @@ export class CommandRouterService {
           return;
         }
         await this.briefService.requestBrief(command.symbol);
+        return;
+      case 'review':
+        try {
+          const period = this.reviewsService.resolveCalendarMonthPeriod(
+            command.month,
+          );
+          await this.reviewsService.runPeriodReview({
+            periodStart: period.periodStart,
+            periodEnd: period.periodEnd,
+          });
+        } catch {
+          await this.telegramClient.sendMessage(
+            formatReviewUsageMessage(locale),
+          );
+        }
         return;
       case 'unknown':
         await this.telegramClient.sendMessage(formatBriefHelpMessage(locale));

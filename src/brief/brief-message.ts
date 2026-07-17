@@ -100,18 +100,20 @@ export function formatBriefHelpMessage(locale: AppLocale): string {
     return [
       'Comandos disponibles:',
       '/brief TICKER — brief educativo (TA/FA) sin señales de comprá/vendé',
+      '/review [YYYY-MM] — review de hipótesis del mes (UTC)',
       '/help — esta ayuda',
       '',
-      'Límites: sin cotización en vivo en v1; no es asesoramiento de inversión.',
+      'Límites: research only; no es asesoramiento de inversión ni backtest científico.',
     ].join('\n');
   }
 
   return [
     'Available commands:',
     '/brief TICKER — educational TA/FA brief (no buy/sell instructions)',
+    '/review [YYYY-MM] — hypothesis review for the UTC calendar month',
     '/help — this help',
     '',
-    'Limits: no live quotes in v1; not investment advice.',
+    'Limits: research only; not investment advice or a scientific backtest.',
   ].join('\n');
 }
 

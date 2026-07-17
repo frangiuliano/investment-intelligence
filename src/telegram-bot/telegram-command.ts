@@ -20,6 +20,7 @@ export type TelegramUpdate = {
 
 export type ParsedTelegramCommand =
   | { type: 'brief'; symbol: string }
+  | { type: 'review'; month?: string }
   | { type: 'help' }
   | { type: 'unknown'; raw: string }
   | { type: 'empty' };
@@ -45,6 +46,11 @@ export function parseTelegramCommand(
   if (command === 'brief') {
     const symbol = args.split(/\s+/)[0] ?? '';
     return { type: 'brief', symbol };
+  }
+
+  if (command === 'review') {
+    const month = args.split(/\s+/)[0] ?? '';
+    return month ? { type: 'review', month } : { type: 'review' };
   }
 
   if (command === 'help' || command === 'start') {
