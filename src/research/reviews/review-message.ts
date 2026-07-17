@@ -114,6 +114,12 @@ export function formatReviewErrorMessage(locale: AppLocale): string {
     : 'Could not complete the hypothesis review. Check logs or try again.';
 }
 
+export function formatReviewDeliveryErrorMessage(locale: AppLocale): string {
+  return locale === 'es'
+    ? 'El review se guardó, pero falló el envío a Telegram. Revisá logs; no hace falta re-ejecutar el período.'
+    : 'The review was saved, but Telegram delivery failed. Check logs; no need to re-run the period.';
+}
+
 export function formatReviewUsageMessage(locale: AppLocale): string {
   return locale === 'es'
     ? 'Uso: /review — revisa el mes calendario UTC actual. Opcional: /review YYYY-MM'

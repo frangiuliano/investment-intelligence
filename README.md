@@ -70,7 +70,7 @@ falta una variable obligatoria de runtime (mensaje explícito vía Joi).
 | `STORY_CLUSTER_WINDOW_HOURS` | No (default `24`) | Ventana para colapsar historias duplicadas en un solo push |
 | `WATCHLIST_TICKERS` | No | Filtro opcional de tickers para relevancia |
 | `DASHBOARD_API_KEY` | No (default vacío) | Secret BFF → Nest (`x-dashboard-api-key`); vacío = `/reviews` en 401 |
-| `REVIEW_CRON_SCHEDULE` | No (default `0 12 1 * *`) | Cron mensual del review de hipótesis (UTC) |
+| `REVIEW_CRON_SCHEDULE` | No (default `0 12 1 * *`) | Cron mensual: día 1 UTC revisa el **mes UTC anterior** |
 
 `APP_LOCALE` define el idioma de salida de la app (un locale por deploy).
 Valores permitidos: `en`, `es` (default `en`). Si el valor no está permitido,
@@ -697,6 +697,8 @@ curl -s "http://localhost:3000/reviews/<id>" \
 calendario UTC actual si se omiten. `notify: false` persiste sin Telegram.
 
 Cron default: `REVIEW_CRON_SCHEDULE=0 12 1 * *` (día 1, 12:00 UTC).
+Ese tick revisa el **mes UTC anterior** (cierre de mes). On-demand sin args
+(`/review`, `review:once`, `POST /reviews/run` vacío) usa el mes UTC **actual**.
 
 ## Brief on-demand (`/brief`)
 

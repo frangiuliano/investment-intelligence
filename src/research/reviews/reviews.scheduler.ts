@@ -24,7 +24,7 @@ export class ReviewScheduler implements OnModuleInit {
     const job = CronJob.from({
       cronTime: cronSchedule,
       onTick: () => {
-        void this.reviewsService.runPeriodReview().catch((error: unknown) => {
+        void this.runScheduledReview().catch((error: unknown) => {
           this.logger.error(
             `Hypothesis review cron tick failed: ${
               error instanceof Error ? error.message : String(error)
@@ -39,5 +39,14 @@ export class ReviewScheduler implements OnModuleInit {
     this.logger.log(
       `Registered hypothesis review cron "${REVIEW_JOB}" with schedule: ${cronSchedule}`,
     );
+  }
+
+  /** Exposed for tests: monthly cron reviews the previous UTC calendar month. */
+  async runScheduledReview(): Promise<void> {
+    const period = this.reviewsService.resolvePreviousUtcMonthPeriod();
+    await this.reviewsService.runPeriodReview({
+      periodStart: period.periodStart,
+      periodEnd: period.periodEnd,
+    });
   }
 }

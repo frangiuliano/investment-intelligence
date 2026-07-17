@@ -31,6 +31,7 @@ import {
 import { classifyHypothesisReview } from './review-outcome';
 import {
   formatReviewBusyMessage,
+  formatReviewDeliveryErrorMessage,
   formatReviewEmptyMessage,
   formatReviewErrorMessage,
   formatReviewSummaryMessage,
@@ -51,6 +52,8 @@ export type PeriodReviewResult = {
   message: string;
   ok: boolean;
   skipped: boolean;
+  /** False when persistence succeeded but Telegram delivery failed. */
+  notified: boolean;
 };
 
 export type ListReviewsQuery = {
@@ -111,6 +114,7 @@ export class ReviewsService {
         message,
         ok: false,
         skipped: true,
+        notified: false,
       };
     }
 
@@ -137,8 +141,18 @@ export class ReviewsService {
           periodEnd,
           locale,
         );
+        let notified = false;
         if (notify) {
-          await this.safeSend(message);
+          try {
+            await this.telegramClient.sendMessage(message);
+            notified = true;
+          } catch (error) {
+            this.logger.error(
+              `Empty review run Telegram delivery failed: ${
+                error instanceof Error ? error.message : String(error)
+              }`,
+            );
+          }
         }
         const emptyRun = await this.reviewRunsRepository.save(
           this.reviewRunsRepository.create({
@@ -153,9 +167,13 @@ export class ReviewsService {
         return {
           run: emptyRun,
           reviews: [],
-          message,
+          message:
+            notify && !notified
+              ? formatReviewDeliveryErrorMessage(locale)
+              : message,
           ok: true,
           skipped: false,
+          notified: !notify || notified,
         };
       }
 
@@ -223,14 +241,22 @@ export class ReviewsService {
           return {
             run,
             reviews,
-            message: formatReviewErrorMessage(locale),
-            ok: false,
+            message: formatReviewDeliveryErrorMessage(locale),
+            ok: true,
             skipped: false,
+            notified: false,
           };
         }
       }
 
-      return { run, reviews, message, ok: true, skipped: false };
+      return {
+        run,
+        reviews,
+        message,
+        ok: true,
+        skipped: false,
+        notified: true,
+      };
     } catch (error) {
       const detail = error instanceof Error ? error.message : String(error);
       this.logger.error(`Hypothesis review run failed: ${detail}`);
@@ -244,20 +270,27 @@ export class ReviewsService {
         message,
         ok: false,
         skipped: false,
+        notified: false,
       };
     } finally {
       this.running = false;
     }
   }
 
-  async runPeriodReviewOrThrow(
-    input: RunPeriodReviewInput = {},
-  ): Promise<{ run: HypothesisReviewRun; reviews: HypothesisReview[] }> {
+  async runPeriodReviewOrThrow(input: RunPeriodReviewInput = {}): Promise<{
+    run: HypothesisReviewRun;
+    reviews: HypothesisReview[];
+    notified: boolean;
+  }> {
     const result = await this.runPeriodReview(input);
     if (!result.ok || !result.run) {
       throw new ConflictException(result.message);
     }
-    return { run: result.run, reviews: result.reviews };
+    return {
+      run: result.run,
+      reviews: result.reviews,
+      notified: result.notified,
+    };
   }
 
   async findAll(query: ListReviewsQuery = {}): Promise<PaginatedReviews> {
@@ -321,6 +354,21 @@ export class ReviewsService {
       throw new BadRequestException('month must use YYYY-MM');
     }
 
+    const periodStart = new Date(Date.UTC(year, month - 1, 1, 0, 0, 0, 0));
+    const periodEnd = new Date(Date.UTC(year, month, 0, 23, 59, 59, 999));
+    return { periodStart, periodEnd };
+  }
+
+  /**
+   * Period for the monthly cron (default day-1 schedule): previous UTC month.
+   * On-demand `/review` without args still uses the current UTC month.
+   */
+  resolvePreviousUtcMonthPeriod(now: Date = new Date()): {
+    periodStart: Date;
+    periodEnd: Date;
+  } {
+    const year = now.getUTCFullYear();
+    const month = now.getUTCMonth();
     const periodStart = new Date(Date.UTC(year, month - 1, 1, 0, 0, 0, 0));
     const periodEnd = new Date(Date.UTC(year, month, 0, 23, 59, 59, 999));
     return { periodStart, periodEnd };

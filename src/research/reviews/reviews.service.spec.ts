@@ -237,4 +237,51 @@ describe('ReviewsService', () => {
       BadRequestException,
     );
   });
+
+  it('resolves the previous UTC calendar month for the monthly cron', () => {
+    const { service } = createService();
+    const period = service.resolvePreviousUtcMonthPeriod(
+      new Date('2026-03-01T12:00:00.000Z'),
+    );
+
+    expect(period.periodStart.toISOString()).toBe('2026-02-01T00:00:00.000Z');
+    expect(period.periodEnd.toISOString()).toBe('2026-02-28T23:59:59.999Z');
+  });
+
+  it('resolves previous December when now is January UTC', () => {
+    const { service } = createService();
+    const period = service.resolvePreviousUtcMonthPeriod(
+      new Date('2026-01-01T12:00:00.000Z'),
+    );
+
+    expect(period.periodStart.toISOString()).toBe('2025-12-01T00:00:00.000Z');
+    expect(period.periodEnd.toISOString()).toBe('2025-12-31T23:59:59.999Z');
+  });
+
+  it('keeps ok=true when Telegram fails after reviews are persisted', async () => {
+    const { service, sendMessage } = createService({
+      hypotheses: [dueHypothesis],
+      sendMessage: jest.fn().mockRejectedValue(new Error('telegram down')),
+    });
+
+    const result = await service.runPeriodReview({
+      periodStart: new Date('2026-01-01T00:00:00.000Z'),
+      periodEnd: new Date('2026-01-31T23:59:59.999Z'),
+    });
+
+    expect(result.ok).toBe(true);
+    expect(result.run).not.toBeNull();
+    expect(result.reviews).toHaveLength(1);
+    expect(result.notified).toBe(false);
+    expect(result.message).toContain('Telegram delivery failed');
+    expect(sendMessage).toHaveBeenCalled();
+
+    const thrown = await service.runPeriodReviewOrThrow({
+      periodStart: new Date('2026-01-01T00:00:00.000Z'),
+      periodEnd: new Date('2026-01-31T23:59:59.999Z'),
+      notify: false,
+    });
+    expect(thrown.run.id).toEqual(expect.any(String));
+    expect(thrown.notified).toBe(true);
+  });
 });
