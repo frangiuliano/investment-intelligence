@@ -23,8 +23,8 @@ Mapa de módulos del backend NestJS y su relación con el backlog del MVP.
 | `pipeline/` | Implementado | Cron end-to-end + `GET /status` | #7 |
 | `portfolio/` | Implementado | Holdings + watchlist (`/holdings`, `/watchlist`) | #27, #28 |
 | `brief/` | Implementado | Briefs educativos on-demand (Gemini, persistencia) | #32 |
-| `telegram-bot/` | Implementado | Inbound Telegram (`/brief`, webhook/poll) | #32 |
-| `research/` | Implementado | Journal de hipótesis; reviews como extensión futura | #33, #34 |
+| `telegram-bot/` | Implementado | Inbound Telegram (`/brief`, `/review`, webhook/poll) | #32, #34 |
+| `research/` | Implementado | Journal de hipótesis + reviews de período | #33, #34 |
 | `market-data/` | Implementado | Port + adapter Yahoo para OHLCV histórico | #55 |
 | `web/` | Planificado | Dashboard Next.js (lectura + escrituras acotadas); BFF → Nest | #35 + foundation `scope:v2` |
 
@@ -40,8 +40,9 @@ pipeline
 portfolio  ← holdings + watchlist (REST CRUD; base para briefs/journal)
 brief      ← Gemini on-demand + research_briefs (consume holdings + Telegram outbound)
 telegram-bot ← inbound webhook/commands → brief
-research   ← hypotheses (REST create/list/close; reviews futuras separadas)
+research   ← hypotheses + reviews (REST + /review Telegram; market-data para returns)
 market-data ← MarketDataService → MarketDataPort → Yahoo adapter
+telegram-bot ← inbound webhook/commands → brief + review
 
 web (Next.js) ← BFF server-only → Nest REST (dashboard APIs + API key)
   pantallas: holdings | hypotheses | alerts | briefs | reviews
@@ -78,6 +79,10 @@ Ver `docs/adr/003-dashboard-web.md`.
 - `hypotheses` guarda tesis, invalidación, horizonte, sesgo acotado y origen.
   `source_ref_id` es un UUID opaco sin FK porque puede referir a un brief o una
   alerta. El cierre registra `closed_at` y una nota opcional.
+- `hypothesis_review_runs` / `hypothesis_reviews` guardan reviews de período
+  con outcomes `thesis_confirmed` \| `thesis_rejected` \| `timing_issue` \|
+  `inconclusive`, notas (thesis/timing/learning) y retorno de precio nullable
+  (nunca inventado). API `GET/POST /reviews*` protegida con `DASHBOARD_API_KEY`.
 
 ## Health check
 

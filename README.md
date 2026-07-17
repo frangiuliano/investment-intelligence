@@ -61,7 +61,7 @@ falta una variable obligatoria de runtime (mensaje explícito vía Joi).
 | `MARKET_DATA_TIMEOUT_MS` | No (default `10000`) | Timeout del provider (1000–30000 ms) |
 | `TELEGRAM_BOT_TOKEN` | Sí | Bot de alertas |
 | `TELEGRAM_CHAT_ID` | Sí | Chat destino de alertas |
-| `TELEGRAM_WEBHOOK_SECRET` | No (default vacío) | Secret del webhook inbound (`/brief`); vacío = webhook off |
+| `TELEGRAM_WEBHOOK_SECRET` | No (default vacío) | Secret del webhook inbound (`/brief`, `/review`); vacío = webhook off |
 | `TELEGRAM_ALLOWED_USER_IDS` | No | Allowlist opcional de user ids para comandos inbound |
 | `RSS_FEED_URLS` | Sí | Feeds RSS (separados por coma) |
 | `COLLECTION_CRON_SCHEDULE` | No (default `*/15 * * * *`) | Cron del pipeline end-to-end |
@@ -69,6 +69,8 @@ falta una variable obligatoria de runtime (mensaje explícito vía Joi).
 | `DIGEST_LOOKBACK_HOURS` | No (default `24`) | Ventana de candidatos al digesto (1–168) |
 | `STORY_CLUSTER_WINDOW_HOURS` | No (default `24`) | Ventana para colapsar historias duplicadas en un solo push |
 | `WATCHLIST_TICKERS` | No | Filtro opcional de tickers para relevancia |
+| `DASHBOARD_API_KEY` | No (default vacío) | Secret BFF → Nest (`x-dashboard-api-key`); vacío = `/reviews` en 401 |
+| `REVIEW_CRON_SCHEDULE` | No (default `0 12 1 * *`) | Cron mensual: día 1 UTC revisa el **mes UTC anterior** |
 
 `APP_LOCALE` define el idioma de salida de la app (un locale por deploy).
 Valores permitidos: `en`, `es` (default `en`). Si el valor no está permitido,
@@ -643,6 +645,60 @@ curl -s 'http://localhost:3000/hypotheses?status=closed' | jq
 
 El cierre es irreversible desde esta API. Un segundo intento devuelve `409`;
 un identificador inexistente devuelve `404`.
+
+## Review de hipótesis
+
+Cierra el loop de aprendizaje del journal: a fin de mes (cron), por Telegram
+(`/review`) o por HTTP/script. Evalúa hipótesis **cerradas en el período** o
+**abiertas con horizonte vencido**. No revisa abiertas cuyo horizonte aún no
+terminó (salvo cierre manual).
+
+### Outcomes (códigos EN en DB)
+
+| Outcome | Significado |
+|---------|-------------|
+| `thesis_confirmed` | El precio se movió de forma compatible con el `bias` (proxy) |
+| `thesis_rejected` | El precio se movió en contra del `bias` (proxy) |
+| `timing_issue` | La dirección alineó **después** del horizonte declarado |
+| `inconclusive` | Sin datos de precio, barras insuficientes, o movimiento lateral |
+
+Umbral de movimiento material: **±5%** close-to-close. El precio es un proxy
+honesto, **no** verifica catalizadores textuales ni es un backtest científico.
+Sin market data → `inconclusive` y `price_return_pct = null` (nunca inventa %).
+
+Campos separados: `thesis_quality_note`, `timing_note`, `learning_note`,
+`explanation` + disclaimer.
+
+### Disparar un review
+
+```bash
+# One-shot (mes UTC actual, o YYYY-MM)
+npm run migration:run
+npm run review:once
+npm run review:once -- 2026-01
+
+# Telegram (chat privado): /review  o  /review 2026-01
+
+# HTTP (requiere DASHBOARD_API_KEY)
+export DASHBOARD_API_KEY=pick_a_long_random_string
+curl -s -X POST http://localhost:3000/reviews/run \
+  -H "Content-Type: application/json" \
+  -H "x-dashboard-api-key: $DASHBOARD_API_KEY" \
+  -d '{"notify":true}' | jq
+
+# List / detail
+curl -s 'http://localhost:3000/reviews?page=1&limit=20' \
+  -H "x-dashboard-api-key: $DASHBOARD_API_KEY" | jq
+curl -s "http://localhost:3000/reviews/<id>" \
+  -H "x-dashboard-api-key: $DASHBOARD_API_KEY" | jq
+```
+
+`POST /reviews/run` acepta `periodStart` / `periodEnd` (ISO) juntos, o el mes
+calendario UTC actual si se omiten. `notify: false` persiste sin Telegram.
+
+Cron default: `REVIEW_CRON_SCHEDULE=0 12 1 * *` (día 1, 12:00 UTC).
+Ese tick revisa el **mes UTC anterior** (cierre de mes). On-demand sin args
+(`/review`, `review:once`, `POST /reviews/run` vacío) usa el mes UTC **actual**.
 
 ## Brief on-demand (`/brief`)
 

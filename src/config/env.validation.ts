@@ -19,6 +19,8 @@ export const DEFAULT_DIGEST_CRON_SCHEDULE = '0 12 * * *';
 export const DEFAULT_DIGEST_LOOKBACK_HOURS = 24;
 export const DEFAULT_MARKET_DATA_PROVIDER = 'yahoo' as const;
 export const DEFAULT_MARKET_DATA_TIMEOUT_MS = 10_000;
+/** First day of each month at 12:00 UTC — period review of hypotheses. */
+export const DEFAULT_REVIEW_CRON_SCHEDULE = '0 12 1 * *';
 
 export function parseFeedUrls(raw: string | undefined): string[] {
   if (!raw) {
@@ -169,4 +171,13 @@ export const envValidationSchema = Joi.object({
     .min(1_000)
     .max(30_000)
     .default(DEFAULT_MARKET_DATA_TIMEOUT_MS),
+  /**
+   * Shared secret for dashboard-facing Nest routes (BFF header
+   * x-dashboard-api-key). Empty disables those routes (401).
+   */
+  DASHBOARD_API_KEY: Joi.string().trim().allow('').optional().default(''),
+  REVIEW_CRON_SCHEDULE: Joi.string()
+    .trim()
+    .min(1)
+    .default(DEFAULT_REVIEW_CRON_SCHEDULE),
 });

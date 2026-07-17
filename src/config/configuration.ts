@@ -10,6 +10,7 @@ import {
   DEFAULT_DIGEST_LOOKBACK_HOURS,
   DEFAULT_MARKET_DATA_PROVIDER,
   DEFAULT_MARKET_DATA_TIMEOUT_MS,
+  DEFAULT_REVIEW_CRON_SCHEDULE,
   DEFAULT_STORY_CLUSTER_WINDOW_HOURS,
   parseFeedUrls,
   parseTelegramAllowedUserIds,
@@ -64,6 +65,12 @@ export type AppConfig = {
   marketData: {
     provider: typeof DEFAULT_MARKET_DATA_PROVIDER;
     timeoutMs: number;
+  };
+  dashboard: {
+    apiKey: string;
+  };
+  review: {
+    cronSchedule: string;
   };
 };
 
@@ -128,5 +135,12 @@ export default (): AppConfig => ({
         String(DEFAULT_MARKET_DATA_TIMEOUT_MS),
       10,
     ),
+  },
+  dashboard: {
+    apiKey: (process.env.DASHBOARD_API_KEY ?? '').trim(),
+  },
+  review: {
+    cronSchedule:
+      process.env.REVIEW_CRON_SCHEDULE?.trim() ?? DEFAULT_REVIEW_CRON_SCHEDULE,
   },
 });

@@ -1,6 +1,14 @@
 import { parseTelegramCommand } from './telegram-command';
 
 describe('parseTelegramCommand', () => {
+  it('parses /review with optional month', () => {
+    expect(parseTelegramCommand('/review')).toEqual({ type: 'review' });
+    expect(parseTelegramCommand('/review@FinanceBot 2026-01')).toEqual({
+      type: 'review',
+      month: '2026-01',
+    });
+  });
+
   it('parses /brief with ticker and bot suffix', () => {
     expect(parseTelegramCommand('/brief AAPL')).toEqual({
       type: 'brief',
