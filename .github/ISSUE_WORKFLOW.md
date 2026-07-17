@@ -69,23 +69,40 @@ hipótesis de research; sin trading automático. Posturas etiquetadas
 | 23 | #50 | Generar headline localizado en el mismo análisis Gemini y usarlo en Telegram |
 | 24 | #32 | Brief on-demand educativo (TA/FA) por Telegram |
 | 25 | #33 | Journal de hipótesis de research |
-| 26 | #34 | Review de hipótesis (mensual o a pedido) |
-| 28 | #55 | Integrar fuente mínima de datos de mercado (OHLCV) |
-| 29 | #56 | Brief con postura accionable relativa a holdings |
-| 30 | #57 | Enviar chart de análisis técnico en imagen por Telegram |
+| 26 | #34 | Review de hipótesis (mensual o a pedido) + API reviews |
+| 27 | #56 | Brief con postura accionable relativa a holdings |
+| 28 | #55 | Integrar fuente mínima de datos de mercado (OHLCV) — cerrado (corrió en paralelo) |
+| 29 | #57 | Enviar chart de análisis técnico en imagen por Telegram |
 
-`#55` puede arrancar en paralelo al journal (#33) tras mergear #32; `#56`
-requiere #55; `#57` es deseo (prioridad baja).
+Orden vigente post-bot (v1 abiertos): **#34 → #56 → #57**.
+
+`#55` (cerrado) corrió en paralelo al journal tras mergear #32. `#56` requiere
+`#55` (cumplido). `#57` es deseo (prioridad baja) y depende de `#56`.
 
 ## Orden de ejecución (v2) — dashboard
 
+ADR: `docs/adr/003-dashboard-web.md` (Next.js + shadcn + Tailwind, BFF, auth).
+
 | Orden | Issue | Título |
 |-------|-------|--------|
-| 27 | #35 | Dashboard de lectura (historial, cartera, reviews) |
+| 30 | #62 | Exponer API de lectura de news articles y analyses |
+| 31 | #63 | Exponer API de lectura de notificaciones/alertas |
+| 32 | #65 | Exponer API de lectura y request de research briefs |
+| 33 | #64 | Scaffold `web/` Next.js + shadcn + auth BFF |
+| 34 | #35 | Dashboard research desk (5 áreas, read + write acotado) |
 
-**No empezar #35** hasta estabilizar el loop del bot (#26–#34) y el follow-up
-de locale (#49–#50). Obligatorio `/arch` antes. Los issues #55–#57 no
-bloquean el dashboard, pero charts en dashboard no reemplazan #57.
+Orden vigente v2: **#62 → #63 → #65 → #64 → #35**.
+
+Las APIs (#62/#63/#65) pueden avanzar en paralelo al path bot (#56/#57)
+porque no dependen de Telegram charts. **No empezar #35** hasta:
+cerrar #34 (reviews + API), mergear foundation APIs + scaffold (#62–#65/#64),
+y preferiblemente #56. `#57` no bloquea el dashboard.
+
+Si falta el label `order-NN` en GitHub, la sección **Orden de ejecución**
+del body del issue es la fuente de verdad.
+
+Skills de UI (uso automático, sin slash): `.agents/skills/frontend-design`,
+`vercel-react-best-practices`, `web-design-guidelines`.
 
 ## Fuera de backlog (explícito)
 
@@ -114,8 +131,10 @@ No compartir la misma key entre ambos: el free tier es por proyecto.
 | Pre-scaffold | Architect | Antes del issue #8 |
 | Ideas de alertas / features de research | Finance Advisor (`/fin`) | Consultas de dominio; no crea Issues |
 | Locale display / headline | — | #49–#50 siguen el ADR implícito Arch (códigos EN + display; headline en el mismo JSON) |
-| Holdings / brief / journal / precios | Architect (`/arch`) | Antes de #27, #32, #33, #34 (si hay fuente de precios), #35 |
+| Holdings / brief / journal / precios / charts / dashboard | Architect (`/arch`) | Antes de #27, #32, #33, #34, #57, #35; ADR 003 para dashboard |
 | Rúbrica de review de hipótesis | Finance Advisor (`/fin`) | Antes o durante #34 |
+| Vocabulario de stance | Finance Advisor (`/fin`) | Antes o durante #56 |
+| Scaffold / pantallas `web/` | Skills automáticas | `frontend-design`, `vercel-react-best-practices` |
 | CI setup | DevOps | Antes o durante issue #10 |
 | AI Review workflow | DevOps | Antes o durante issue #11 |
 | Cada feature | Developer | Automático por `order-NN` |
