@@ -38,7 +38,7 @@ pipeline
   └── notifications
 
 portfolio  ← holdings + watchlist (REST CRUD; base para briefs/journal)
-brief      ← Gemini on-demand + research_briefs (consume holdings + Telegram outbound)
+brief      ← Gemini on-demand + research_briefs (holdings + market-data + Telegram outbound)
 telegram-bot ← inbound webhook/commands → brief
 research   ← hypotheses + reviews (REST + /review Telegram; market-data para returns)
 market-data ← MarketDataService → MarketDataPort → Yahoo adapter
@@ -73,9 +73,10 @@ Ver `docs/adr/003-dashboard-web.md`.
   parcial activo (`WHERE deleted_at IS NULL`).
 - Relevancia: watchlist persistida (si no vacía) prevalece sobre
   `WATCHLIST_TICKERS` (env fallback).
-- `research_briefs` guarda sections JSON fijas (`overview`, `fundamental`,
-  `technical`, `risks`, `invalidation`, `disclaimer`) + `prompt_version`.
-  Sin cotización en vivo en v1.
+- `research_briefs` guarda sections JSON educativas (`overview`, `fundamental`,
+  `technical`, `risks`, `invalidation`, `disclaimer`) + `prompt_version`, y
+  columnas de postura (`stance`, `stance_rationale`, `market_as_of`,
+  `market_source`). Sin market data → `stance` null (nunca inventa precios).
 - `hypotheses` guarda tesis, invalidación, horizonte, sesgo acotado y origen.
   `source_ref_id` es un UUID opaco sin FK porque puede referir a un brief o una
   alerta. El cierre registra `closed_at` y una nota opcional.
