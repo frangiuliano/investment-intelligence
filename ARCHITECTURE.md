@@ -26,6 +26,7 @@ Mapa de módulos del backend NestJS y su relación con el backlog del MVP.
 | `telegram-bot/` | Implementado | Inbound Telegram (`/brief`, webhook/poll) | #32 |
 | `research/` | Implementado | Journal de hipótesis; reviews como extensión futura | #33, #34 |
 | `market-data/` | Implementado | Port + adapter Yahoo para OHLCV histórico | #55 |
+| `web/` | Planificado | Dashboard Next.js (lectura + escrituras acotadas); BFF → Nest | #35 + foundation `scope:v2` |
 
 ## Diagrama de dependencias (MVP)
 
@@ -42,10 +43,25 @@ telegram-bot ← inbound webhook/commands → brief
 research   ← hypotheses (REST create/list/close; reviews futuras separadas)
 market-data ← MarketDataService → MarketDataPort → Yahoo adapter
 
+web (Next.js) ← BFF server-only → Nest REST (dashboard APIs + API key)
+  pantallas: holdings | hypotheses | alerts | briefs | reviews
+
 database ← TypeORM DataSource + entidades de dominio
 config   ← global
 health   ← database (ping vía DataSource)
 ```
+
+## Dashboard web (v2)
+
+Ver `docs/adr/003-dashboard-web.md`.
+
+- **Stack:** Next.js App Router, Tailwind, shadcn/ui.
+- **Auth:** password + cookie de sesión; Nest protegido con
+  `DASHBOARD_API_KEY` desde el BFF.
+- **Repo:** carpeta `web/` en el mismo repositorio (Nest permanece en `src/`).
+- **Skills (automáticas al implementar UI):** `frontend-design`,
+  `vercel-react-best-practices`; auditoría opcional con
+  `web-design-guidelines`.
 
 ## Persistencia
 
