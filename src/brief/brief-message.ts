@@ -1,6 +1,6 @@
 import { AppLocale } from '../config/env.validation';
 import { TELEGRAM_MAX_MESSAGE_LENGTH } from '../notifications/telegram.constants';
-import { BriefHoldingContext, BriefSections } from './brief.types';
+import { BriefHoldingContext, BriefSections, BriefStance } from './brief.types';
 
 type BriefMessageLabels = {
   header: string;
@@ -13,6 +13,32 @@ type BriefMessageLabels = {
   holdingContext: string;
   holdingPresent: string;
   noLivePrices: string;
+  marketAttached: string;
+  stance: string;
+  stanceRationale: string;
+  insufficientMarketData: string;
+  researchHypothesisBanner: string;
+};
+
+const STANCE_LABELS: Record<AppLocale, Record<BriefStance, string>> = {
+  en: {
+    enter: 'Enter (research hypothesis)',
+    avoid: 'Avoid (research hypothesis)',
+    watch: 'Watch (research hypothesis)',
+    hold: 'Hold (research hypothesis)',
+    add: 'Add (research hypothesis)',
+    reduce: 'Reduce (research hypothesis)',
+    exit: 'Exit (research hypothesis)',
+  },
+  es: {
+    enter: 'Entrar (hipótesis de research)',
+    avoid: 'Evitar (hipótesis de research)',
+    watch: 'Observar (hipótesis de research)',
+    hold: 'Mantener (hipótesis de research)',
+    add: 'Agregar (hipótesis de research)',
+    reduce: 'Reducir (hipótesis de research)',
+    exit: 'Salir (hipótesis de research)',
+  },
 };
 
 const LABELS_BY_LOCALE: Record<AppLocale, BriefMessageLabels> = {
@@ -26,9 +52,16 @@ const LABELS_BY_LOCALE: Record<AppLocale, BriefMessageLabels> = {
     disclaimer: 'Disclaimer',
     holdingContext: 'Holdings context',
     holdingPresent:
-      'You have a recorded position in this ticker. This is context only — not a sell or reduce instruction.',
+      'You have a recorded position in this ticker. Any stance below is relative to that position — a research hypothesis, not a broker order.',
     noLivePrices:
-      'No live market quotes are attached to this brief. Do not treat any numbers as verified prices.',
+      'No live market quotes are attached to this brief. Stance was not issued. Do not treat any numbers as verified prices.',
+    marketAttached: 'Market data attached from provider',
+    stance: 'Research stance',
+    stanceRationale: 'Stance rationale',
+    insufficientMarketData:
+      'Insufficient market data to issue a stance. Educational sections only — no invented prices or posture.',
+    researchHypothesisBanner:
+      'Labeled stance is a research hypothesis for the operator only. Not investment advice. Not a broker order.',
   },
   es: {
     header: 'Brief educativo de research',
@@ -40,9 +73,16 @@ const LABELS_BY_LOCALE: Record<AppLocale, BriefMessageLabels> = {
     disclaimer: 'Disclaimer',
     holdingContext: 'Contexto de cartera',
     holdingPresent:
-      'Tenés una posición registrada en este ticker. Es solo contexto — no es una instrucción de venta ni de reducción.',
+      'Tenés una posición registrada en este ticker. Cualquier postura abajo es relativa a esa posición — hipótesis de research, no una orden de broker.',
     noLivePrices:
-      'Este brief no incluye cotizaciones en vivo. No trates ningún número como precio verificado.',
+      'Este brief no incluye cotizaciones en vivo. No se emitió postura. No trates ningún número como precio verificado.',
+    marketAttached: 'Datos de mercado adjuntos del proveedor',
+    stance: 'Postura de research',
+    stanceRationale: 'Justificación de la postura',
+    insufficientMarketData:
+      'Datos de mercado insuficientes para emitir una postura. Solo secciones educativas — sin precios ni postura inventados.',
+    researchHypothesisBanner:
+      'La postura etiquetada es una hipótesis de research para el operador. No es asesoramiento de inversión ni una orden de broker.',
   },
 };
 
@@ -50,6 +90,10 @@ export type FormatBriefInput = {
   symbol: string;
   sections: BriefSections;
   holding: BriefHoldingContext | null;
+  stance: BriefStance | null;
+  stanceRationale: string | null;
+  marketSource: string | null;
+  marketAsOf: Date | null;
 };
 
 export function formatBriefMessage(
@@ -57,11 +101,32 @@ export function formatBriefMessage(
   locale: AppLocale,
 ): string {
   const labels = LABELS_BY_LOCALE[locale];
-  const lines = [
-    `${labels.header}: ${input.symbol}`,
-    '',
-    labels.noLivePrices,
-    '',
+  const lines = [`${labels.header}: ${input.symbol}`, ''];
+
+  if (input.stance) {
+    lines.push(labels.researchHypothesisBanner, '');
+    lines.push(`${labels.stance}: ${STANCE_LABELS[locale][input.stance]}`);
+    if (input.stanceRationale) {
+      lines.push(`${labels.stanceRationale}:`, input.stanceRationale);
+    }
+    if (input.marketSource) {
+      const asOf =
+        input.marketAsOf instanceof Date ? input.marketAsOf.toISOString() : '';
+      lines.push(
+        `${labels.marketAttached}: ${input.marketSource}${
+          asOf ? ` @ ${asOf}` : ''
+        }`,
+      );
+    }
+    lines.push('');
+  } else {
+    lines.push(
+      input.marketSource ? labels.insufficientMarketData : labels.noLivePrices,
+      '',
+    );
+  }
+
+  lines.push(
     `${labels.overview}:`,
     input.sections.overview,
     '',
@@ -76,7 +141,7 @@ export function formatBriefMessage(
     '',
     `${labels.invalidation}:`,
     input.sections.invalidation,
-  ];
+  );
 
   if (input.holding) {
     lines.push(
@@ -91,6 +156,9 @@ export function formatBriefMessage(
   }
 
   lines.push('', `${labels.disclaimer}:`, input.sections.disclaimer);
+  if (input.stance) {
+    lines.push('', labels.researchHypothesisBanner);
+  }
 
   return truncateMessage(lines.join('\n'));
 }
@@ -99,7 +167,7 @@ export function formatBriefHelpMessage(locale: AppLocale): string {
   if (locale === 'es') {
     return [
       'Comandos disponibles:',
-      '/brief TICKER — brief educativo (TA/FA) sin señales de comprá/vendé',
+      '/brief TICKER — brief educativo (TA/FA) con postura etiquetada si hay market data (no es orden de broker)',
       '/review [YYYY-MM] — review de hipótesis del mes (UTC)',
       '/help — esta ayuda',
       '',
@@ -109,7 +177,7 @@ export function formatBriefHelpMessage(locale: AppLocale): string {
 
   return [
     'Available commands:',
-    '/brief TICKER — educational TA/FA brief (no buy/sell instructions)',
+    '/brief TICKER — educational TA/FA brief with labeled stance when market data is available (not a broker order)',
     '/review [YYYY-MM] — hypothesis review for the UTC calendar month',
     '/help — this help',
     '',

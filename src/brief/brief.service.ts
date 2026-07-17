@@ -8,10 +8,13 @@ import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AppLocale } from '../config/env.validation';
+import { MarketDataUnavailableError } from '../market-data/market-data.errors';
+import { MarketDataService } from '../market-data/market-data.service';
 import { TelegramClient } from '../notifications/telegram.client';
 import { HoldingsService } from '../portfolio/holdings/holdings.service';
 import { BRIEF_TICKER_PATTERN } from './brief.constants';
 import { BriefGeminiClient } from './brief-gemini.client';
+import { buildMarketFactsBlock } from './brief-market-facts';
 import {
   formatBriefBusyMessage,
   formatBriefDeliveryErrorMessage,
@@ -20,7 +23,12 @@ import {
   formatBriefUsageMessage,
 } from './brief-message';
 import { BRIEF_PROMPT_VERSION, sanitizeHoldingNotes } from './brief-prompt';
-import { BriefHoldingContext, BriefHoldingLookup } from './brief.types';
+import { validateStanceForHolding } from './brief-stance';
+import {
+  BriefHoldingContext,
+  BriefHoldingLookup,
+  BriefMarketContext,
+} from './brief.types';
 import { ResearchBrief } from './entities/research-brief.entity';
 
 export type BriefRequestResult = {
@@ -37,6 +45,7 @@ export class BriefService {
   constructor(
     private readonly configService: ConfigService,
     private readonly holdingsService: HoldingsService,
+    private readonly marketDataService: MarketDataService,
     private readonly briefGeminiClient: BriefGeminiClient,
     private readonly telegramClient: TelegramClient,
     @InjectRepository(ResearchBrief)
@@ -66,17 +75,35 @@ export class BriefService {
     try {
       const holdingLookup = await this.resolveHoldingContext(symbol);
       const holdingContext = this.toHoldingContext(holdingLookup);
-      const sections = await this.briefGeminiClient.generateBrief({
+      const market = await this.resolveMarketContext(symbol);
+      const generated = await this.briefGeminiClient.generateBrief({
         symbol,
         holding: holdingContext,
+        marketFacts: market?.factsBlock ?? null,
       });
+
+      const stance = validateStanceForHolding(
+        generated.stance,
+        holdingContext !== null,
+      );
+      if (generated.stance && !stance) {
+        this.logger.warn(
+          `Discarding stance "${generated.stance}" for ${symbol} (holding=${holdingContext !== null})`,
+        );
+      }
+
+      const stanceRationale = stance ? generated.stanceRationale : null;
 
       persistedBrief = await this.researchBriefsRepository.save(
         this.researchBriefsRepository.create({
           symbol,
           locale,
-          sections,
+          sections: generated.sections,
           promptVersion: BRIEF_PROMPT_VERSION,
+          stance,
+          stanceRationale,
+          marketAsOf: market?.asOf ?? null,
+          marketSource: market?.source ?? null,
           holdingId: holdingLookup?.holdingId ?? null,
         }),
       );
@@ -84,8 +111,12 @@ export class BriefService {
       const message = formatBriefMessage(
         {
           symbol,
-          sections,
+          sections: generated.sections,
           holding: holdingContext,
+          stance,
+          stanceRationale,
+          marketSource: market?.source ?? null,
+          marketAsOf: market?.asOf ?? null,
         },
         locale,
       );
@@ -134,6 +165,32 @@ export class BriefService {
       throw new BadRequestException(result.message);
     }
     return result.brief;
+  }
+
+  private async resolveMarketContext(
+    symbol: string,
+  ): Promise<BriefMarketContext | null> {
+    try {
+      const series = await this.marketDataService.getSeries(symbol);
+      return {
+        factsBlock: buildMarketFactsBlock(series),
+        asOf: new Date(series.asOf),
+        source: series.source,
+      };
+    } catch (error) {
+      if (!(error instanceof MarketDataUnavailableError)) {
+        this.logger.warn(
+          `Unexpected market data error for ${symbol}: ${
+            error instanceof Error ? error.message : String(error)
+          }`,
+        );
+      } else {
+        this.logger.warn(
+          `Market data unavailable for brief ${symbol}: ${error.reason}`,
+        );
+      }
+      return null;
+    }
   }
 
   private async safeSend(message: string): Promise<void> {
