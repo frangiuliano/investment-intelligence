@@ -22,7 +22,7 @@ describe('BriefGeminiClient', () => {
     } as unknown as ConfigService);
   }
 
-  it('posts a JSON brief request and parses sections', async () => {
+  it('posts a JSON brief request and parses sections with stance', async () => {
     const fetchMock = jest.fn().mockResolvedValue({
       ok: true,
       json: () =>
@@ -39,6 +39,8 @@ describe('BriefGeminiClient', () => {
                       risks: 'r',
                       invalidation: 'i',
                       disclaimer: 'd',
+                      stance: 'watch',
+                      stance_rationale: 'Range-bound',
                     }),
                   },
                 ],
@@ -50,12 +52,15 @@ describe('BriefGeminiClient', () => {
     global.fetch = fetchMock;
 
     const client = createClient();
-    const sections = await client.generateBrief({
+    const result = await client.generateBrief({
       symbol: 'AAPL',
       holding: null,
+      marketFacts: 'Market facts (source=yahoo):\nlastClose=100',
     });
 
-    expect(sections.overview).toBe('o');
+    expect(result.sections.overview).toBe('o');
+    expect(result.stance).toBe('watch');
+    expect(result.stanceRationale).toBe('Range-bound');
     expect(fetchMock).toHaveBeenCalledTimes(1);
     const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
     expect(typeof init.body).toBe('string');
@@ -63,7 +68,7 @@ describe('BriefGeminiClient', () => {
       systemInstruction: { parts: Array<{ text: string }> };
       generationConfig: { responseMimeType: string };
     };
-    expect(body.systemInstruction.parts[0].text).toContain('educational');
+    expect(body.systemInstruction.parts[0].text).toContain('stance');
     expect(body.generationConfig.responseMimeType).toBe('application/json');
   });
 
@@ -77,7 +82,15 @@ describe('BriefGeminiClient', () => {
 
     const client = createClient();
     await expect(
-      client.generateBrief({ symbol: 'AAPL', holding: null }),
-    ).rejects.toThrow(/Brief Gemini API 500/);
+      client.generateBrief({
+        symbol: 'AAPL',
+        holding: null,
+        marketFacts: null,
+      }),
+    ).rejects.toMatchObject({
+      name: 'BriefGeminiApiError',
+      statusCode: 500,
+      retryable: true,
+    });
   });
 });
