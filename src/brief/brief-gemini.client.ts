@@ -8,9 +8,9 @@ import {
 import {
   buildBriefSystemPrompt,
   buildBriefUserPrompt,
-  parseBriefSectionsText,
+  parseBriefResponseText,
 } from './brief-prompt';
-import { BriefHoldingContext, BriefSections } from './brief.types';
+import { BriefGenerationResult, BriefHoldingContext } from './brief.types';
 
 export class BriefGeminiApiError extends Error {
   constructor(
@@ -26,19 +26,24 @@ export class BriefGeminiApiError extends Error {
 export type GenerateBriefInput = {
   symbol: string;
   holding: BriefHoldingContext | null;
+  marketFacts: string | null;
 };
 
 @Injectable()
 export class BriefGeminiClient {
   constructor(private readonly configService: ConfigService) {}
 
-  async generateBrief(input: GenerateBriefInput): Promise<BriefSections> {
+  async generateBrief(
+    input: GenerateBriefInput,
+  ): Promise<BriefGenerationResult> {
     const apiKey = this.configService.getOrThrow<string>(
       'gemini.apiKeyFinance',
     );
     const model = this.configService.getOrThrow<string>('gemini.model');
     const locale = this.configService.getOrThrow<AppLocale>('locale');
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
+    const expectStance = input.marketFacts !== null;
+    const hasHolding = input.holding !== null;
 
     const controller = new AbortController();
     const timeout = setTimeout(
@@ -55,7 +60,14 @@ export class BriefGeminiClient {
         },
         body: JSON.stringify({
           systemInstruction: {
-            parts: [{ text: buildBriefSystemPrompt(locale) }],
+            parts: [
+              {
+                text: buildBriefSystemPrompt(locale, {
+                  hasHolding,
+                  expectStance,
+                }),
+              },
+            ],
           },
           contents: [
             {
@@ -105,7 +117,7 @@ export class BriefGeminiClient {
       }
 
       try {
-        return parseBriefSectionsText(text);
+        return parseBriefResponseText(text, { expectStance, hasHolding });
       } catch (parseError) {
         throw new BriefGeminiApiError(
           `Brief Gemini response parse failed: ${errorMessage(parseError)}`,

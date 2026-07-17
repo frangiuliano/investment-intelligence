@@ -702,19 +702,23 @@ Ese tick revisa el **mes UTC anterior** (cierre de mes). On-demand sin args
 
 ## Brief on-demand (`/brief`)
 
-Brief educativo TA/FA a pedido (modo research, **no** señales comprá/vendé).
-Usa `GEMINI_API_KEY_FINANCE` + `APP_LOCALE`. **Sin cotización en vivo en
-v1** — el mensaje lo declara explícitamente y no inventa precios como
-verificados.
+Brief educativo TA/FA a pedido (modo research). Con market data disponible
+incluye una **postura etiquetada** (`stance`) relativa a holdings; sin market
+data **no** inventa precios ni postura. Usa `GEMINI_API_KEY_FINANCE` +
+`APP_LOCALE` + `MarketDataService` (#55).
 
 | Pieza | Rol |
 |-------|-----|
-| `brief/` | Prompt Gemini propio, persistencia en `research_briefs`, formato Telegram |
+| `brief/` | Prompt Gemini, persistencia en `research_briefs` (sections + stance), formato Telegram |
+| `market-data/` | OHLCV verificado → facts block del prompt; fallo → stance `null` |
 | `telegram-bot/` | Inbound: `POST /telegram/webhook` + router `/brief` `/help` |
-| Holdings | Si el ticker está en cartera, agrega **contexto** (nunca “vendé”) |
+| Holdings | Sin posición: `enter` \| `avoid` \| `watch`. Con posición: `hold` \| `add` \| `reduce` \| `exit` |
 
-Secciones JSON fijas: `overview`, `fundamental`, `technical`, `risks`,
-`invalidation`, `disclaimer`.
+Secciones educativas JSON: `overview`, `fundamental`, `technical`, `risks`,
+`invalidation`, `disclaimer`. Columnas dedicadas: `stance`,
+`stance_rationale`, `market_as_of`, `market_source` (ADR 002). Códigos EN en
+DB; labels localizados en Telegram. La postura es **hipótesis de research**
+con disclaimer visible — no orden de broker ni asesoramiento regulado.
 
 ### Pedir un brief
 
@@ -756,9 +760,17 @@ npm run migration:run
 npm run brief:once -- AAPL
 ```
 
-Límites: 1 brief a la vez; no hay charts; no es asesoramiento de inversión.
-El brief todavía no consume automáticamente market data; esa integración
-corresponde al issue #56.
+Validar stance vs holdings:
+
+1. Sin holding: `npm run brief:once -- AAPL` → stance `enter`/`avoid`/`watch`
+   (si Yahoo responde).
+2. `POST /holdings` con el mismo ticker y repetir → stance
+   `hold`/`add`/`reduce`/`exit`.
+3. Forzar fallo de provider (ticker inválido o red) → mensaje de insuficiencia,
+   `stance` null, sin números inventados.
+
+Límites: 1 brief a la vez; charts en imagen son #57; no es asesoramiento de
+inversión ni ejecución de órdenes.
 
 ## Market data OHLCV
 

@@ -35,6 +35,7 @@ import { AddNewsAnalysisHeadline1752550000000 } from './migrations/1752550000000
 import { CreateResearchBriefs1752560000000 } from './migrations/1752560000000-CreateResearchBriefs';
 import { CreateHypotheses1752570000000 } from './migrations/1752570000000-CreateHypotheses';
 import { CreateHypothesisReviews1752580000000 } from './migrations/1752580000000-CreateHypothesisReviews';
+import { AddResearchBriefStance1752590000000 } from './migrations/1752590000000-AddResearchBriefStance';
 import {
   DEFAULT_TEST_DATABASE_URL,
   resolveTestDatabaseUrl,
@@ -92,6 +93,7 @@ describe('Database schema (integration)', () => {
         CreateResearchBriefs1752560000000,
         CreateHypotheses1752570000000,
         CreateHypothesisReviews1752580000000,
+        AddResearchBriefStance1752590000000,
       ],
       synchronize: false,
       logging: false,
@@ -485,10 +487,16 @@ describe('Database schema (integration)', () => {
           invalidation: 'Invalidation',
           disclaimer: 'Research only.',
         },
-        promptVersion: 'v1',
+        promptVersion: 'brief-v2',
+        stance: 'watch',
+        stanceRationale: 'Range-bound on verified closes; wait for catalysts.',
+        marketAsOf: new Date('2026-07-17T12:00:00.000Z'),
+        marketSource: 'yahoo-finance-chart',
         holdingId: null,
       }),
     );
+    expect(brief.stance).toBe('watch');
+    expect(brief.marketSource).toBe('yahoo-finance-chart');
 
     const fromBrief = await hypotheses.save(
       hypotheses.create({

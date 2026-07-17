@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { MarketDataModule } from '../market-data/market-data.module';
 import { NotificationsModule } from '../notifications/notifications.module';
 import { PortfolioModule } from '../portfolio/portfolio.module';
 import { BriefGeminiClient } from './brief-gemini.client';
@@ -10,6 +11,7 @@ import { ResearchBrief } from './entities/research-brief.entity';
   imports: [
     TypeOrmModule.forFeature([ResearchBrief]),
     PortfolioModule,
+    MarketDataModule,
     NotificationsModule,
   ],
   providers: [BriefGeminiClient, BriefService],
