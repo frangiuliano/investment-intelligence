@@ -1,6 +1,7 @@
 import { ConfigService } from '@nestjs/config';
 import { BriefService } from '../brief/brief.service';
 import { TelegramClient } from '../notifications/telegram.client';
+import { ReviewsService } from '../research/reviews/reviews.service';
 import { CommandRouterService } from './command-router.service';
 
 describe('CommandRouterService', () => {
@@ -9,11 +10,22 @@ describe('CommandRouterService', () => {
     locale?: string;
     allowedUserIds?: string[];
     requestBrief?: jest.Mock;
+    runPeriodReview?: jest.Mock;
+    resolveCalendarMonthPeriod?: jest.Mock;
     sendMessage?: jest.Mock;
   }) {
     const requestBrief =
       overrides?.requestBrief ??
       jest.fn().mockResolvedValue({ ok: true, brief: null, message: 'ok' });
+    const runPeriodReview =
+      overrides?.runPeriodReview ??
+      jest.fn().mockResolvedValue({ ok: true, reviews: [] });
+    const resolveCalendarMonthPeriod =
+      overrides?.resolveCalendarMonthPeriod ??
+      jest.fn().mockReturnValue({
+        periodStart: new Date('2026-01-01T00:00:00.000Z'),
+        periodEnd: new Date('2026-01-31T23:59:59.999Z'),
+      });
     const sendMessage =
       overrides?.sendMessage ?? jest.fn().mockResolvedValue(undefined);
 
@@ -33,10 +45,20 @@ describe('CommandRouterService', () => {
         },
       } as unknown as ConfigService,
       { requestBrief } as unknown as BriefService,
+      {
+        runPeriodReview,
+        resolveCalendarMonthPeriod,
+      } as unknown as ReviewsService,
       { sendMessage } as unknown as TelegramClient,
     );
 
-    return { router, requestBrief, sendMessage };
+    return {
+      router,
+      requestBrief,
+      runPeriodReview,
+      resolveCalendarMonthPeriod,
+      sendMessage,
+    };
   }
 
   it('routes /brief from the allowed private chat', async () => {
@@ -48,6 +70,21 @@ describe('CommandRouterService', () => {
 
     expect(requestBrief).toHaveBeenCalledWith('AAPL');
     expect(sendMessage).not.toHaveBeenCalled();
+  });
+
+  it('routes /review for the calendar month', async () => {
+    const { router, runPeriodReview, resolveCalendarMonthPeriod } =
+      createRouter();
+
+    await router.handleUpdate({
+      message: { chat: { id: 111 }, text: '/review 2026-01' },
+    });
+
+    expect(resolveCalendarMonthPeriod).toHaveBeenCalledWith('2026-01');
+    expect(runPeriodReview).toHaveBeenCalledWith({
+      periodStart: new Date('2026-01-01T00:00:00.000Z'),
+      periodEnd: new Date('2026-01-31T23:59:59.999Z'),
+    });
   });
 
   it('ignores updates from other chats', async () => {
@@ -109,6 +146,9 @@ describe('CommandRouterService', () => {
 
     expect(sendMessage).toHaveBeenCalledWith(
       expect.stringContaining('/brief TICKER'),
+    );
+    expect(sendMessage).toHaveBeenCalledWith(
+      expect.stringContaining('/review'),
     );
   });
 });

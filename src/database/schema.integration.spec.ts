@@ -19,6 +19,11 @@ import {
   HypothesisSource,
   HypothesisStatus,
 } from '../research/hypotheses/entities/hypothesis.entity';
+import { HypothesisReviewRun } from '../research/reviews/entities/hypothesis-review-run.entity';
+import {
+  HypothesisReview,
+  HypothesisReviewOutcome,
+} from '../research/reviews/entities/hypothesis-review.entity';
 import { InitialSchema1752180000000 } from './migrations/1752180000000-InitialSchema';
 import { AddNewsAnalysisMateriality1752430000000 } from './migrations/1752430000000-AddNewsAnalysisMateriality';
 import { CreateHoldings1752500000000 } from './migrations/1752500000000-CreateHoldings';
@@ -29,6 +34,7 @@ import { CreateDigestTables1752540000000 } from './migrations/1752540000000-Crea
 import { AddNewsAnalysisHeadline1752550000000 } from './migrations/1752550000000-AddNewsAnalysisHeadline';
 import { CreateResearchBriefs1752560000000 } from './migrations/1752560000000-CreateResearchBriefs';
 import { CreateHypotheses1752570000000 } from './migrations/1752570000000-CreateHypotheses';
+import { CreateHypothesisReviews1752580000000 } from './migrations/1752580000000-CreateHypothesisReviews';
 import {
   DEFAULT_TEST_DATABASE_URL,
   resolveTestDatabaseUrl,
@@ -49,6 +55,8 @@ describe('Database schema (integration)', () => {
   let digestItems: Repository<DigestItem>;
   let researchBriefs: Repository<ResearchBrief>;
   let hypotheses: Repository<Hypothesis>;
+  let hypothesisReviewRuns: Repository<HypothesisReviewRun>;
+  let hypothesisReviews: Repository<HypothesisReview>;
   let databaseUrl: string;
 
   beforeAll(async () => {
@@ -69,6 +77,8 @@ describe('Database schema (integration)', () => {
         DigestItem,
         ResearchBrief,
         Hypothesis,
+        HypothesisReviewRun,
+        HypothesisReview,
       ],
       migrations: [
         InitialSchema1752180000000,
@@ -81,6 +91,7 @@ describe('Database schema (integration)', () => {
         AddNewsAnalysisHeadline1752550000000,
         CreateResearchBriefs1752560000000,
         CreateHypotheses1752570000000,
+        CreateHypothesisReviews1752580000000,
       ],
       synchronize: false,
       logging: false,
@@ -112,6 +123,8 @@ describe('Database schema (integration)', () => {
     digestItems = dataSource.getRepository(DigestItem);
     researchBriefs = dataSource.getRepository(ResearchBrief);
     hypotheses = dataSource.getRepository(Hypothesis);
+    hypothesisReviewRuns = dataSource.getRepository(HypothesisReviewRun);
+    hypothesisReviews = dataSource.getRepository(HypothesisReview);
   }, 30_000);
 
   afterAll(async () => {
@@ -122,7 +135,7 @@ describe('Database schema (integration)', () => {
 
   beforeEach(async () => {
     await dataSource.query(
-      'TRUNCATE TABLE "hypotheses", "research_briefs", "digest_items", "digest_runs", "notifications", "news_story_cluster_members", "news_story_clusters", "news_analysis", "news_articles", "holdings", "watchlist_entries" RESTART IDENTITY CASCADE',
+      'TRUNCATE TABLE "hypothesis_reviews", "hypothesis_review_runs", "hypotheses", "research_briefs", "digest_items", "digest_runs", "notifications", "news_story_cluster_members", "news_story_clusters", "news_analysis", "news_articles", "holdings", "watchlist_entries" RESTART IDENTITY CASCADE',
     );
   });
 
@@ -142,7 +155,9 @@ describe('Database schema (integration)', () => {
           'digest_runs',
           'digest_items',
           'research_briefs',
-          'hypotheses'
+          'hypotheses',
+          'hypothesis_review_runs',
+          'hypothesis_reviews'
         )
       ORDER BY table_name
     `);
@@ -152,6 +167,8 @@ describe('Database schema (integration)', () => {
       'digest_runs',
       'holdings',
       'hypotheses',
+      'hypothesis_review_runs',
+      'hypothesis_reviews',
       'news_analysis',
       'news_articles',
       'news_story_cluster_members',
@@ -488,5 +505,77 @@ describe('Database schema (integration)', () => {
       }),
     );
     expect(fromBrief.sourceRefId).toBe(brief.id);
+  });
+
+  it('should persist hypothesis reviews linked to a run', async () => {
+    const hypothesis = await hypotheses.save(
+      hypotheses.create({
+        symbol: 'AAPL',
+        bias: HypothesisBias.BULLISH,
+        thesis: 'Services growth supports margins.',
+        invalidation: 'Services growth falls below 5%.',
+        horizonDays: 90,
+        status: HypothesisStatus.CLOSED,
+        source: HypothesisSource.MANUAL,
+        sourceRefId: null,
+        closedAt: new Date('2026-01-20T00:00:00.000Z'),
+        closeNote: 'Closed for review',
+      }),
+    );
+
+    const run = await hypothesisReviewRuns.save(
+      hypothesisReviewRuns.create({
+        periodStart: new Date('2026-01-01T00:00:00.000Z'),
+        periodEnd: new Date('2026-01-31T23:59:59.999Z'),
+        reviewedCount: 1,
+        skippedCount: 0,
+        locale: 'en',
+        summaryMessage: 'Review summary',
+      }),
+    );
+
+    const review = await hypothesisReviews.save(
+      hypothesisReviews.create({
+        reviewRunId: run.id,
+        hypothesisId: hypothesis.id,
+        outcome: HypothesisReviewOutcome.INCONCLUSIVE,
+        thesisQualityNote: 'Qualitative only',
+        timingNote: 'Horizon not price-checked',
+        learningNote: 'Revisit catalysts',
+        explanation:
+          'Numerical performance is unavailable. Not a backtest or investment advice.',
+        priceReturnPct: null,
+        priceStart: null,
+        priceEnd: null,
+        priceAsOf: null,
+        marketSource: null,
+        priceUnavailableReason: 'not_found',
+        locale: 'en',
+      }),
+    );
+
+    expect(review.id).toBeDefined();
+    expect(review.outcome).toBe(HypothesisReviewOutcome.INCONCLUSIVE);
+
+    await expect(
+      hypothesisReviews.save(
+        hypothesisReviews.create({
+          reviewRunId: run.id,
+          hypothesisId: hypothesis.id,
+          outcome: HypothesisReviewOutcome.THESIS_CONFIRMED,
+          thesisQualityNote: 'dup',
+          timingNote: 'dup',
+          learningNote: 'dup',
+          explanation: 'dup',
+          priceReturnPct: null,
+          priceStart: null,
+          priceEnd: null,
+          priceAsOf: null,
+          marketSource: null,
+          priceUnavailableReason: null,
+          locale: 'en',
+        }),
+      ),
+    ).rejects.toBeInstanceOf(QueryFailedError);
   });
 });

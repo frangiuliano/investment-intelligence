@@ -8,6 +8,7 @@ import {
   DEFAULT_GEMINI_REQUEST_DELAY_MS,
   DEFAULT_MARKET_DATA_PROVIDER,
   DEFAULT_MARKET_DATA_TIMEOUT_MS,
+  DEFAULT_REVIEW_CRON_SCHEDULE,
   DEFAULT_STORY_CLUSTER_WINDOW_HOURS,
   envValidationSchema,
   parseWatchlistTickers,
@@ -34,6 +35,8 @@ type ValidatedEnv = {
   DIGEST_LOOKBACK_HOURS: number;
   MARKET_DATA_PROVIDER: string;
   MARKET_DATA_TIMEOUT_MS: number;
+  DASHBOARD_API_KEY: string;
+  REVIEW_CRON_SCHEDULE: string;
 };
 
 describe('envValidationSchema', () => {
@@ -59,6 +62,8 @@ describe('envValidationSchema', () => {
     expect(value.DIGEST_LOOKBACK_HOURS).toBe(DEFAULT_DIGEST_LOOKBACK_HOURS);
     expect(value.MARKET_DATA_PROVIDER).toBe(DEFAULT_MARKET_DATA_PROVIDER);
     expect(value.MARKET_DATA_TIMEOUT_MS).toBe(DEFAULT_MARKET_DATA_TIMEOUT_MS);
+    expect(value.DASHBOARD_API_KEY).toBe('');
+    expect(value.REVIEW_CRON_SCHEDULE).toBe(DEFAULT_REVIEW_CRON_SCHEDULE);
     expect(
       (result.value as ValidatedEnv & { TELEGRAM_WEBHOOK_SECRET: string })
         .TELEGRAM_WEBHOOK_SECRET,
