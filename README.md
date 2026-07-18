@@ -69,7 +69,7 @@ falta una variable obligatoria de runtime (mensaje explícito vía Joi).
 | `DIGEST_LOOKBACK_HOURS` | No (default `24`) | Ventana de candidatos al digesto (1–168) |
 | `STORY_CLUSTER_WINDOW_HOURS` | No (default `24`) | Ventana para colapsar historias duplicadas en un solo push |
 | `WATCHLIST_TICKERS` | No | Filtro opcional de tickers para relevancia |
-| `DASHBOARD_API_KEY` | No (default vacío) | Secret BFF → Nest (`x-dashboard-api-key`); vacío = `/reviews` y `/news/*` en 401 |
+| `DASHBOARD_API_KEY` | No (default vacío) | Secret BFF → Nest (`x-dashboard-api-key`); vacío = `/reviews`, `/news/*` y `/notifications` en 401 |
 | `REVIEW_CRON_SCHEDULE` | No (default `0 12 1 * *`) | Cron mensual: día 1 UTC revisa el **mes UTC anterior** |
 | `TECHNICAL_CHART_ENABLED` | No (default `true`) | Enviar chart técnico en imagen tras un brief con market data |
 | `TECHNICAL_CHART_SMA_PERIODS` | No (default `20`) | Ventanas SMA del overlay, separadas por coma (ej. `20,50`) |
@@ -741,6 +741,48 @@ curl -s 'http://localhost:3000/news/analyses?from=2026-07-01&to=2026-07-31' \
 Los campos de respuesta salen tal cual de `news_articles` / `news_analysis`
 (sin datos de mercado inventados): `analysis` incluye `headline`, `summary`,
 `sentiment`, `tickers`, `materiality`, `eventType`, `model`, `analyzedAt`.
+
+## API de lectura de notificaciones (dashboard)
+
+Endpoints **solo lectura** sobre la tabla `notifications` (alertas enviadas y
+supresiones de duplicados) para el BFF del dashboard (ADR 003). Requieren el
+header `x-dashboard-api-key` (`DASHBOARD_API_KEY`); con la variable vacía
+responden `401`. No hay creación ni borrado de alertas por API: las alertas
+las genera solo el pipeline.
+
+| Endpoint | Descripción |
+|----------|-------------|
+| `GET /notifications` | Notificaciones paginadas (orden `sent_at` DESC), con `article` y su `analysis` embebidos |
+| `GET /notifications/:id` | Detalle de una notificación + artículo/análisis asociados (`404` si no existe) |
+
+Query params (list): `page` (default `1`), `limit` (default `20`, máx `100`),
+`ticker` (matchea contra `analysis.tickers` del artículo, case-insensitive),
+`from` / `to` (ISO, sobre `sent_at`). Un `to` fecha-sola (`YYYY-MM-DD`) es
+**inclusivo**: cubre ese día UTC completo. Shape de respuesta paginada:
+`{ items, page, limit, total }`.
+
+Cada notificación expone `id`, `channel` (`telegram`), `sentAt` y el `payload`
+jsonb tal cual se persistió: para alertas enviadas incluye `title`, `summary`,
+`sentiment`, `tickers`, `url`, `eventType` (y `clusterId` si aplica); para
+duplicados suprimidos incluye `suppressed: true`, `reason` y
+`matchedArticleId`. El vínculo al detalle es `article` (con `analysis`
+embebido si existe).
+
+```bash
+export DASHBOARD_API_KEY=pick_a_long_random_string
+
+# Listar notificaciones (con filtros opcionales)
+curl -s 'http://localhost:3000/notifications?page=1&limit=20&ticker=AAPL' \
+  -H "x-dashboard-api-key: $DASHBOARD_API_KEY" | jq
+
+# Detalle de una notificación (incluye article + analysis)
+curl -s "http://localhost:3000/notifications/<id>" \
+  -H "x-dashboard-api-key: $DASHBOARD_API_KEY" | jq
+
+# Filtrar por rango de fechas de envío
+curl -s 'http://localhost:3000/notifications?from=2026-07-01&to=2026-07-31' \
+  -H "x-dashboard-api-key: $DASHBOARD_API_KEY" | jq
+```
 
 ## Brief on-demand (`/brief`)
 

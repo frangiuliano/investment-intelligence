@@ -32,6 +32,30 @@ export function parseLimit(limit?: number): number {
   return limit;
 }
 
+const TICKER_PATTERN = /^[A-Z0-9.\-^]{1,12}$/;
+
+export function parseTicker(value: string): string {
+  const ticker = value.trim().toUpperCase();
+  if (!TICKER_PATTERN.test(ticker)) {
+    throw new BadRequestException(
+      'ticker must be 1-12 chars (letters, digits, ".", "-", "^")',
+    );
+  }
+  return ticker;
+}
+
+export function parseDateRange(
+  from?: string,
+  to?: string,
+): { from?: Date; to?: Date } {
+  const fromDate = from ? parseIsoDate(from, 'from') : undefined;
+  const toDate = to ? parseIsoDateRangeEnd(to, 'to') : undefined;
+  if (fromDate && toDate && toDate < fromDate) {
+    throw new BadRequestException('to must be >= from');
+  }
+  return { from: fromDate, to: toDate };
+}
+
 const DATE_ONLY_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
 export function parseIsoDate(value: string, field: string): Date {
