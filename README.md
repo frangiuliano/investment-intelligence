@@ -206,11 +206,12 @@ holdings/watchlist).
 | `npm run migration:show` | Lista migraciones y su estado |
 | `npm run migration:revert` | Revierte la última migración |
 | `npm run pipeline:once` | Pipeline MVP completo (one-shot) |
-| `npm run verify:lockfile` | `npm ci` en Linux (Docker) — evita drift macOS→CI |
+| `npm run verify:lockfile` | `npm ci` en Linux (Docker) para raíz y `web/` — evita drift macOS→CI |
 
 Pre-push obligatorio: `verify:lockfile` → `lint` → `test` → `build`.
 `verify:lockfile` es necesario porque un lockfile válido en macOS puede fallar
-en GitHub Actions (deps opcionales de plataforma, p. ej. `@emnapi/*`).
+en GitHub Actions (deps opcionales de plataforma, p. ej. `@emnapi/*`). Valida
+tanto el lockfile de la raíz como el de `web/`.
 
 ## CI (GitHub Actions)
 

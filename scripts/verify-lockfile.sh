@@ -1,11 +1,15 @@
 #!/usr/bin/env bash
-# Verify package-lock.json installs cleanly on Linux (same as GitHub Actions).
-# macOS `npm ci` can succeed while Linux CI fails on optional native deps
-# (e.g. missing @emnapi/*). Always run this before pushing lockfile changes.
+# Verify every package-lock.json installs cleanly on Linux (same as GitHub
+# Actions). macOS `npm ci` can succeed while Linux CI fails on optional native
+# deps (e.g. missing @emnapi/*). Always run this before pushing lockfile
+# changes. Covers the root Nest project and the web/ dashboard.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
+
+# Directories (relative to ROOT) that ship their own package-lock.json.
+PROJECT_DIRS=("." "web")
 
 if ! command -v docker >/dev/null 2>&1; then
   echo "verify:lockfile: ERROR — Docker is required." >&2
@@ -20,14 +24,32 @@ if ! docker info >/dev/null 2>&1; then
   exit 1
 fi
 
-TMP="$(mktemp -d)"
-trap 'rm -rf "$TMP"' EXIT
-cp package.json package-lock.json "$TMP/"
+verify_dir() {
+  local project_dir="$1"
+  local abs_dir="$ROOT/$project_dir"
 
-docker run --rm \
-  -v "$TMP:/app" \
-  -w /app \
-  node:22-bookworm-slim \
-  npm ci --ignore-scripts
+  if [ ! -f "$abs_dir/package-lock.json" ]; then
+    echo "verify:lockfile: skip ($project_dir has no package-lock.json)"
+    return 0
+  fi
 
-echo "verify:lockfile: OK (linux/node:22)"
+  local tmp
+  tmp="$(mktemp -d)"
+  trap 'rm -rf "$tmp"' RETURN
+
+  cp "$abs_dir/package.json" "$abs_dir/package-lock.json" "$tmp/"
+
+  docker run --rm \
+    -v "$tmp:/app" \
+    -w /app \
+    node:22-bookworm-slim \
+    npm ci --ignore-scripts
+
+  echo "verify:lockfile: OK ($project_dir, linux/node:22)"
+}
+
+for project_dir in "${PROJECT_DIRS[@]}"; do
+  verify_dir "$project_dir"
+done
+
+echo "verify:lockfile: all lockfiles OK (linux/node:22)"
