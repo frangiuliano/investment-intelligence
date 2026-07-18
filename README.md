@@ -69,7 +69,7 @@ falta una variable obligatoria de runtime (mensaje explícito vía Joi).
 | `DIGEST_LOOKBACK_HOURS` | No (default `24`) | Ventana de candidatos al digesto (1–168) |
 | `STORY_CLUSTER_WINDOW_HOURS` | No (default `24`) | Ventana para colapsar historias duplicadas en un solo push |
 | `WATCHLIST_TICKERS` | No | Filtro opcional de tickers para relevancia |
-| `DASHBOARD_API_KEY` | No (default vacío) | Secret BFF → Nest (`x-dashboard-api-key`); vacío = `/reviews`, `/news/*` y `/notifications` en 401 |
+| `DASHBOARD_API_KEY` | No (default vacío) | Secret BFF → Nest (`x-dashboard-api-key`); vacío = `/reviews`, `/news/*`, `/notifications` y `/briefs` en 401 |
 | `REVIEW_CRON_SCHEDULE` | No (default `0 12 1 * *`) | Cron mensual: día 1 UTC revisa el **mes UTC anterior** |
 | `TECHNICAL_CHART_ENABLED` | No (default `true`) | Enviar chart técnico en imagen tras un brief con market data |
 | `TECHNICAL_CHART_SMA_PERIODS` | No (default `20`) | Ventanas SMA del overlay, separadas por coma (ej. `20,50`) |
@@ -784,6 +784,56 @@ curl -s 'http://localhost:3000/notifications?from=2026-07-01&to=2026-07-31' \
   -H "x-dashboard-api-key: $DASHBOARD_API_KEY" | jq
 ```
 
+## API de research briefs (dashboard)
+
+Endpoints de **lectura + request** sobre `research_briefs` para el BFF del
+dashboard (ADR 003). Requieren el header `x-dashboard-api-key`
+(`DASHBOARD_API_KEY`); con la variable vacía responden `401`.
+
+`POST /briefs` reutiliza el mismo pipeline que Telegram `/brief` y
+`npm run brief:once` (`BriefService`): Gemini + market data + persistencia +
+envío al chat configurado. Es **síncrono**: la respuesta HTTP espera a que el
+brief se persista (puede tardar decenas de segundos por Gemini/Yahoo).
+
+| Endpoint | Descripción |
+|----------|-------------|
+| `GET /briefs` | Briefs paginados (orden `created_at` DESC) |
+| `GET /briefs/:id` | Detalle de un brief (`404` si no existe) |
+| `POST /briefs` | Solicita un brief para `{ "ticker": "AAPL" }` → `201` + fila persistida |
+
+Query params (list): `page` (default `1`), `limit` (default `20`, máx `100`),
+`ticker` (match exacto de `symbol`, case-insensitive). Shape paginada:
+`{ items, page, limit, total }`.
+
+Cada brief expone `id`, `symbol`, `locale`, `sections` (overview / fundamental /
+technical / risks / invalidation / disclaimer), `promptVersion`, `stance`,
+`stanceRationale`, `marketAsOf`, `marketSource`, `holdingId`, `createdAt`.
+Sin market data o fallo de Gemini → `stance`/`market*` en `null` o error HTTP
+explícito (`400` / `409` si ya hay un brief en curso); **nunca** inventa
+números de mercado.
+
+```bash
+export DASHBOARD_API_KEY=pick_a_long_random_string
+
+# Solicitar brief (síncrono; deja registro consultable)
+curl -s -X POST http://localhost:3000/briefs \
+  -H "Content-Type: application/json" \
+  -H "x-dashboard-api-key: $DASHBOARD_API_KEY" \
+  -d '{"ticker":"AAPL"}' | jq
+
+# Listar / filtrar
+curl -s 'http://localhost:3000/briefs?page=1&limit=20&ticker=AAPL' \
+  -H "x-dashboard-api-key: $DASHBOARD_API_KEY" | jq
+
+# Detalle
+curl -s "http://localhost:3000/briefs/<id>" \
+  -H "x-dashboard-api-key: $DASHBOARD_API_KEY" | jq
+```
+
+Si Telegram falla **después** de persistir, `POST` igual responde `201` con el
+brief guardado (consultable por `GET`); el error de delivery solo afecta el
+canal Telegram.
+
 ## Brief on-demand (`/brief`)
 
 Brief educativo TA/FA a pedido (modo research). Con market data disponible
@@ -843,6 +893,9 @@ npm run telegram:poll
 npm run migration:run
 npm run brief:once -- AAPL
 ```
+
+**HTTP (dashboard BFF):** ver [API de research briefs](#api-de-research-briefs-dashboard)
+(`POST /briefs` con `DASHBOARD_API_KEY`).
 
 Validar stance vs holdings:
 
