@@ -157,8 +157,9 @@ export class BriefService {
   }
 
   /**
-   * One-shot / tests: generate + persist without Telegram inbound gating.
-   * Still sends the formatted brief to the configured chat.
+   * HTTP / one-shot: generate + persist (same pipeline as Telegram `/brief`).
+   * Returns the persisted row when available — including when Telegram delivery
+   * fails after save — so the dashboard can still read the brief.
    */
   async requestBriefOrThrow(rawSymbol: string): Promise<ResearchBrief> {
     if (this.running) {
@@ -166,7 +167,7 @@ export class BriefService {
     }
 
     const result = await this.requestBrief(rawSymbol);
-    if (!result.ok || !result.brief) {
+    if (!result.brief) {
       throw new BadRequestException(result.message);
     }
     return result.brief;

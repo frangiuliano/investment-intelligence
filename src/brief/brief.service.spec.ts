@@ -1,3 +1,4 @@
+import { BadRequestException, ConflictException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Repository } from 'typeorm';
 import { TechnicalChartService } from '../charts/technical-chart.service';
@@ -448,4 +449,75 @@ describe('BriefService', () => {
     expect(result.message).toContain('delivery failed');
     expect(sendMessage).toHaveBeenCalledTimes(2);
   });
+
+  describe('requestBriefOrThrow', () => {
+    it('returns the persisted brief on success', async () => {
+      const { service } = createService();
+
+      const brief = await service.requestBriefOrThrow('AAPL');
+
+      expect(brief.symbol).toBe('AAPL');
+      expect(brief.stance).toBe('watch');
+    });
+
+    it('returns the persisted brief when Telegram delivery fails after save', async () => {
+      const sendMessage = jest
+        .fn()
+        .mockRejectedValueOnce(new Error('telegram down'))
+        .mockResolvedValue(undefined);
+      const { service } = createService({ sendMessage });
+
+      const brief = await service.requestBriefOrThrow('AAPL');
+
+      expect(brief.symbol).toBe('AAPL');
+    });
+
+    it('throws BadRequest when the ticker is invalid', async () => {
+      const { service } = createService();
+
+      await expect(service.requestBriefOrThrow('!!!')).rejects.toThrow(
+        BadRequestException,
+      );
+    });
+
+    it('throws Conflict when a brief is already running', async () => {
+      const deferred: {
+        resolve: ((value: BriefGenerationResult) => void) | null;
+      } = { resolve: null };
+      const generateBrief = jest.fn(
+        () =>
+          new Promise<BriefGenerationResult>((resolve) => {
+            deferred.resolve = resolve;
+          }),
+      );
+      const { service } = createService({ generateBrief });
+
+      const firstPromise = service.requestBrief('AAPL');
+      await waitUntil(() => deferred.resolve !== null);
+
+      await expect(service.requestBriefOrThrow('MSFT')).rejects.toThrow(
+        ConflictException,
+      );
+
+      deferred.resolve?.({
+        sections,
+        stance: 'watch',
+        stanceRationale: 'wait',
+      });
+      await firstPromise;
+    });
+  });
 });
+
+async function waitUntil(
+  predicate: () => boolean,
+  attempts = 50,
+): Promise<void> {
+  for (let i = 0; i < attempts; i++) {
+    if (predicate()) {
+      return;
+    }
+    await new Promise<void>((resolve) => setImmediate(resolve));
+  }
+  throw new Error('waitUntil timed out');
+}
