@@ -1,17 +1,13 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { NewsAnalysis } from '../analysis/entities/news-analysis.entity';
 import {
   Paginated,
-  parseIsoDate,
-  parseIsoDateRangeEnd,
+  parseDateRange,
   parseLimit,
   parsePage,
+  parseTicker,
 } from '../common/list-query';
 import { NewsArticle } from './entities/news-article.entity';
 
@@ -22,8 +18,6 @@ export type ListNewsQuery = {
   from?: string;
   to?: string;
 };
-
-const TICKER_PATTERN = /^[A-Z0-9.\-^]{1,12}$/;
 
 @Injectable()
 export class NewsQueryService {
@@ -99,23 +93,9 @@ export class NewsQueryService {
     from?: Date;
     to?: Date;
   } {
-    let ticker: string | undefined;
-    if (query.ticker !== undefined) {
-      ticker = query.ticker.trim().toUpperCase();
-      if (!TICKER_PATTERN.test(ticker)) {
-        throw new BadRequestException(
-          'ticker must be 1-12 chars (letters, digits, ".", "-", "^")',
-        );
-      }
-    }
-
-    const from = query.from ? parseIsoDate(query.from, 'from') : undefined;
-    const to = query.to ? parseIsoDateRangeEnd(query.to, 'to') : undefined;
-    if (from && to && to < from) {
-      throw new BadRequestException('to must be >= from');
-    }
-
-    return { ticker, from, to };
+    const ticker =
+      query.ticker !== undefined ? parseTicker(query.ticker) : undefined;
+    return { ticker, ...parseDateRange(query.from, query.to) };
   }
 
   private applyDateRange(
