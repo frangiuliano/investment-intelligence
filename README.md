@@ -69,7 +69,7 @@ falta una variable obligatoria de runtime (mensaje explícito vía Joi).
 | `DIGEST_LOOKBACK_HOURS` | No (default `24`) | Ventana de candidatos al digesto (1–168) |
 | `STORY_CLUSTER_WINDOW_HOURS` | No (default `24`) | Ventana para colapsar historias duplicadas en un solo push |
 | `WATCHLIST_TICKERS` | No | Filtro opcional de tickers para relevancia |
-| `DASHBOARD_API_KEY` | No (default vacío) | Secret BFF → Nest (`x-dashboard-api-key`); vacío = `/reviews` en 401 |
+| `DASHBOARD_API_KEY` | No (default vacío) | Secret BFF → Nest (`x-dashboard-api-key`); vacío = `/reviews` y `/news/*` en 401 |
 | `REVIEW_CRON_SCHEDULE` | No (default `0 12 1 * *`) | Cron mensual: día 1 UTC revisa el **mes UTC anterior** |
 
 `APP_LOCALE` define el idioma de salida de la app (un locale por deploy).
@@ -699,6 +699,45 @@ calendario UTC actual si se omiten. `notify: false` persiste sin Telegram.
 Cron default: `REVIEW_CRON_SCHEDULE=0 12 1 * *` (día 1, 12:00 UTC).
 Ese tick revisa el **mes UTC anterior** (cierre de mes). On-demand sin args
 (`/review`, `review:once`, `POST /reviews/run` vacío) usa el mes UTC **actual**.
+
+## API de lectura de noticias (dashboard)
+
+Endpoints **solo lectura** para el BFF del dashboard (ADR 003). Requieren el
+header `x-dashboard-api-key` (`DASHBOARD_API_KEY`); con la variable vacía
+responden `401`. No re-corren el pipeline ni editan artículos.
+
+| Endpoint | Descripción |
+|----------|-------------|
+| `GET /news/articles` | Artículos paginados, con `analysis` embebido si existe |
+| `GET /news/articles/:id` | Detalle de un artículo + análisis asociado (`404` si no existe) |
+| `GET /news/analyses` | Análisis paginados (orden `analyzed_at` DESC) |
+
+Query params comunes (list): `page` (default `1`), `limit` (default `20`,
+máx `100`), `ticker` (matchea contra `analysis.tickers`, case-insensitive),
+`from` / `to` (ISO; sobre `created_at` de artículos — fecha de **ingesta**,
+no `published_at` — y `analyzed_at` de análisis). Un `to` fecha-sola
+(`YYYY-MM-DD`) es **inclusivo**: cubre ese día UTC completo. Shape de
+respuesta paginada: `{ items, page, limit, total }`.
+
+```bash
+export DASHBOARD_API_KEY=pick_a_long_random_string
+
+# Listar artículos (con filtros opcionales)
+curl -s 'http://localhost:3000/news/articles?page=1&limit=20&ticker=AAPL' \
+  -H "x-dashboard-api-key: $DASHBOARD_API_KEY" | jq
+
+# Detalle de artículo (incluye analysis si existe)
+curl -s "http://localhost:3000/news/articles/<id>" \
+  -H "x-dashboard-api-key: $DASHBOARD_API_KEY" | jq
+
+# Listar análisis
+curl -s 'http://localhost:3000/news/analyses?from=2026-07-01&to=2026-07-31' \
+  -H "x-dashboard-api-key: $DASHBOARD_API_KEY" | jq
+```
+
+Los campos de respuesta salen tal cual de `news_articles` / `news_analysis`
+(sin datos de mercado inventados): `analysis` incluye `headline`, `summary`,
+`sentiment`, `tickers`, `materiality`, `eventType`, `model`, `analyzedAt`.
 
 ## Brief on-demand (`/brief`)
 
