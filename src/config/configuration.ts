@@ -12,7 +12,10 @@ import {
   DEFAULT_MARKET_DATA_TIMEOUT_MS,
   DEFAULT_REVIEW_CRON_SCHEDULE,
   DEFAULT_STORY_CLUSTER_WINDOW_HOURS,
+  DEFAULT_TECHNICAL_CHART_ENABLED,
+  DEFAULT_TECHNICAL_CHART_MAX_BARS,
   parseFeedUrls,
+  parseSmaPeriods,
   parseTelegramAllowedUserIds,
   parseWatchlistTickers,
 } from './env.validation';
@@ -28,6 +31,14 @@ function resolveAppLocale(raw: string | undefined): AppLocale {
   }
 
   return DEFAULT_APP_LOCALE;
+}
+
+function resolveTechnicalChartEnabled(raw: string | undefined): boolean {
+  const normalized = raw?.trim().toLowerCase();
+  if (!normalized) {
+    return DEFAULT_TECHNICAL_CHART_ENABLED;
+  }
+  return normalized !== 'false' && normalized !== '0';
 }
 
 export type AppConfig = {
@@ -71,6 +82,11 @@ export type AppConfig = {
   };
   review: {
     cronSchedule: string;
+  };
+  technicalChart: {
+    enabled: boolean;
+    smaPeriods: number[];
+    maxBars: number;
   };
 };
 
@@ -142,5 +158,14 @@ export default (): AppConfig => ({
   review: {
     cronSchedule:
       process.env.REVIEW_CRON_SCHEDULE?.trim() ?? DEFAULT_REVIEW_CRON_SCHEDULE,
+  },
+  technicalChart: {
+    enabled: resolveTechnicalChartEnabled(process.env.TECHNICAL_CHART_ENABLED),
+    smaPeriods: parseSmaPeriods(process.env.TECHNICAL_CHART_SMA_PERIODS),
+    maxBars: parseInt(
+      process.env.TECHNICAL_CHART_MAX_BARS ??
+        String(DEFAULT_TECHNICAL_CHART_MAX_BARS),
+      10,
+    ),
   },
 });
