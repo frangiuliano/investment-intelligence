@@ -32,6 +32,8 @@ export function parseLimit(limit?: number): number {
   return limit;
 }
 
+const DATE_ONLY_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+
 export function parseIsoDate(value: string, field: string): Date {
   if (typeof value !== 'string' || value.trim() === '') {
     throw new BadRequestException(`${field} must be a valid ISO date`);
@@ -39,6 +41,19 @@ export function parseIsoDate(value: string, field: string): Date {
   const parsed = new Date(value);
   if (Number.isNaN(parsed.getTime())) {
     throw new BadRequestException(`${field} must be a valid ISO date`);
+  }
+  return parsed;
+}
+
+/**
+ * Parses an upper-bound date used with `<=`. Date-only inputs (YYYY-MM-DD)
+ * are normalized to the end of that UTC day so the range edge is inclusive
+ * (e.g. `to=2026-07-31` covers the whole 31st, not just midnight).
+ */
+export function parseIsoDateRangeEnd(value: string, field: string): Date {
+  const parsed = parseIsoDate(value, field);
+  if (DATE_ONLY_PATTERN.test(value.trim())) {
+    parsed.setUTCHours(23, 59, 59, 999);
   }
   return parsed;
 }

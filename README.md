@@ -714,8 +714,10 @@ responden `401`. No re-corren el pipeline ni editan artículos.
 
 Query params comunes (list): `page` (default `1`), `limit` (default `20`,
 máx `100`), `ticker` (matchea contra `analysis.tickers`, case-insensitive),
-`from` / `to` (ISO; sobre `created_at` de artículos y `analyzed_at` de
-análisis). Shape de respuesta paginada: `{ items, page, limit, total }`.
+`from` / `to` (ISO; sobre `created_at` de artículos — fecha de **ingesta**,
+no `published_at` — y `analyzed_at` de análisis). Un `to` fecha-sola
+(`YYYY-MM-DD`) es **inclusivo**: cubre ese día UTC completo. Shape de
+respuesta paginada: `{ items, page, limit, total }`.
 
 ```bash
 export DASHBOARD_API_KEY=pick_a_long_random_string

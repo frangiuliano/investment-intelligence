@@ -9,6 +9,7 @@ import { NewsAnalysis } from '../analysis/entities/news-analysis.entity';
 import {
   Paginated,
   parseIsoDate,
+  parseIsoDateRangeEnd,
   parseLimit,
   parsePage,
 } from '../common/list-query';
@@ -109,7 +110,7 @@ export class NewsQueryService {
     }
 
     const from = query.from ? parseIsoDate(query.from, 'from') : undefined;
-    const to = query.to ? parseIsoDate(query.to, 'to') : undefined;
+    const to = query.to ? parseIsoDateRangeEnd(query.to, 'to') : undefined;
     if (from && to && to < from) {
       throw new BadRequestException('to must be >= from');
     }

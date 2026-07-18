@@ -95,7 +95,7 @@ describe('NewsQueryService', () => {
       );
     });
 
-    it('filters by date range', async () => {
+    it('filters by date range with an inclusive date-only upper bound', async () => {
       await service.findArticles({
         from: '2026-01-01',
         to: '2026-01-31',
@@ -107,7 +107,29 @@ describe('NewsQueryService', () => {
       );
       expect(articlesQb.andWhere).toHaveBeenCalledWith(
         'article.createdAt <= :to',
-        { to: new Date('2026-01-31') },
+        { to: new Date('2026-01-31T23:59:59.999Z') },
+      );
+    });
+
+    it('includes records from the "to" day itself (date-only upper bound)', async () => {
+      await service.findArticles({ to: '2026-07-31' });
+
+      const [, params] = articlesQb.andWhere.mock.calls.find(
+        ([clause]: [string]) => clause === 'article.createdAt <= :to',
+      ) as [string, { to: Date }];
+
+      const recordFromThatDay = new Date('2026-07-31T14:30:00.000Z');
+      expect(recordFromThatDay.getTime()).toBeLessThanOrEqual(
+        params.to.getTime(),
+      );
+    });
+
+    it('keeps an explicit datetime "to" untouched', async () => {
+      await service.findArticles({ to: '2026-01-31T12:00:00.000Z' });
+
+      expect(articlesQb.andWhere).toHaveBeenCalledWith(
+        'article.createdAt <= :to',
+        { to: new Date('2026-01-31T12:00:00.000Z') },
       );
     });
 
