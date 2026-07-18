@@ -152,6 +152,21 @@ export function formatBriefUsageMessage(locale: AppLocale): string {
     : 'Usage: /brief TICKER (e.g. /brief AAPL)';
 }
 
+export function formatBriefChartCaption(
+  symbol: string,
+  locale: AppLocale,
+): string {
+  return locale === 'es'
+    ? `${symbol} — velas diarias con SMA, máximo/mínimo de la ventana y último cierre. Chart ilustrativo de research desde OHLCV verificado. No es asesoramiento de inversión.`
+    : `${symbol} — daily candles with SMA, window high/low and last close. Illustrative research chart from verified OHLCV. Not investment advice.`;
+}
+
+export function formatBriefChartUnavailableMessage(locale: AppLocale): string {
+  return locale === 'es'
+    ? 'El brief se entregó, pero no se pudo generar o enviar la imagen del chart técnico. Revisá logs.'
+    : 'The brief was delivered, but the technical chart image could not be generated or sent. Check logs.';
+}
+
 function buildDisclaimerFooter(
   input: FormatBriefInput,
   labels: BriefMessageLabels,

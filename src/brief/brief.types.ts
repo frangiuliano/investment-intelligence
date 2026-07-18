@@ -1,3 +1,5 @@
+import { MarketSeries } from '../market-data/market-data.types';
+
 export const BRIEF_SECTION_KEYS = [
   'overview',
   'fundamental',
@@ -44,4 +46,5 @@ export type BriefMarketContext = {
   factsBlock: string;
   asOf: Date;
   source: string;
+  series: MarketSeries;
 };

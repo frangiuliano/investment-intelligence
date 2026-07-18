@@ -1,5 +1,6 @@
 import { ConfigService } from '@nestjs/config';
 import { Repository } from 'typeorm';
+import { TechnicalChartService } from '../charts/technical-chart.service';
 import { MarketDataUnavailableError } from '../market-data/market-data.errors';
 import { MarketDataService } from '../market-data/market-data.service';
 import { MarketSeries } from '../market-data/market-data.types';
@@ -50,7 +51,10 @@ describe('BriefService', () => {
     generateBrief?: jest.Mock;
     getSeries?: jest.Mock;
     sendMessage?: jest.Mock;
+    sendPhoto?: jest.Mock;
     save?: jest.Mock;
+    chartEnabled?: boolean;
+    renderTechnicalChart?: jest.Mock;
   }) {
     const holdingsService = {
       findBySymbol: jest.fn().mockResolvedValue(overrides?.holdings ?? []),
@@ -75,7 +79,20 @@ describe('BriefService', () => {
 
     const sendMessage =
       overrides?.sendMessage ?? jest.fn().mockResolvedValue(undefined);
-    const telegramClient = { sendMessage } as unknown as TelegramClient;
+    const sendPhoto =
+      overrides?.sendPhoto ?? jest.fn().mockResolvedValue(undefined);
+    const telegramClient = {
+      sendMessage,
+      sendPhoto,
+    } as unknown as TelegramClient;
+
+    const renderTechnicalChart =
+      overrides?.renderTechnicalChart ??
+      jest.fn().mockReturnValue(Buffer.from('fake-png'));
+    const technicalChartService = {
+      isEnabled: jest.fn().mockReturnValue(overrides?.chartEnabled ?? true),
+      renderTechnicalChart,
+    } as unknown as TechnicalChartService;
 
     const saved: ResearchBrief = {
       id: 'brief-1',
@@ -117,6 +134,7 @@ describe('BriefService', () => {
       holdingsService,
       marketDataService,
       briefGeminiClient,
+      technicalChartService,
       telegramClient,
       repository,
     );
@@ -127,6 +145,8 @@ describe('BriefService', () => {
       generateBrief,
       getSeries,
       sendMessage,
+      sendPhoto,
+      renderTechnicalChart,
       save,
     };
   }
@@ -333,6 +353,85 @@ describe('BriefService', () => {
     });
     const first = await firstPromise;
     expect(first.ok).toBe(true);
+  });
+
+  it('sends the technical chart as a follow-up photo after the brief text', async () => {
+    const { service, sendMessage, sendPhoto, renderTechnicalChart } =
+      createService();
+
+    const result = await service.requestBrief('AAPL');
+
+    expect(result.ok).toBe(true);
+    expect(renderTechnicalChart).toHaveBeenCalledWith(
+      expect.objectContaining({ symbol: 'AAPL', bars: seriesFixture.bars }),
+    );
+    expect(sendPhoto).toHaveBeenCalledTimes(1);
+    const [photo, caption] = sendPhoto.mock.calls[0] as [Buffer, string];
+    expect(Buffer.isBuffer(photo)).toBe(true);
+    expect(caption).toContain('AAPL');
+    expect(caption).toContain('Not investment advice');
+    expect(sendMessage).toHaveBeenCalledTimes(1);
+  });
+
+  it('skips the chart when market data is unavailable', async () => {
+    const getSeries = jest
+      .fn()
+      .mockRejectedValue(
+        new MarketDataUnavailableError('AAPL', 'not_found', 'missing'),
+      );
+    const { service, sendPhoto, renderTechnicalChart } = createService({
+      getSeries,
+    });
+
+    const result = await service.requestBrief('AAPL');
+
+    expect(result.ok).toBe(true);
+    expect(renderTechnicalChart).not.toHaveBeenCalled();
+    expect(sendPhoto).not.toHaveBeenCalled();
+  });
+
+  it('skips the chart when the feature is disabled', async () => {
+    const { service, sendPhoto, renderTechnicalChart } = createService({
+      chartEnabled: false,
+    });
+
+    const result = await service.requestBrief('AAPL');
+
+    expect(result.ok).toBe(true);
+    expect(renderTechnicalChart).not.toHaveBeenCalled();
+    expect(sendPhoto).not.toHaveBeenCalled();
+  });
+
+  it('still delivers the brief and reports chart failure when render throws', async () => {
+    const renderTechnicalChart = jest.fn(() => {
+      throw new Error('render exploded');
+    });
+    const { service, sendMessage, sendPhoto } = createService({
+      renderTechnicalChart,
+    });
+
+    const result = await service.requestBrief('AAPL');
+
+    expect(result.ok).toBe(true);
+    expect(sendPhoto).not.toHaveBeenCalled();
+    expect(sendMessage).toHaveBeenCalledWith(expect.stringContaining('chart'));
+    expect(sendMessage).toHaveBeenCalledWith(
+      expect.stringContaining('Research stance'),
+    );
+  });
+
+  it('still succeeds and reports chart failure when sendPhoto fails', async () => {
+    const sendPhoto = jest.fn().mockRejectedValue(new Error('photo failed'));
+    const { service, sendMessage } = createService({ sendPhoto });
+
+    const result = await service.requestBrief('AAPL');
+
+    expect(result.ok).toBe(true);
+    expect(sendMessage).toHaveBeenCalledWith(
+      expect.stringContaining(
+        'the technical chart image could not be generated or sent',
+      ),
+    );
   });
 
   it('reports delivery failure when Telegram send fails after persist', async () => {

@@ -7,6 +7,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { TechnicalChartService } from '../charts/technical-chart.service';
 import { AppLocale } from '../config/env.validation';
 import { MarketDataUnavailableError } from '../market-data/market-data.errors';
 import { MarketDataService } from '../market-data/market-data.service';
@@ -17,6 +18,8 @@ import { BriefGeminiClient } from './brief-gemini.client';
 import { buildMarketFactsBlock } from './brief-market-facts';
 import {
   formatBriefBusyMessage,
+  formatBriefChartCaption,
+  formatBriefChartUnavailableMessage,
   formatBriefDeliveryErrorMessage,
   formatBriefErrorMessage,
   formatBriefMessage,
@@ -47,6 +50,7 @@ export class BriefService {
     private readonly holdingsService: HoldingsService,
     private readonly marketDataService: MarketDataService,
     private readonly briefGeminiClient: BriefGeminiClient,
+    private readonly technicalChartService: TechnicalChartService,
     private readonly telegramClient: TelegramClient,
     @InjectRepository(ResearchBrief)
     private readonly researchBriefsRepository: Repository<ResearchBrief>,
@@ -123,6 +127,7 @@ export class BriefService {
 
       try {
         await this.telegramClient.sendMessage(message);
+        await this.sendChartFollowUp(symbol, market, locale);
         return { brief: persistedBrief, message, ok: true };
       } catch (sendError) {
         const detail =
@@ -167,6 +172,35 @@ export class BriefService {
     return result.brief;
   }
 
+  /**
+   * Chart errors are isolated on purpose (ADR 004): a render or sendPhoto
+   * failure must never fail the already-delivered textual brief.
+   */
+  private async sendChartFollowUp(
+    symbol: string,
+    market: BriefMarketContext | null,
+    locale: AppLocale,
+  ): Promise<void> {
+    if (!market || !this.technicalChartService.isEnabled()) {
+      return;
+    }
+
+    try {
+      const chart = this.technicalChartService.renderTechnicalChart(
+        market.series,
+      );
+      await this.telegramClient.sendPhoto(
+        chart,
+        formatBriefChartCaption(symbol, locale),
+      );
+    } catch (chartError) {
+      const detail =
+        chartError instanceof Error ? chartError.message : String(chartError);
+      this.logger.error(`Technical chart failed for ${symbol}: ${detail}`);
+      await this.safeSend(formatBriefChartUnavailableMessage(locale));
+    }
+  }
+
   private async resolveMarketContext(
     symbol: string,
   ): Promise<BriefMarketContext | null> {
@@ -176,6 +210,7 @@ export class BriefService {
         factsBlock: buildMarketFactsBlock(series),
         asOf: new Date(series.asOf),
         source: series.source,
+        series,
       };
     } catch (error) {
       if (!(error instanceof MarketDataUnavailableError)) {
