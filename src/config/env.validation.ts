@@ -21,6 +21,10 @@ export const DEFAULT_MARKET_DATA_PROVIDER = 'yahoo' as const;
 export const DEFAULT_MARKET_DATA_TIMEOUT_MS = 10_000;
 /** First day of each month at 12:00 UTC — period review of hypotheses. */
 export const DEFAULT_REVIEW_CRON_SCHEDULE = '0 12 1 * *';
+/** Technical chart follow-up for briefs (ADR 004). */
+export const DEFAULT_TECHNICAL_CHART_ENABLED = true;
+export const DEFAULT_TECHNICAL_CHART_SMA_PERIODS = '20';
+export const DEFAULT_TECHNICAL_CHART_MAX_BARS = 90;
 
 export function parseFeedUrls(raw: string | undefined): string[] {
   if (!raw) {
@@ -51,6 +55,28 @@ export function parseWatchlistTickers(raw: string | undefined): string[] {
   }
 
   return tickers;
+}
+
+/** Comma-separated SMA window sizes (positive integers, deduplicated). */
+export function parseSmaPeriods(raw: string | undefined): number[] {
+  const source =
+    raw && raw.trim() !== '' ? raw : DEFAULT_TECHNICAL_CHART_SMA_PERIODS;
+
+  const seen = new Set<number>();
+  const periods: number[] = [];
+  for (const part of source.split(',')) {
+    const trimmed = part.trim();
+    if (!/^\d+$/.test(trimmed)) {
+      continue;
+    }
+    const period = parseInt(trimmed, 10);
+    if (period < 1 || seen.has(period)) {
+      continue;
+    }
+    seen.add(period);
+    periods.push(period);
+  }
+  return periods;
 }
 
 /** Comma-separated Telegram user ids (positive integers as strings). */
@@ -180,4 +206,25 @@ export const envValidationSchema = Joi.object({
     .trim()
     .min(1)
     .default(DEFAULT_REVIEW_CRON_SCHEDULE),
+  TECHNICAL_CHART_ENABLED: Joi.boolean().default(
+    DEFAULT_TECHNICAL_CHART_ENABLED,
+  ),
+  TECHNICAL_CHART_SMA_PERIODS: Joi.string()
+    .optional()
+    .allow('')
+    .custom((value: string, helpers) => {
+      if (parseSmaPeriods(value).length === 0) {
+        return helpers.error('technicalChart.noPeriods');
+      }
+      return value;
+    })
+    .messages({
+      'technicalChart.noPeriods':
+        'TECHNICAL_CHART_SMA_PERIODS must include at least one positive integer (e.g. "20" or "20,50")',
+    }),
+  TECHNICAL_CHART_MAX_BARS: Joi.number()
+    .integer()
+    .min(5)
+    .max(365)
+    .default(DEFAULT_TECHNICAL_CHART_MAX_BARS),
 });

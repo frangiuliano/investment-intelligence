@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { TELEGRAM_REQUEST_TIMEOUT_MS } from './telegram.constants';
+import {
+  TELEGRAM_MAX_CAPTION_LENGTH,
+  TELEGRAM_REQUEST_TIMEOUT_MS,
+} from './telegram.constants';
 
 export class TelegramApiError extends Error {
   constructor(
@@ -18,9 +21,42 @@ export class TelegramClient {
   constructor(private readonly configService: ConfigService) {}
 
   async sendMessage(text: string): Promise<void> {
-    const botToken = this.configService.getOrThrow<string>('telegram.botToken');
     const chatId = this.configService.getOrThrow<string>('telegram.chatId');
-    const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+    await this.postToBotApi('sendMessage', {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text,
+        disable_web_page_preview: false,
+      }),
+    });
+  }
+
+  async sendPhoto(photo: Buffer, caption?: string): Promise<void> {
+    const chatId = this.configService.getOrThrow<string>('telegram.chatId');
+
+    const form = new FormData();
+    form.append('chat_id', chatId);
+    form.append(
+      'photo',
+      new Blob([new Uint8Array(photo)], { type: 'image/png' }),
+      'chart.png',
+    );
+    if (caption) {
+      form.append('caption', truncateCaption(caption));
+    }
+
+    await this.postToBotApi('sendPhoto', { body: form });
+  }
+
+  private async postToBotApi(
+    method: 'sendMessage' | 'sendPhoto',
+    request: { headers?: Record<string, string>; body: BodyInit },
+  ): Promise<void> {
+    const botToken = this.configService.getOrThrow<string>('telegram.botToken');
+    const url = `https://api.telegram.org/bot${botToken}/${method}`;
 
     const controller = new AbortController();
     const timeout = setTimeout(
@@ -31,14 +67,8 @@ export class TelegramClient {
     try {
       const response = await fetch(url, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          chat_id: chatId,
-          text,
-          disable_web_page_preview: false,
-        }),
+        headers: request.headers,
+        body: request.body,
         signal: controller.signal,
       });
 
@@ -59,7 +89,7 @@ export class TelegramClient {
 
       if (!data.ok) {
         throw new TelegramApiError(
-          `Telegram API rejected message: ${truncateLogBody(data.description ?? 'unknown error')}`,
+          `Telegram API rejected ${method}: ${truncateLogBody(data.description ?? 'unknown error')}`,
           undefined,
           false,
         );
@@ -134,6 +164,13 @@ function createAbortError(): Error {
   const error = new Error('This operation was aborted');
   error.name = 'AbortError';
   return error;
+}
+
+function truncateCaption(caption: string): string {
+  if (caption.length <= TELEGRAM_MAX_CAPTION_LENGTH) {
+    return caption;
+  }
+  return `${caption.slice(0, TELEGRAM_MAX_CAPTION_LENGTH - 1)}…`;
 }
 
 function truncateLogBody(body: string, maxLength = 500): string {

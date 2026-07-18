@@ -10,7 +10,10 @@ import {
   DEFAULT_MARKET_DATA_TIMEOUT_MS,
   DEFAULT_REVIEW_CRON_SCHEDULE,
   DEFAULT_STORY_CLUSTER_WINDOW_HOURS,
+  DEFAULT_TECHNICAL_CHART_ENABLED,
+  DEFAULT_TECHNICAL_CHART_MAX_BARS,
   envValidationSchema,
+  parseSmaPeriods,
   parseWatchlistTickers,
 } from './env.validation';
 
@@ -210,6 +213,67 @@ describe('envValidationSchema', () => {
       expect(error).toBeDefined();
       expect(error?.message).toContain('MARKET_DATA_TIMEOUT_MS');
     }
+  });
+
+  it('applies technical chart defaults', () => {
+    const result = envValidationSchema.validate(validEnv);
+    const value = result.value as ValidatedEnv & {
+      TECHNICAL_CHART_ENABLED: boolean;
+      TECHNICAL_CHART_MAX_BARS: number;
+    };
+
+    expect(result.error).toBeUndefined();
+    expect(value.TECHNICAL_CHART_ENABLED).toBe(DEFAULT_TECHNICAL_CHART_ENABLED);
+    expect(value.TECHNICAL_CHART_MAX_BARS).toBe(
+      DEFAULT_TECHNICAL_CHART_MAX_BARS,
+    );
+  });
+
+  it('accepts TECHNICAL_CHART_ENABLED=false and comma-separated SMA periods', () => {
+    const { error } = envValidationSchema.validate({
+      ...validEnv,
+      TECHNICAL_CHART_ENABLED: 'false',
+      TECHNICAL_CHART_SMA_PERIODS: '20, 50',
+    });
+
+    expect(error).toBeUndefined();
+  });
+
+  it('rejects TECHNICAL_CHART_SMA_PERIODS without any valid period', () => {
+    const { error } = envValidationSchema.validate({
+      ...validEnv,
+      TECHNICAL_CHART_SMA_PERIODS: 'abc, -5, 0',
+    });
+
+    expect(error).toBeDefined();
+    expect(error?.message).toContain('TECHNICAL_CHART_SMA_PERIODS');
+  });
+
+  it('rejects TECHNICAL_CHART_MAX_BARS outside the supported range', () => {
+    for (const maxBars of [4, 366]) {
+      const { error } = envValidationSchema.validate({
+        ...validEnv,
+        TECHNICAL_CHART_MAX_BARS: maxBars,
+      });
+
+      expect(error).toBeDefined();
+      expect(error?.message).toContain('TECHNICAL_CHART_MAX_BARS');
+    }
+  });
+});
+
+describe('parseSmaPeriods', () => {
+  it('falls back to the default when unset or blank', () => {
+    expect(parseSmaPeriods(undefined)).toEqual([20]);
+    expect(parseSmaPeriods('')).toEqual([20]);
+  });
+
+  it('parses, trims, and deduplicates positive integer periods', () => {
+    expect(parseSmaPeriods(' 20 , 50, 20 ')).toEqual([20, 50]);
+  });
+
+  it('ignores invalid entries', () => {
+    expect(parseSmaPeriods('abc, -5, 0, 10')).toEqual([10]);
   });
 });
 

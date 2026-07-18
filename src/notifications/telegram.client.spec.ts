@@ -84,6 +84,53 @@ describe('TelegramClient', () => {
     await expect(client.sendMessage('hello')).rejects.toThrow(/chat not found/);
   });
 
+  it('should upload the photo as multipart form data with caption', async () => {
+    fetchMock.mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ ok: true }),
+    });
+
+    await client.sendPhoto(Buffer.from('fake-png-bytes'), 'AAPL chart');
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const [url, options] = fetchMock.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe('https://api.telegram.org/bottest-bot-token/sendPhoto');
+    expect(options.method).toBe('POST');
+    const form = options.body as FormData;
+    expect(form).toBeInstanceOf(FormData);
+    expect(form.get('chat_id')).toBe('123456789');
+    expect(form.get('caption')).toBe('AAPL chart');
+    const photo = form.get('photo') as File;
+    expect(photo.type).toBe('image/png');
+    expect(photo.size).toBe(Buffer.from('fake-png-bytes').length);
+  });
+
+  it('should truncate photo captions above the Telegram limit', async () => {
+    fetchMock.mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ ok: true }),
+    });
+
+    await client.sendPhoto(Buffer.from('png'), 'x'.repeat(2_000));
+
+    const [, options] = fetchMock.mock.calls[0] as [string, RequestInit];
+    const caption = (options.body as FormData).get('caption') as string;
+    expect(caption.length).toBe(1_024);
+    expect(caption.endsWith('…')).toBe(true);
+  });
+
+  it('should throw TelegramApiError when sendPhoto is rejected', async () => {
+    fetchMock.mockResolvedValue({
+      ok: true,
+      json: () =>
+        Promise.resolve({ ok: false, description: 'photo too large' }),
+    });
+
+    await expect(client.sendPhoto(Buffer.from('png'))).rejects.toThrow(
+      /photo too large/,
+    );
+  });
+
   it('should throw a retryable error on timeout', async () => {
     jest.useFakeTimers();
     fetchMock.mockImplementation(
