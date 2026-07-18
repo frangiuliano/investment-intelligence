@@ -71,6 +71,9 @@ falta una variable obligatoria de runtime (mensaje explícito vía Joi).
 | `WATCHLIST_TICKERS` | No | Filtro opcional de tickers para relevancia |
 | `DASHBOARD_API_KEY` | No (default vacío) | Secret BFF → Nest (`x-dashboard-api-key`); vacío = `/reviews` y `/news/*` en 401 |
 | `REVIEW_CRON_SCHEDULE` | No (default `0 12 1 * *`) | Cron mensual: día 1 UTC revisa el **mes UTC anterior** |
+| `TECHNICAL_CHART_ENABLED` | No (default `true`) | Enviar chart técnico en imagen tras un brief con market data |
+| `TECHNICAL_CHART_SMA_PERIODS` | No (default `20`) | Ventanas SMA del overlay, separadas por coma (ej. `20,50`) |
+| `TECHNICAL_CHART_MAX_BARS` | No (default `90`) | Máx. barras diarias renderizadas (5–365) |
 
 `APP_LOCALE` define el idioma de salida de la app (un locale por deploy).
 Valores permitidos: `en`, `es` (default `en`). Si el valor no está permitido,
@@ -808,8 +811,42 @@ Validar stance vs holdings:
 3. Forzar fallo de provider (ticker inválido o red) → mensaje de insuficiencia,
    `stance` null, sin números inventados.
 
-Límites: 1 brief a la vez; charts en imagen son #57; no es asesoramiento de
-inversión ni ejecución de órdenes.
+Límites: 1 brief a la vez; no es asesoramiento de inversión ni ejecución de
+órdenes.
+
+### Chart técnico en imagen (follow-up del brief)
+
+Cuando el brief tiene market data adjunto y `TECHNICAL_CHART_ENABLED=true`
+(default), después del texto llega una **imagen PNG** (~1280×720) por
+`sendPhoto`, renderizada de forma **determinista** desde las mismas barras
+OHLCV del provider (ADR 004). No se persiste: se genera en memoria, se envía
+y se descarta.
+
+Marcas incluidas (ilustrativas, computadas solo desde OHLCV — no "confirman"
+la postura):
+
+- **Velas diarias** de la misma ventana del brief, cap por
+  `TECHNICAL_CHART_MAX_BARS` (default 90).
+- **SMA sobre cierres** por cada período de `TECHNICAL_CHART_SMA_PERIODS`
+  (default `20`); si la ventana tiene menos barras que el período, la línea
+  se omite sin fallar.
+- **Niveles horizontales**: máximo/mínimo de la ventana visible y último
+  cierre.
+
+Degradación: sin market data no hay chart (consistente con stance `null`).
+Si el render o el `sendPhoto` fallan, el brief textual ya fue entregado y
+llega un aviso corto de "chart no disponible" — el error del chart nunca
+tira el brief. Render server-side con `@napi-rs/canvas` (binarios prebuilt
+glibc/musl; sin cairo/pango en Alpine).
+
+Validar en local:
+
+```bash
+npm run migration:run
+npm run brief:once -- AAPL
+# En Telegram: primero el texto del brief, luego la foto del chart.
+# TECHNICAL_CHART_ENABLED=false npm run brief:once -- AAPL → solo texto.
+```
 
 ## Market data OHLCV
 
