@@ -1,11 +1,133 @@
-import { AreaPlaceholder } from "@/components/area-placeholder"
+import Link from "next/link"
 
-export default function ReviewsPage() {
+import { EmptyState, ErrorState } from "@/components/data-states"
+import { PageHeader } from "@/components/page-header"
+import { Pagination } from "@/components/pagination"
+import { Badge } from "@/components/ui/badge"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import { parsePageParam } from "@/lib/api/query"
+import { listHypotheses, listReviews } from "@/lib/api/research"
+import type { HypothesisReview, Paginated } from "@/lib/api/types"
+import {
+  formatDateTime,
+  formatReturnPct,
+  outcomeLabel,
+  outcomeTone,
+} from "@/lib/display"
+
+import { RunReviewForm } from "./run-review-form"
+
+export const dynamic = "force-dynamic"
+
+type ReviewsPageProps = {
+  searchParams: Promise<{ page?: string }>
+}
+
+async function buildSymbolIndex(): Promise<Map<string, string>> {
+  const [open, closed] = await Promise.all([
+    listHypotheses("open"),
+    listHypotheses("closed"),
+  ])
+  return new Map(
+    [...open, ...closed].map((hypothesis) => [
+      hypothesis.id,
+      hypothesis.symbol,
+    ])
+  )
+}
+
+export default async function ReviewsPage({ searchParams }: ReviewsPageProps) {
+  const params = await searchParams
+  const page = parsePageParam(params.page)
+
+  let reviews: Paginated<HypothesisReview>
+  let symbolsByHypothesisId: Map<string, string>
+  try {
+    ;[reviews, symbolsByHypothesisId] = await Promise.all([
+      listReviews({ page }),
+      buildSymbolIndex(),
+    ])
+  } catch {
+    return (
+      <section>
+        <PageHeader
+          areaCode="05"
+          title="Reviews"
+          description="Periodic grading of hypotheses against market data: what the thesis got right, what it missed, and what to learn."
+        />
+        <ErrorState message="Reviews could not be loaded. Check that the Nest API is running and reload." />
+      </section>
+    )
+  }
+
   return (
-    <AreaPlaceholder
-      areaCode="05"
-      title="Reviews"
-      description="Study thesis outcomes by period and separate thesis quality from timing without claiming predictive edge."
-    />
+    <section>
+      <PageHeader
+        areaCode="05"
+        title="Reviews"
+        description="Periodic grading of hypotheses against market data: what the thesis got right, what it missed, and what to learn."
+      >
+        <RunReviewForm />
+      </PageHeader>
+
+      {reviews.items.length === 0 ? (
+        <EmptyState message="No reviews yet. Run a review once hypotheses reach their horizon." />
+      ) : (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Hypothesis</TableHead>
+              <TableHead>Outcome</TableHead>
+              <TableHead>Return</TableHead>
+              <TableHead>Reviewed</TableHead>
+              <TableHead className="text-right">Detail</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {reviews.items.map((review) => (
+              <TableRow key={review.id}>
+                <TableCell className="font-mono text-xs font-semibold">
+                  {symbolsByHypothesisId.get(review.hypothesisId) ??
+                    review.hypothesisId.slice(0, 8)}
+                </TableCell>
+                <TableCell>
+                  <Badge tone={outcomeTone(review.outcome)}>
+                    {outcomeLabel(review.outcome)}
+                  </Badge>
+                </TableCell>
+                <TableCell className="font-mono text-xs">
+                  {formatReturnPct(review.priceReturnPct)}
+                </TableCell>
+                <TableCell className="text-muted-foreground">
+                  {formatDateTime(review.createdAt)}
+                </TableCell>
+                <TableCell className="text-right">
+                  <Link
+                    href={`/reviews/${review.id}`}
+                    className="text-xs font-medium underline-offset-4 hover:underline"
+                  >
+                    Open review
+                  </Link>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
+
+      <Pagination
+        basePath="/reviews"
+        page={reviews.page}
+        limit={reviews.limit}
+        total={reviews.total}
+      />
+    </section>
   )
 }
