@@ -21,7 +21,7 @@ export function parseHoldingForm(
   const assetType = parseOneOf(
     readString(formData, "assetType"),
     HOLDING_ASSET_TYPES,
-    "Asset type"
+    "El tipo de activo"
   )
   if (!assetType.ok) {
     return assetType
@@ -29,7 +29,7 @@ export function parseHoldingForm(
 
   const quantity = parsePositiveNumber(
     readString(formData, "quantity"),
-    "Quantity"
+    "La cantidad"
   )
   if (!quantity.ok) {
     return quantity
@@ -37,7 +37,7 @@ export function parseHoldingForm(
 
   const avgEntryPrice = parseNonNegativeNumber(
     readString(formData, "avgEntryPrice"),
-    "Average entry price"
+    "El precio promedio de entrada"
   )
   if (!avgEntryPrice.ok) {
     return avgEntryPrice
@@ -45,7 +45,10 @@ export function parseHoldingForm(
 
   const currency = readString(formData, "currency").toUpperCase()
   if (currency !== "" && !/^[A-Z]{3}$/.test(currency)) {
-    return { ok: false, error: "Currency must be a 3-letter ISO code." }
+    return {
+      ok: false,
+      error: "La moneda debe ser un código ISO de 3 letras.",
+    }
   }
 
   return {

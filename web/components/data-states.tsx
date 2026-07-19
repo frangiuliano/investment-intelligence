@@ -19,7 +19,7 @@ export function ErrorState({ message }: { message: string }) {
         <CircleAlert className="mt-0.5 size-4 shrink-0 text-destructive" />
         <div>
           <p className="text-sm font-medium text-destructive">
-            The backend could not be reached
+            No se pudo conectar con el servicio de datos
           </p>
           <p className="mt-1 text-sm text-muted-foreground">{message}</p>
         </div>

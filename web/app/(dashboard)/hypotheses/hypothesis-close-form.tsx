@@ -31,7 +31,7 @@ export function HypothesisCloseForm({
         size="sm"
         onClick={() => setIsClosing(true)}
       >
-        Close hypothesis
+        Cerrar hipótesis
       </Button>
     )
   }
@@ -41,17 +41,17 @@ export function HypothesisCloseForm({
       <input type="hidden" name="id" value={hypothesisId} />
       <div className="space-y-2">
         <Label htmlFor={`close-note-${hypothesisId}`}>
-          Close note (optional)
+          Nota de cierre (opcional)
         </Label>
         <Input
           id={`close-note-${hypothesisId}`}
           name="closeNote"
-          placeholder={`Why is the ${symbol} hypothesis being closed?`}
+          placeholder={`¿Por qué se cierra la hipótesis de ${symbol}?`}
         />
       </div>
       <div className="flex items-center gap-3">
-        <SubmitButton size="sm" pendingLabel="Closing…">
-          Confirm close
+        <SubmitButton size="sm" pendingLabel="Cerrando…">
+          Confirmar cierre
         </SubmitButton>
         <Button
           type="button"
@@ -59,7 +59,7 @@ export function HypothesisCloseForm({
           size="sm"
           onClick={() => setIsClosing(false)}
         >
-          Cancel
+          Cancelar
         </Button>
         <ActionMessage state={state} />
       </div>

@@ -19,13 +19,13 @@ export function BriefRequestForm() {
       <div className="flex items-end gap-2">
         <Input
           name="ticker"
-          placeholder="Ticker, e.g. AAPL"
+          placeholder="Símbolo, p. ej. AAPL"
           required
           className="w-44 uppercase"
-          aria-label="Ticker to brief"
+          aria-label="Símbolo para el informe"
         />
-        <SubmitButton pendingLabel="Generating… this can take a minute">
-          Request brief
+        <SubmitButton pendingLabel="Generando… puede tardar un minuto">
+          Solicitar informe
         </SubmitButton>
       </div>
       <ActionMessage state={state} />

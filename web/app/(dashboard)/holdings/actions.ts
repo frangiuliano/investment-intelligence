@@ -32,7 +32,7 @@ export async function createHoldingAction(
   try {
     const holding = await createHolding(parsed.value)
     revalidatePath("/holdings")
-    return successState(`${holding.symbol} added to holdings.`)
+    return successState(`${holding.symbol} se agregó a la cartera.`)
   } catch (error) {
     return toErrorState(error)
   }
@@ -53,7 +53,7 @@ export async function updateHoldingAction(
   try {
     const holding = await updateHolding(id, parsed.value)
     revalidatePath("/holdings")
-    return successState(`${holding.symbol} updated.`)
+    return successState(`${holding.symbol} se actualizó.`)
   } catch (error) {
     return toErrorState(error)
   }
@@ -68,7 +68,7 @@ export async function deleteHoldingAction(
   try {
     await deleteHolding(readString(formData, "id"))
     revalidatePath("/holdings")
-    return successState("Holding removed.")
+    return successState("La posición se eliminó.")
   } catch (error) {
     return toErrorState(error)
   }
@@ -88,7 +88,9 @@ export async function createWatchlistEntryAction(
   try {
     const entry = await createWatchlistEntry(parsed.value)
     revalidatePath("/holdings")
-    return successState(`${entry.symbol} added to the watchlist.`)
+    return successState(
+      `${entry.symbol} se agregó a la lista de seguimiento.`
+    )
   } catch (error) {
     return toErrorState(error)
   }
@@ -103,7 +105,7 @@ export async function deleteWatchlistEntryAction(
   try {
     await deleteWatchlistEntry(readString(formData, "id"))
     revalidatePath("/holdings")
-    return successState("Watchlist entry removed.")
+    return successState("El símbolo se eliminó de la lista de seguimiento.")
   } catch (error) {
     return toErrorState(error)
   }

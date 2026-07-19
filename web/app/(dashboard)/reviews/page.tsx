@@ -59,10 +59,10 @@ export default async function ReviewsPage({ searchParams }: ReviewsPageProps) {
       <section>
         <PageHeader
           areaCode="05"
-          title="Reviews"
-          description="Periodic grading of hypotheses against market data: what the thesis got right, what it missed, and what to learn."
+          title="Revisiones"
+          description="Evaluación periódica de hipótesis contra datos de mercado: aciertos, errores y aprendizajes."
         />
-        <ErrorState message="Reviews could not be loaded. Check that the Nest API is running and reload." />
+        <ErrorState message="No se pudieron cargar las revisiones. Verificá que la API Nest esté activa y recargá la página." />
       </section>
     )
   }
@@ -71,23 +71,23 @@ export default async function ReviewsPage({ searchParams }: ReviewsPageProps) {
     <section>
       <PageHeader
         areaCode="05"
-        title="Reviews"
-        description="Periodic grading of hypotheses against market data: what the thesis got right, what it missed, and what to learn."
+        title="Revisiones"
+        description="Evaluación periódica de hipótesis contra datos de mercado: aciertos, errores y aprendizajes."
       >
         <RunReviewForm />
       </PageHeader>
 
       {reviews.items.length === 0 ? (
-        <EmptyState message="No reviews yet. Run a review once hypotheses reach their horizon." />
+        <EmptyState message="Todavía no hay revisiones. Ejecutá una cuando las hipótesis alcancen su horizonte." />
       ) : (
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Hypothesis</TableHead>
-              <TableHead>Outcome</TableHead>
-              <TableHead>Return</TableHead>
-              <TableHead>Reviewed</TableHead>
-              <TableHead className="text-right">Detail</TableHead>
+              <TableHead>Hipótesis</TableHead>
+              <TableHead>Resultado</TableHead>
+              <TableHead>Retorno</TableHead>
+              <TableHead>Revisada</TableHead>
+              <TableHead className="text-right">Detalle</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -113,7 +113,7 @@ export default async function ReviewsPage({ searchParams }: ReviewsPageProps) {
                     href={`/reviews/${review.id}`}
                     className="text-xs font-medium underline-offset-4 hover:underline"
                   >
-                    Open review
+                    Abrir revisión
                   </Link>
                 </TableCell>
               </TableRow>

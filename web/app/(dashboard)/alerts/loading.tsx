@@ -1,5 +1,5 @@
 import { LoadingState } from "@/components/data-states"
 
 export default function Loading() {
-  return <LoadingState label="Loading alerts" />
+  return <LoadingState label="Cargando alertas" />
 }

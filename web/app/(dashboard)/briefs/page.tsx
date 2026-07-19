@@ -15,7 +15,7 @@ import {
 import { parsePageParam } from "@/lib/api/query"
 import { listBriefs } from "@/lib/api/research"
 import type { Paginated, ResearchBrief } from "@/lib/api/types"
-import { formatDateTime, stanceTone } from "@/lib/display"
+import { formatDateTime, stanceLabel, stanceTone } from "@/lib/display"
 
 import { BriefRequestForm } from "./brief-request-form"
 
@@ -37,10 +37,10 @@ export default async function BriefsPage({ searchParams }: BriefsPageProps) {
       <section>
         <PageHeader
           areaCode="04"
-          title="Briefs"
-          description="On-demand educational briefs per ticker: fundamentals, technicals, risks, and an explicit invalidation."
+          title="Informes"
+          description="Informes educativos por símbolo bajo demanda: fundamentos, análisis técnico, riesgos e invalidación explícita."
         />
-        <ErrorState message="Briefs could not be loaded. Check that the Nest API is running and reload." />
+        <ErrorState message="No se pudieron cargar los informes. Verificá que la API Nest esté activa y recargá la página." />
       </section>
     )
   }
@@ -49,23 +49,23 @@ export default async function BriefsPage({ searchParams }: BriefsPageProps) {
     <section>
       <PageHeader
         areaCode="04"
-        title="Briefs"
-        description="On-demand educational briefs per ticker: fundamentals, technicals, risks, and an explicit invalidation."
+        title="Informes"
+        description="Informes educativos por símbolo bajo demanda: fundamentos, análisis técnico, riesgos e invalidación explícita."
       >
         <BriefRequestForm />
       </PageHeader>
 
       {briefs.items.length === 0 ? (
-        <EmptyState message="No briefs yet. Request one for a ticker to get started." />
+        <EmptyState message="Todavía no hay informes. Solicitá uno para un símbolo." />
       ) : (
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Symbol</TableHead>
-              <TableHead>Stance</TableHead>
-              <TableHead>Market data</TableHead>
-              <TableHead>Generated</TableHead>
-              <TableHead className="text-right">Detail</TableHead>
+              <TableHead>Símbolo</TableHead>
+              <TableHead>Postura</TableHead>
+              <TableHead>Datos de mercado</TableHead>
+              <TableHead>Generado</TableHead>
+              <TableHead className="text-right">Detalle</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -77,7 +77,7 @@ export default async function BriefsPage({ searchParams }: BriefsPageProps) {
                 <TableCell>
                   {brief.stance ? (
                     <Badge tone={stanceTone(brief.stance)}>
-                      {brief.stance}
+                      {stanceLabel(brief.stance)}
                     </Badge>
                   ) : (
                     <span className="text-muted-foreground">—</span>
@@ -86,7 +86,7 @@ export default async function BriefsPage({ searchParams }: BriefsPageProps) {
                 <TableCell className="text-muted-foreground">
                   {brief.marketSource
                     ? `${brief.marketSource} · ${formatDateTime(brief.marketAsOf)}`
-                    : "unavailable"}
+                    : "no disponibles"}
                 </TableCell>
                 <TableCell className="text-muted-foreground">
                   {formatDateTime(brief.createdAt)}
@@ -96,7 +96,7 @@ export default async function BriefsPage({ searchParams }: BriefsPageProps) {
                     href={`/briefs/${brief.id}`}
                     className="text-xs font-medium underline-offset-4 hover:underline"
                   >
-                    Open brief
+                    Abrir informe
                   </Link>
                 </TableCell>
               </TableRow>

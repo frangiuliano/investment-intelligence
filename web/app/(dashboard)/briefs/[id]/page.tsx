@@ -17,17 +17,17 @@ import {
   type BriefSectionKey,
   type ResearchBrief,
 } from "@/lib/api/types"
-import { formatDateTime, stanceTone } from "@/lib/display"
+import { formatDateTime, stanceLabel, stanceTone } from "@/lib/display"
 
 export const dynamic = "force-dynamic"
 
 const SECTION_TITLES: Record<BriefSectionKey, string> = {
-  overview: "Overview",
-  fundamental: "Fundamental view",
-  technical: "Technical view",
-  risks: "Risks",
-  invalidation: "Invalidation",
-  disclaimer: "Disclaimer",
+  overview: "Resumen",
+  fundamental: "Análisis fundamental",
+  technical: "Análisis técnico",
+  risks: "Riesgos",
+  invalidation: "Invalidación",
+  disclaimer: "Aviso legal",
 }
 
 type BriefDetailPageProps = {
@@ -48,7 +48,7 @@ export default async function BriefDetailPage({
     }
     return (
       <section>
-        <ErrorState message="The brief could not be loaded. Check that the Nest API is running and reload." />
+        <ErrorState message="No se pudo cargar el informe. Verificá que la API Nest esté activa y recargá la página." />
       </section>
     )
   }
@@ -64,12 +64,12 @@ export default async function BriefDetailPage({
         className="mb-8 inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
       >
         <ArrowLeft className="size-3.5" />
-        All briefs
+        Todos los informes
       </Link>
 
       <div className="mb-10 border-b border-ink/10 pb-6">
         <p className="mb-3 font-mono text-[0.65rem] uppercase tracking-[0.2em] text-muted-foreground">
-          Research brief / {formatDateTime(brief.createdAt)}
+          Informe de análisis / {formatDateTime(brief.createdAt)}
         </p>
         <h1 className="font-heading text-4xl tracking-[-0.03em] sm:text-5xl">
           {brief.symbol}
@@ -77,13 +77,13 @@ export default async function BriefDetailPage({
         <div className="mt-4 flex flex-wrap items-center gap-2">
           {brief.stance ? (
             <Badge tone={stanceTone(brief.stance)}>
-              stance: {brief.stance}
+              postura: {stanceLabel(brief.stance)}
             </Badge>
           ) : null}
           <Badge>
             {brief.marketSource
-              ? `market data: ${brief.marketSource} · ${formatDateTime(brief.marketAsOf)}`
-              : "market data unavailable"}
+              ? `datos de mercado: ${brief.marketSource} · ${formatDateTime(brief.marketAsOf)}`
+              : "datos de mercado no disponibles"}
           </Badge>
         </div>
         {brief.stanceRationale ? (

@@ -22,7 +22,8 @@ export function parseTicker(raw: string): ParseResult<string> {
   if (!TICKER_PATTERN.test(ticker)) {
     return {
       ok: false,
-      error: 'Ticker must be 1-12 characters (letters, digits, ".", "-", "^").',
+      error:
+        'El ticker debe tener entre 1 y 12 caracteres (letras, números, ".", "-", "^").',
     }
   }
   return { ok: true, value: ticker }
@@ -35,7 +36,7 @@ export function parsePositiveNumber(
   const value = raw.trim()
   const parsed = Number(value)
   if (value === "" || !Number.isFinite(parsed) || parsed <= 0) {
-    return { ok: false, error: `${label} must be a number greater than zero.` }
+    return { ok: false, error: `${label} debe ser un número mayor que cero.` }
   }
   return { ok: true, value }
 }
@@ -50,7 +51,7 @@ export function parseNonNegativeNumber(
   }
   const parsed = Number(value)
   if (!Number.isFinite(parsed) || parsed < 0) {
-    return { ok: false, error: `${label} must be zero or a positive number.` }
+    return { ok: false, error: `${label} debe ser cero o un número positivo.` }
   }
   return { ok: true, value }
 }
@@ -61,7 +62,7 @@ export function parsePositiveInteger(
 ): ParseResult<number> {
   const parsed = Number(raw.trim())
   if (!Number.isInteger(parsed) || parsed <= 0) {
-    return { ok: false, error: `${label} must be a whole number above zero.` }
+    return { ok: false, error: `${label} debe ser un número entero mayor que cero.` }
   }
   return { ok: true, value: parsed }
 }
@@ -74,5 +75,8 @@ export function parseOneOf<T extends string>(
   if ((allowed as readonly string[]).includes(raw)) {
     return { ok: true, value: raw as T }
   }
-  return { ok: false, error: `${label} must be one of: ${allowed.join(", ")}.` }
+  return {
+    ok: false,
+    error: `${label} debe ser uno de estos valores: ${allowed.join(", ")}.`,
+  }
 }

@@ -15,7 +15,7 @@ export function PageHeader({
     <div className="mb-10 flex flex-wrap items-end justify-between gap-6 border-b border-ink/10 pb-6">
       <div>
         <p className="mb-3 font-mono text-[0.65rem] uppercase tracking-[0.2em] text-muted-foreground">
-          Research area / {areaCode}
+          Área de análisis / {areaCode}
         </p>
         <h1 className="font-heading text-4xl tracking-[-0.03em] sm:text-5xl">
           {title}

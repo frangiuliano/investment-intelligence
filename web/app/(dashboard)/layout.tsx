@@ -14,11 +14,11 @@ import { Button } from "@/components/ui/button"
 import { hasValidSession } from "@/lib/auth/server-session"
 
 const navigation = [
-  { href: "/holdings", label: "Holdings", icon: BriefcaseBusiness },
-  { href: "/hypotheses", label: "Hypotheses", icon: FlaskConical },
-  { href: "/alerts", label: "Alerts", icon: Bell },
-  { href: "/briefs", label: "Briefs", icon: BookOpenText },
-  { href: "/reviews", label: "Reviews", icon: ClipboardCheck },
+  { href: "/holdings", label: "Cartera", icon: BriefcaseBusiness },
+  { href: "/hypotheses", label: "Hipótesis", icon: FlaskConical },
+  { href: "/alerts", label: "Alertas", icon: Bell },
+  { href: "/briefs", label: "Informes", icon: BookOpenText },
+  { href: "/reviews", label: "Revisiones", icon: ClipboardCheck },
 ]
 
 export default async function DashboardLayout({
@@ -42,19 +42,19 @@ export default async function DashboardLayout({
                 Investment Intelligence
               </p>
               <p className="font-mono text-[0.62rem] uppercase tracking-[0.18em] text-muted-foreground">
-                Research desk
+                Mesa de análisis
               </p>
             </div>
           </Link>
           <form action="/api/auth/logout" method="post">
             <Button type="submit" variant="ghost" size="sm">
               <LogOut data-icon="inline-start" />
-              End session
+              Cerrar sesión
             </Button>
           </form>
         </div>
         <nav
-          aria-label="Research areas"
+          aria-label="Áreas de análisis"
           className="mx-auto flex max-w-[96rem] gap-1 overflow-x-auto px-5 sm:px-8"
         >
           {navigation.map(({ href, label, icon: Icon }) => (

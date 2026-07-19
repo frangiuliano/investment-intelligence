@@ -18,6 +18,7 @@ import {
   formatReturnPct,
   outcomeLabel,
   outcomeTone,
+  priceUnavailableReasonLabel,
 } from "@/lib/display"
 
 export const dynamic = "force-dynamic"
@@ -30,10 +31,10 @@ const NOTE_SECTIONS: Array<{
   key: "explanation" | "thesisQualityNote" | "timingNote" | "learningNote"
   title: string
 }> = [
-  { key: "explanation", title: "What happened" },
-  { key: "thesisQualityNote", title: "Thesis quality" },
-  { key: "timingNote", title: "Timing" },
-  { key: "learningNote", title: "Learning" },
+  { key: "explanation", title: "Qué ocurrió" },
+  { key: "thesisQualityNote", title: "Calidad de la tesis" },
+  { key: "timingNote", title: "Momento" },
+  { key: "learningNote", title: "Aprendizaje" },
 ]
 
 export default async function ReviewDetailPage({
@@ -50,7 +51,7 @@ export default async function ReviewDetailPage({
     }
     return (
       <section>
-        <ErrorState message="The review could not be loaded. Check that the Nest API is running and reload." />
+        <ErrorState message="No se pudo cargar la revisión. Verificá que la API Nest esté activa y recargá la página." />
       </section>
     )
   }
@@ -62,12 +63,12 @@ export default async function ReviewDetailPage({
         className="mb-8 inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
       >
         <ArrowLeft className="size-3.5" />
-        All reviews
+        Todas las revisiones
       </Link>
 
       <div className="mb-10 border-b border-ink/10 pb-6">
         <p className="mb-3 font-mono text-[0.65rem] uppercase tracking-[0.2em] text-muted-foreground">
-          Hypothesis review / {formatDateTime(review.createdAt)}
+          Revisión de hipótesis / {formatDateTime(review.createdAt)}
         </p>
         <h1 className="font-heading text-4xl tracking-[-0.03em]">
           {outcomeLabel(review.outcome)}
@@ -76,17 +77,17 @@ export default async function ReviewDetailPage({
           <Badge tone={outcomeTone(review.outcome)}>
             {outcomeLabel(review.outcome)}
           </Badge>
-          <Badge>return: {formatReturnPct(review.priceReturnPct)}</Badge>
+          <Badge>retorno: {formatReturnPct(review.priceReturnPct)}</Badge>
           {review.marketSource ? (
             <Badge>
-              market data: {review.marketSource} ·{" "}
+              datos de mercado: {review.marketSource} ·{" "}
               {formatDateTime(review.priceAsOf)}
             </Badge>
           ) : (
             <Badge tone="caution">
-              price unavailable
+              precio no disponible
               {review.priceUnavailableReason
-                ? `: ${review.priceUnavailableReason}`
+                ? `: ${priceUnavailableReasonLabel(review.priceUnavailableReason)}`
                 : ""}
             </Badge>
           )}

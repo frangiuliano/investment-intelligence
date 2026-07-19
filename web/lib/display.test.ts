@@ -1,10 +1,16 @@
 import { describe, expect, it } from "vitest"
 
 import {
+  assetTypeLabel,
+  biasLabel,
+  eventTypeLabel,
   formatDateTime,
   formatReturnPct,
+  materialityLabel,
   outcomeLabel,
+  sentimentLabel,
   sentimentTone,
+  stanceLabel,
   stanceTone,
 } from "./display"
 
@@ -22,9 +28,21 @@ describe("stanceTone", () => {
 })
 
 describe("outcomeLabel", () => {
-  it("translates outcome codes to readable labels", () => {
-    expect(outcomeLabel("thesis_confirmed")).toBe("Thesis confirmed")
-    expect(outcomeLabel("timing_issue")).toBe("Timing issue")
+  it("translates outcome codes to Spanish labels", () => {
+    expect(outcomeLabel("thesis_confirmed")).toBe("Tesis confirmada")
+    expect(outcomeLabel("timing_issue")).toBe("Momento inadecuado")
+  })
+})
+
+describe("Spanish display labels", () => {
+  it("localizes persisted English codes without changing their values", () => {
+    expect(stanceLabel("hold")).toBe("Mantener")
+    expect(biasLabel("bullish")).toBe("Alcista")
+    expect(assetTypeLabel("equity")).toBe("Acción")
+    expect(sentimentLabel("positive")).toBe("Positivo")
+    expect(materialityLabel("high")).toBe("Alta")
+    expect(eventTypeLabel("m_and_a")).toBe("Fusión/adquisición")
+    expect(eventTypeLabel("none")).toBeNull()
   })
 })
 
@@ -38,8 +56,8 @@ describe("sentimentTone", () => {
 
 describe("formatReturnPct", () => {
   it("prefixes gains with a plus sign", () => {
-    expect(formatReturnPct(3.456)).toBe("+3.46%")
-    expect(formatReturnPct(-2.1)).toBe("-2.10%")
+    expect(formatReturnPct(3.456)).toBe("+3,46%")
+    expect(formatReturnPct(-2.1)).toBe("-2,10%")
   })
 
   it("renders a dash when the value is unavailable", () => {

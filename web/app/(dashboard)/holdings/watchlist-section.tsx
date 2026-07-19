@@ -45,7 +45,9 @@ function WatchlistRow({ entry }: { entry: WatchlistEntry }) {
             action={deleteFormAction}
             onSubmit={(event) => {
               if (
-                !window.confirm(`Remove ${entry.symbol} from the watchlist?`)
+                !window.confirm(
+                  `¿Eliminar ${entry.symbol} de la lista de seguimiento?`
+                )
               ) {
                 event.preventDefault()
               }
@@ -53,7 +55,7 @@ function WatchlistRow({ entry }: { entry: WatchlistEntry }) {
           >
             <input type="hidden" name="id" value={entry.id} />
             <SubmitButton variant="destructive" size="sm" pendingLabel="…">
-              Remove
+              Eliminar
             </SubmitButton>
           </form>
           <ActionMessage state={deleteState} />
@@ -73,17 +75,17 @@ export function WatchlistSection({ entries }: { entries: WatchlistEntry[] }) {
     <div className="space-y-5">
       {entries.length === 0 ? (
         <p className="text-sm text-muted-foreground">
-          The watchlist is empty. Add a symbol to weight it in relevance
-          scoring.
+          La lista de seguimiento está vacía. Agregá un símbolo para que el
+          motor de relevancia lo tenga en cuenta.
         </p>
       ) : (
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Symbol</TableHead>
-              <TableHead>Notes</TableHead>
-              <TableHead>Added</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead>Símbolo</TableHead>
+              <TableHead>Notas</TableHead>
+              <TableHead>Agregado</TableHead>
+              <TableHead className="text-right">Acciones</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -97,7 +99,7 @@ export function WatchlistSection({ entries }: { entries: WatchlistEntry[] }) {
       <form action={createFormAction} className="space-y-4">
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="watchlist-symbol">Symbol</Label>
+            <Label htmlFor="watchlist-symbol">Símbolo</Label>
             <Input
               id="watchlist-symbol"
               name="symbol"
@@ -107,12 +109,14 @@ export function WatchlistSection({ entries }: { entries: WatchlistEntry[] }) {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="watchlist-notes">Notes</Label>
-            <Input id="watchlist-notes" name="notes" placeholder="Optional" />
+            <Label htmlFor="watchlist-notes">Notas</Label>
+            <Input id="watchlist-notes" name="notes" placeholder="Opcional" />
           </div>
         </div>
         <div className="flex items-center gap-4">
-          <SubmitButton pendingLabel="Adding…">Add to watchlist</SubmitButton>
+          <SubmitButton pendingLabel="Agregando…">
+            Agregar a seguimiento
+          </SubmitButton>
           <ActionMessage state={createState} />
         </div>
       </form>

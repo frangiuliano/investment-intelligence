@@ -16,7 +16,13 @@ import { Input } from "@/components/ui/input"
 import { listNotifications } from "@/lib/api/alerts"
 import { parsePageParam } from "@/lib/api/query"
 import type { Notification, Paginated } from "@/lib/api/types"
-import { formatDateTime, sentimentTone } from "@/lib/display"
+import {
+  eventTypeLabel,
+  formatDateTime,
+  materialityLabel,
+  sentimentLabel,
+  sentimentTone,
+} from "@/lib/display"
 
 export const dynamic = "force-dynamic"
 
@@ -27,15 +33,18 @@ type AlertsPageProps = {
 function AlertCard({ notification }: { notification: Notification }) {
   const article = notification.article
   const analysis = article?.analysis
+  const eventLabel = analysis?.eventType
+    ? eventTypeLabel(analysis.eventType)
+    : null
 
   return (
     <Card size="sm">
       <CardHeader>
         <CardTitle className="text-base leading-snug">
-          {analysis?.headline ?? article?.title ?? "Alert"}
+          {analysis?.headline ?? article?.title ?? "Alerta"}
         </CardTitle>
         <CardDescription>
-          {formatDateTime(notification.sentAt)} · via {notification.channel}
+          {formatDateTime(notification.sentAt)} · vía {notification.channel}
           {article?.source ? ` · ${article.source}` : ""}
         </CardDescription>
       </CardHeader>
@@ -46,13 +55,13 @@ function AlertCard({ notification }: { notification: Notification }) {
         <div className="flex flex-wrap items-center gap-1.5">
           {analysis?.sentiment ? (
             <Badge tone={sentimentTone(analysis.sentiment)}>
-              {analysis.sentiment}
+              {sentimentLabel(analysis.sentiment)}
             </Badge>
           ) : null}
           {analysis?.materiality ? (
-            <Badge>materiality: {analysis.materiality}</Badge>
+            <Badge>materialidad: {materialityLabel(analysis.materiality)}</Badge>
           ) : null}
-          {analysis?.eventType ? <Badge>{analysis.eventType}</Badge> : null}
+          {eventLabel ? <Badge>{eventLabel}</Badge> : null}
           {(analysis?.tickers ?? []).map((ticker) => (
             <Badge key={ticker} tone="caution">
               {ticker}
@@ -66,7 +75,7 @@ function AlertCard({ notification }: { notification: Notification }) {
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1 text-xs font-medium text-foreground underline-offset-4 hover:underline"
           >
-            Read source article
+            Leer artículo original
             <ExternalLink className="size-3" />
           </a>
         ) : null}
@@ -88,10 +97,10 @@ export default async function AlertsPage({ searchParams }: AlertsPageProps) {
       <section>
         <PageHeader
           areaCode="03"
-          title="Alerts"
-          description="Notifications the pipeline already sent. Read-only: alerts are created by the pipeline, never by hand."
+          title="Alertas"
+          description="Notificaciones que el proceso automático ya envió. Solo lectura: las alertas nunca se crean manualmente."
         />
-        <ErrorState message="Alerts could not be loaded. Check that the Nest API is running and reload." />
+        <ErrorState message="No se pudieron cargar las alertas. Verificá que la API Nest esté activa y recargá la página." />
       </section>
     )
   }
@@ -100,19 +109,19 @@ export default async function AlertsPage({ searchParams }: AlertsPageProps) {
     <section>
       <PageHeader
         areaCode="03"
-        title="Alerts"
-        description="Notifications the pipeline already sent. Read-only: alerts are created by the pipeline, never by hand."
+        title="Alertas"
+        description="Notificaciones que el proceso automático ya envió. Solo lectura: las alertas nunca se crean manualmente."
       >
         <form action="/alerts" method="get" className="flex items-end gap-2">
           <Input
             name="ticker"
             defaultValue={ticker ?? ""}
-            placeholder="Filter by ticker"
+            placeholder="Filtrar por símbolo"
             className="w-40 uppercase"
-            aria-label="Filter by ticker"
+            aria-label="Filtrar por símbolo"
           />
           <Button type="submit" variant="outline">
-            Filter
+            Filtrar
           </Button>
         </form>
       </PageHeader>
@@ -121,8 +130,8 @@ export default async function AlertsPage({ searchParams }: AlertsPageProps) {
         <EmptyState
           message={
             ticker
-              ? `No alerts sent for ${ticker} yet.`
-              : "No alerts sent yet. The pipeline posts here once a relevant story clears the materiality bar."
+              ? `Todavía no se enviaron alertas para ${ticker}.`
+              : "Todavía no se enviaron alertas. El proceso automático publicará aquí cuando una noticia relevante supere el umbral de materialidad."
           }
         />
       ) : (

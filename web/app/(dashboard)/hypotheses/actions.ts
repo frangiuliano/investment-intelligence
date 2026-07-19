@@ -26,7 +26,7 @@ export async function createHypothesisAction(
   try {
     const hypothesis = await createHypothesis(parsed.value)
     revalidatePath("/hypotheses")
-    return successState(`Hypothesis for ${hypothesis.symbol} opened.`)
+    return successState(`Se abrió la hipótesis de ${hypothesis.symbol}.`)
   } catch (error) {
     return toErrorState(error)
   }
@@ -44,7 +44,7 @@ export async function closeHypothesisAction(
       readOptionalString(formData, "closeNote") ?? undefined
     )
     revalidatePath("/hypotheses")
-    return successState(`Hypothesis for ${hypothesis.symbol} closed.`)
+    return successState(`Se cerró la hipótesis de ${hypothesis.symbol}.`)
   } catch (error) {
     return toErrorState(error)
   }

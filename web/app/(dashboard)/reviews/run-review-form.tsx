@@ -12,8 +12,8 @@ export function RunReviewForm() {
 
   return (
     <form action={formAction} className="space-y-2 text-right">
-      <SubmitButton pendingLabel="Reviewing… this can take a minute">
-        Run review for current month
+      <SubmitButton pendingLabel="Revisando… puede tardar un minuto">
+        Ejecutar revisión del mes actual
       </SubmitButton>
       <ActionMessage state={state} />
     </form>

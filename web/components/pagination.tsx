@@ -43,7 +43,7 @@ export function Pagination({
 
   return (
     <nav
-      aria-label="Pagination"
+      aria-label="Paginación"
       className="mt-6 flex items-center justify-between"
     >
       <Link
@@ -52,17 +52,17 @@ export function Pagination({
         className={cn(linkClasses, page <= 1 && disabledClasses)}
       >
         <ChevronLeft className="size-3.5" />
-        Previous
+        Anterior
       </Link>
       <p className="font-mono text-[0.65rem] uppercase tracking-[0.16em] text-muted-foreground">
-        Page {page} of {pageCount} · {total} total
+        Página {page} de {pageCount} · {total} en total
       </p>
       <Link
         href={pageHref(basePath, page + 1, extraParams)}
         aria-disabled={page >= pageCount}
         className={cn(linkClasses, page >= pageCount && disabledClasses)}
       >
-        Next
+        Siguiente
         <ChevronRight className="size-3.5" />
       </Link>
     </nav>

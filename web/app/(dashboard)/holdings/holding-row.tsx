@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label"
 import { NativeSelect } from "@/components/ui/select"
 import { TableCell, TableRow } from "@/components/ui/table"
 import { HOLDING_ASSET_TYPES, type Holding } from "@/lib/api/types"
+import { assetTypeLabel } from "@/lib/display"
 import { idleActionState } from "@/lib/forms/action-state"
 
 import { deleteHoldingAction, updateHoldingAction } from "./actions"
@@ -33,7 +34,7 @@ export function HoldingRow({ holding }: { holding: Holding }) {
             <input type="hidden" name="id" value={holding.id} />
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               <div className="space-y-2">
-                <Label htmlFor={`edit-symbol-${holding.id}`}>Symbol</Label>
+                <Label htmlFor={`edit-symbol-${holding.id}`}>Símbolo</Label>
                 <Input
                   id={`edit-symbol-${holding.id}`}
                   name="symbol"
@@ -44,7 +45,7 @@ export function HoldingRow({ holding }: { holding: Holding }) {
               </div>
               <div className="space-y-2">
                 <Label htmlFor={`edit-asset-type-${holding.id}`}>
-                  Asset type
+                  Tipo de activo
                 </Label>
                 <NativeSelect
                   id={`edit-asset-type-${holding.id}`}
@@ -54,13 +55,13 @@ export function HoldingRow({ holding }: { holding: Holding }) {
                 >
                   {HOLDING_ASSET_TYPES.map((assetType) => (
                     <option key={assetType} value={assetType}>
-                      {assetType}
+                      {assetTypeLabel(assetType)}
                     </option>
                   ))}
                 </NativeSelect>
               </div>
               <div className="space-y-2">
-                <Label htmlFor={`edit-quantity-${holding.id}`}>Quantity</Label>
+                <Label htmlFor={`edit-quantity-${holding.id}`}>Cantidad</Label>
                 <Input
                   id={`edit-quantity-${holding.id}`}
                   name="quantity"
@@ -73,7 +74,7 @@ export function HoldingRow({ holding }: { holding: Holding }) {
               </div>
               <div className="space-y-2">
                 <Label htmlFor={`edit-avg-entry-${holding.id}`}>
-                  Avg entry price
+                  Precio promedio de entrada
                 </Label>
                 <Input
                   id={`edit-avg-entry-${holding.id}`}
@@ -85,7 +86,7 @@ export function HoldingRow({ holding }: { holding: Holding }) {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor={`edit-currency-${holding.id}`}>Currency</Label>
+                <Label htmlFor={`edit-currency-${holding.id}`}>Moneda</Label>
                 <Input
                   id={`edit-currency-${holding.id}`}
                   name="currency"
@@ -95,7 +96,7 @@ export function HoldingRow({ holding }: { holding: Holding }) {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor={`edit-notes-${holding.id}`}>Notes</Label>
+                <Label htmlFor={`edit-notes-${holding.id}`}>Notas</Label>
                 <Input
                   id={`edit-notes-${holding.id}`}
                   name="notes"
@@ -104,8 +105,8 @@ export function HoldingRow({ holding }: { holding: Holding }) {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <SubmitButton size="sm" pendingLabel="Saving…">
-                Save changes
+              <SubmitButton size="sm" pendingLabel="Guardando…">
+                Guardar cambios
               </SubmitButton>
               <Button
                 type="button"
@@ -113,7 +114,7 @@ export function HoldingRow({ holding }: { holding: Holding }) {
                 size="sm"
                 onClick={() => setIsEditing(false)}
               >
-                Cancel
+                Cancelar
               </Button>
               <ActionMessage state={updateState} />
             </div>
@@ -129,7 +130,7 @@ export function HoldingRow({ holding }: { holding: Holding }) {
         {holding.symbol}
       </TableCell>
       <TableCell>
-        <Badge>{holding.assetType}</Badge>
+        <Badge>{assetTypeLabel(holding.assetType)}</Badge>
       </TableCell>
       <TableCell className="font-mono text-xs">{holding.quantity}</TableCell>
       <TableCell className="font-mono text-xs">
@@ -147,19 +148,19 @@ export function HoldingRow({ holding }: { holding: Holding }) {
             size="sm"
             onClick={() => setIsEditing(true)}
           >
-            Edit
+            Editar
           </Button>
           <form
             action={deleteFormAction}
             onSubmit={(event) => {
-              if (!window.confirm(`Remove ${holding.symbol} from holdings?`)) {
+              if (!window.confirm(`¿Eliminar ${holding.symbol} de la cartera?`)) {
                 event.preventDefault()
               }
             }}
           >
             <input type="hidden" name="id" value={holding.id} />
             <SubmitButton variant="destructive" size="sm" pendingLabel="…">
-              Remove
+              Eliminar
             </SubmitButton>
           </form>
           <ActionMessage state={deleteState} />

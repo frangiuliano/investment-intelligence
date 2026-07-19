@@ -25,7 +25,7 @@ export async function requestBriefAction(
   try {
     const brief = await requestBrief(ticker.value)
     revalidatePath("/briefs")
-    return successState(`Brief for ${brief.symbol} is ready below.`)
+    return successState(`El informe de ${brief.symbol} está listo.`)
   } catch (error) {
     return toErrorState(error)
   }

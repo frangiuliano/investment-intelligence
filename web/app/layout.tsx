@@ -18,7 +18,8 @@ export const metadata: Metadata = {
     default: "Investment Intelligence",
     template: "%s · Investment Intelligence",
   },
-  description: "Private research desk for investment hypotheses and evidence.",
+  description:
+    "Mesa privada de research para analizar hipótesis de inversión y evidencia.",
 }
 
 export default function RootLayout({
@@ -28,7 +29,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="es"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">{children}</body>

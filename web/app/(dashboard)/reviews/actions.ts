@@ -16,7 +16,7 @@ export async function runReviewAction(
     const result = await runPeriodReview()
     revalidatePath("/reviews")
     return successState(
-      `Review run finished: ${result.run.reviewedCount} reviewed, ${result.run.skippedCount} skipped.`
+      `Revisión finalizada: ${result.run.reviewedCount} evaluadas y ${result.run.skippedCount} omitidas.`
     )
   } catch (error) {
     return toErrorState(error)

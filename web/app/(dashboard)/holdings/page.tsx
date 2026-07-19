@@ -35,10 +35,10 @@ export default async function HoldingsPage() {
       <section>
         <PageHeader
           areaCode="01"
-          title="Holdings"
-          description="Portfolio positions and watchlist that anchor research to the operator's actual exposure."
+          title="Cartera"
+          description="Posiciones y lista de seguimiento que conectan el análisis con la exposición real del operador."
         />
-        <ErrorState message="Holdings and watchlist could not be loaded. Check that the Nest API is running and reload." />
+        <ErrorState message="No se pudieron cargar la cartera ni la lista de seguimiento. Verificá que la API Nest esté activa y recargá la página." />
       </section>
     )
   }
@@ -47,32 +47,32 @@ export default async function HoldingsPage() {
     <section className="space-y-10">
       <PageHeader
         areaCode="01"
-        title="Holdings"
-        description="Portfolio positions and watchlist that anchor research to the operator's actual exposure."
+        title="Cartera"
+        description="Posiciones y lista de seguimiento que conectan el análisis con la exposición real del operador."
       />
 
       <Card>
         <CardHeader>
-          <CardTitle>Positions</CardTitle>
+          <CardTitle>Posiciones</CardTitle>
           <CardDescription>
-            Current holdings weighted by the relevance engine and used as
-            context for briefs.
+            Activos actuales ponderados por el motor de relevancia y usados
+            como contexto para los informes.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {holdings.length === 0 ? (
-            <EmptyState message="No holdings yet. Add the first position below." />
+            <EmptyState message="Todavía no hay posiciones. Agregá la primera debajo." />
           ) : (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Symbol</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Quantity</TableHead>
-                  <TableHead>Avg entry</TableHead>
-                  <TableHead>Currency</TableHead>
-                  <TableHead>Notes</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead>Símbolo</TableHead>
+                  <TableHead>Tipo</TableHead>
+                  <TableHead>Cantidad</TableHead>
+                  <TableHead>Entrada prom.</TableHead>
+                  <TableHead>Moneda</TableHead>
+                  <TableHead>Notas</TableHead>
+                  <TableHead className="text-right">Acciones</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -88,10 +88,10 @@ export default async function HoldingsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Watchlist</CardTitle>
+          <CardTitle>Lista de seguimiento</CardTitle>
           <CardDescription>
-            Symbols without a position that should still surface relevant
-            alerts.
+            Símbolos sin una posición que igualmente deben mostrar alertas
+            relevantes.
           </CardDescription>
         </CardHeader>
         <CardContent>

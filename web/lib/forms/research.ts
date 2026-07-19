@@ -19,7 +19,7 @@ export function parseHypothesisForm(
   const bias = parseOneOf(
     readString(formData, "bias"),
     HYPOTHESIS_BIASES,
-    "Bias"
+    "El sesgo"
   )
   if (!bias.ok) {
     return bias
@@ -27,17 +27,17 @@ export function parseHypothesisForm(
 
   const thesis = readString(formData, "thesis")
   if (thesis === "") {
-    return { ok: false, error: "Thesis is required." }
+    return { ok: false, error: "La tesis es obligatoria." }
   }
 
   const invalidation = readString(formData, "invalidation")
   if (invalidation === "") {
-    return { ok: false, error: "Invalidation condition is required." }
+    return { ok: false, error: "La condición de invalidación es obligatoria." }
   }
 
   const horizonDays = parsePositiveInteger(
     readString(formData, "horizonDays"),
-    "Horizon (days)"
+    "El horizonte (días)"
   )
   if (!horizonDays.ok) {
     return horizonDays
