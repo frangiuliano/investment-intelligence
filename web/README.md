@@ -48,8 +48,10 @@ curl http://localhost:3001/api/health \
   -H "Cookie: research_desk_session=<session-cookie>"
 ```
 
-The BFF forwards the request to `GET /health` with `x-dashboard-api-key`.
-It returns `401` without a valid session and `502` when Nest is unavailable.
+The BFF forwards the request to `GET /health` with `x-dashboard-api-key` and
+mirrors the Nest status and body (for example `503` with a JSON payload when
+the database is down). It returns `401` without a valid session and `502`
+only when Nest is unreachable.
 
 ## Quality checks
 

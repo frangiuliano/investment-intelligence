@@ -5,6 +5,11 @@ type BackendHealth = {
   database?: string
 }
 
+export type BackendHealthResult = {
+  httpStatus: number
+  body: BackendHealth
+}
+
 function getApiConfig() {
   const baseUrl = process.env.API_BASE_URL
   const apiKey = process.env.DASHBOARD_API_KEY
@@ -19,7 +24,10 @@ function getApiConfig() {
   }
 }
 
-export async function getBackendHealth(): Promise<BackendHealth> {
+// Nest replies 503 with a JSON body when the database is down; that is a
+// valid health payload, not a transport failure, so status and body are
+// forwarded as-is. Only network/config errors should throw.
+export async function getBackendHealth(): Promise<BackendHealthResult> {
   const { baseUrl, apiKey } = getApiConfig()
   const healthUrl = new URL("/health", baseUrl)
   const response = await fetch(healthUrl, {
@@ -30,9 +38,8 @@ export async function getBackendHealth(): Promise<BackendHealth> {
     signal: AbortSignal.timeout(5_000),
   })
 
-  if (!response.ok) {
-    throw new Error(`Backend health request failed with ${response.status}`)
+  return {
+    httpStatus: response.status,
+    body: (await response.json()) as BackendHealth,
   }
-
-  return response.json() as Promise<BackendHealth>
 }

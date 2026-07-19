@@ -29,8 +29,9 @@ verify_dir() {
   local abs_dir="$ROOT/$project_dir"
 
   if [ ! -f "$abs_dir/package-lock.json" ]; then
-    echo "verify:lockfile: skip ($project_dir has no package-lock.json)"
-    return 0
+    echo "verify:lockfile: ERROR — $project_dir/package-lock.json is missing." >&2
+    echo "Every directory in PROJECT_DIRS must ship a committed lockfile; CI runs npm ci there." >&2
+    return 1
   fi
 
   local tmp

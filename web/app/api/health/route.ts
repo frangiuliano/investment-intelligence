@@ -9,7 +9,8 @@ export async function GET() {
   }
 
   try {
-    return NextResponse.json(await getBackendHealth())
+    const { httpStatus, body } = await getBackendHealth()
+    return NextResponse.json(body, { status: httpStatus })
   } catch {
     return NextResponse.json(
       { error: "Backend health is unavailable" },
