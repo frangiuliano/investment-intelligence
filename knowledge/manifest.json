@@ -1,0 +1,36 @@
+{
+  "knowledgeVersion": "0.1.0",
+  "updatedAt": "2026-07-22",
+  "playbooks": [
+    {
+      "id": "equity",
+      "path": "playbooks/equity.md",
+      "assetType": "equity"
+    },
+    {
+      "id": "cedear",
+      "path": "playbooks/cedear.md",
+      "assetType": "cedear"
+    },
+    {
+      "id": "bond",
+      "path": "playbooks/bond.md",
+      "assetType": "bond"
+    }
+  ],
+  "rubrics": [
+    {
+      "id": "materiality",
+      "path": "rubrics/materiality.md"
+    },
+    {
+      "id": "event-types",
+      "path": "rubrics/event-types.md"
+    },
+    {
+      "id": "stance-invalidation",
+      "path": "rubrics/stance-invalidation.md"
+    }
+  ],
+  "sources": []
+}

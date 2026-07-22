@@ -1,0 +1,17 @@
+SAMPLE EQUITY EARNINGS FIXTURE (copyright-safe synthetic text)
+
+Company: Example Tech Inc. (ticker: EXTECH)
+Period: Q2 FY2026
+
+Headline: Example Tech reports Q2 results; raises full-year guidance
+
+Body:
+Example Tech Inc. reported fiscal Q2 revenue of $4.2 billion, up 12% year
+over year, and diluted EPS of $1.15 versus consensus of $1.08. Operating
+margin expanded 80 basis points. Management raised full-year revenue
+guidance to $17.0–$17.3 billion from $16.5–$16.9 billion, citing stronger
+cloud demand. The company will host an earnings call today at 17:00 ET.
+
+No other tickers are mentioned. This text is synthetic and may be used to
+demo knowledge-ingest chunking and playbook extraction without copyrighted
+source material.

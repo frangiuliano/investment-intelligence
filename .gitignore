@@ -24,3 +24,8 @@ coverage/
 
 # Build / Nest
 *.tsbuildinfo
+
+# Knowledge Pack — local PDFs / large sources (version playbooks, not books)
+knowledge/sources/**/*.pdf
+knowledge/sources/**/*.PDF
+!knowledge/sources/fixtures/
