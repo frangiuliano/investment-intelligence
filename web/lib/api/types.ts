@@ -121,6 +121,7 @@ export type ResearchBrief = {
   marketSource: string | null
   holdingId: string | null
   createdAt: string
+  chartAvailable?: boolean
 }
 
 export type HypothesisReviewOutcome =

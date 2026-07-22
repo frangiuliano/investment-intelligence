@@ -1,6 +1,6 @@
 import "server-only"
 
-import { backendFetch } from "@/lib/api/client"
+import { backendFetch, backendFetchBinary } from "@/lib/api/client"
 import { buildListPath, type ListParams } from "@/lib/api/query"
 import type {
   Hypothesis,
@@ -52,6 +52,10 @@ export function listBriefs(
 
 export function getBrief(id: string): Promise<ResearchBrief> {
   return backendFetch<ResearchBrief>(`/briefs/${id}`)
+}
+
+export function getBriefChartPng(id: string): Promise<Buffer> {
+  return backendFetchBinary(`/briefs/${id}/chart`)
 }
 
 // Brief generation calls Gemini + market data synchronously; allow more time

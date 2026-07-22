@@ -88,6 +88,33 @@ export async function backendFetch<T>(
   return (await response.json()) as T
 }
 
+export async function backendFetchBinary(
+  path: string,
+  options: { timeoutMs?: number } = {}
+): Promise<Buffer> {
+  const { baseUrl, apiKey } = getApiConfig()
+  const url = new URL(path, baseUrl)
+  const { timeoutMs = 15_000 } = options
+
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      "x-dashboard-api-key": apiKey,
+    },
+    cache: "no-store",
+    signal: AbortSignal.timeout(timeoutMs),
+  })
+
+  if (!response.ok) {
+    throw new BackendApiError(
+      response.status,
+      await readErrorMessage(response)
+    )
+  }
+
+  return Buffer.from(await response.arrayBuffer())
+}
+
 // Nest replies 503 with a JSON body when the database is down; that is a
 // valid health payload, not a transport failure, so status and body are
 // forwarded as-is. Only network/config errors should throw.
