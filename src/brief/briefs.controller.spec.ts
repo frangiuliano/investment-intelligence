@@ -6,6 +6,7 @@ describe('BriefsController', () => {
   const briefsQueryService = {
     findBriefs: jest.fn(),
     findBrief: jest.fn(),
+    findBriefChartPng: jest.fn(),
   };
 
   const briefService = {
@@ -56,10 +57,32 @@ describe('BriefsController', () => {
   });
 
   it('returns brief detail', async () => {
-    briefsQueryService.findBrief.mockResolvedValue({ id: 'b1' });
+    briefsQueryService.findBrief.mockResolvedValue({
+      id: 'b1',
+      chartAvailable: false,
+    });
 
-    await expect(controller.detail('b1')).resolves.toEqual({ id: 'b1' });
+    await expect(controller.detail('b1')).resolves.toEqual({
+      id: 'b1',
+      chartAvailable: false,
+    });
     expect(briefsQueryService.findBrief).toHaveBeenCalledWith('b1');
+  });
+
+  it('returns the chart as a StreamableFile', async () => {
+    const png = Buffer.from([0x89, 0x50, 0x4e, 0x47]);
+    briefsQueryService.findBriefChartPng.mockResolvedValue(png);
+
+    const file = await controller.chart('11111111-1111-1111-1111-111111111111');
+
+    expect(briefsQueryService.findBriefChartPng).toHaveBeenCalledWith(
+      '11111111-1111-1111-1111-111111111111',
+    );
+    expect(file.getHeaders()).toEqual(
+      expect.objectContaining({
+        type: 'image/png',
+      }),
+    );
   });
 
   it('requests a brief via the shared pipeline', async () => {

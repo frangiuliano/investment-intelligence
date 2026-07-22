@@ -15,6 +15,10 @@ export type ListBriefsQuery = {
   ticker?: string;
 };
 
+export type BriefDetail = Omit<ResearchBrief, 'chartPng' | 'holding'> & {
+  chartAvailable: boolean;
+};
+
 @Injectable()
 export class BriefsQueryService {
   constructor(
@@ -44,13 +48,51 @@ export class BriefsQueryService {
     return { items, page, limit, total };
   }
 
-  async findBrief(id: string): Promise<ResearchBrief> {
+  async findBrief(id: string): Promise<BriefDetail> {
     const brief = await this.researchBriefsRepository.findOne({
       where: { id },
     });
     if (!brief) {
       throw new NotFoundException(`Brief ${id} not found`);
     }
-    return brief;
+
+    const chartAvailable = await this.researchBriefsRepository
+      .createQueryBuilder('brief')
+      .where('brief.id = :id', { id })
+      .andWhere('brief.chart_png IS NOT NULL')
+      .andWhere('octet_length(brief.chart_png) > 0')
+      .getExists();
+
+    return {
+      id: brief.id,
+      symbol: brief.symbol,
+      locale: brief.locale,
+      sections: brief.sections,
+      promptVersion: brief.promptVersion,
+      stance: brief.stance,
+      stanceRationale: brief.stanceRationale,
+      marketAsOf: brief.marketAsOf,
+      marketSource: brief.marketSource,
+      holdingId: brief.holdingId,
+      createdAt: brief.createdAt,
+      chartAvailable,
+    };
+  }
+
+  async findBriefChartPng(id: string): Promise<Buffer> {
+    const brief = await this.researchBriefsRepository
+      .createQueryBuilder('brief')
+      .select('brief.id')
+      .addSelect('brief.chartPng')
+      .where('brief.id = :id', { id })
+      .getOne();
+
+    if (!brief) {
+      throw new NotFoundException(`Brief ${id} not found`);
+    }
+    if (!brief.chartPng || brief.chartPng.length === 0) {
+      throw new NotFoundException(`Chart for brief ${id} not found`);
+    }
+    return brief.chartPng;
   }
 }

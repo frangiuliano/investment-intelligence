@@ -8,6 +8,7 @@ import {
   ParseUUIDPipe,
   Post,
   Query,
+  StreamableFile,
   UseGuards,
 } from '@nestjs/common';
 import { DashboardApiKeyGuard } from '../common/guards/dashboard-api-key.guard';
@@ -36,6 +37,15 @@ export class BriefsController {
     return this.briefsQueryService.findBriefs(
       buildListQuery(page, limit, ticker),
     );
+  }
+
+  @Get(':id/chart')
+  async chart(@Param('id', ParseUUIDPipe) id: string): Promise<StreamableFile> {
+    const png = await this.briefsQueryService.findBriefChartPng(id);
+    return new StreamableFile(png, {
+      type: 'image/png',
+      disposition: `inline; filename="brief-${id}-chart.png"`,
+    });
   }
 
   @Get(':id')

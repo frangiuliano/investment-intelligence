@@ -125,16 +125,22 @@ export class BriefService {
         locale,
       );
 
+      let deliveryOk = true;
       try {
         await this.telegramClient.sendMessage(message);
-        await this.sendChartFollowUp(symbol, market, locale);
-        return { brief: persistedBrief, message, ok: true };
       } catch (sendError) {
+        deliveryOk = false;
         const detail =
           sendError instanceof Error ? sendError.message : String(sendError);
         this.logger.error(
           `Brief persisted for ${symbol} but Telegram delivery failed: ${detail}`,
         );
+      }
+
+      // Desk reuse (#76): persist chart even when the text message failed.
+      await this.sendChartFollowUp(persistedBrief, market, locale);
+
+      if (!deliveryOk) {
         const deliveryMessage = formatBriefDeliveryErrorMessage(locale);
         await this.safeSend(deliveryMessage);
         return {
@@ -143,6 +149,8 @@ export class BriefService {
           ok: false,
         };
       }
+
+      return { brief: persistedBrief, message, ok: true };
     } catch (error) {
       const detail = error instanceof Error ? error.message : String(error);
       this.logger.error(`Brief request failed for ${symbol}: ${detail}`);
@@ -175,10 +183,12 @@ export class BriefService {
 
   /**
    * Chart errors are isolated on purpose (ADR 004): a render or sendPhoto
-   * failure must never fail the already-delivered textual brief.
+   * failure must never fail the already-persisted textual brief. One render
+   * feeds both persistence and Telegram (#76). Called even when the brief
+   * text message failed, so the desk can still read chart_png.
    */
   private async sendChartFollowUp(
-    symbol: string,
+    brief: ResearchBrief,
     market: BriefMarketContext | null,
     locale: AppLocale,
   ): Promise<void> {
@@ -186,18 +196,44 @@ export class BriefService {
       return;
     }
 
+    let chart: Buffer;
     try {
-      const chart = this.technicalChartService.renderTechnicalChart(
-        market.series,
-      );
-      await this.telegramClient.sendPhoto(
-        chart,
-        formatBriefChartCaption(symbol, locale),
-      );
+      chart = this.technicalChartService.renderTechnicalChart(market.series);
     } catch (chartError) {
       const detail =
         chartError instanceof Error ? chartError.message : String(chartError);
-      this.logger.error(`Technical chart failed for ${symbol}: ${detail}`);
+      this.logger.error(
+        `Technical chart render failed for ${brief.symbol}: ${detail}`,
+      );
+      await this.safeSend(formatBriefChartUnavailableMessage(locale));
+      return;
+    }
+
+    try {
+      await this.researchBriefsRepository.update(brief.id, {
+        chartPng: chart,
+      });
+    } catch (persistError) {
+      const detail =
+        persistError instanceof Error
+          ? persistError.message
+          : String(persistError);
+      this.logger.error(
+        `Technical chart persist failed for ${brief.symbol}: ${detail}`,
+      );
+    }
+
+    try {
+      await this.telegramClient.sendPhoto(
+        chart,
+        formatBriefChartCaption(brief.symbol, locale),
+      );
+    } catch (sendError) {
+      const detail =
+        sendError instanceof Error ? sendError.message : String(sendError);
+      this.logger.error(
+        `Technical chart sendPhoto failed for ${brief.symbol}: ${detail}`,
+      );
       await this.safeSend(formatBriefChartUnavailableMessage(locale));
     }
   }

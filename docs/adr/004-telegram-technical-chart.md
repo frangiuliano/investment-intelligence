@@ -147,3 +147,23 @@ This ADR removes the `/arch` gate on #57. PO can flip #57 from
 `status:blocked` → `status:ready` and reference `docs/adr/004-telegram-technical-chart.md`
 in the issue body. Implementation stays with the Developer (Issue #57 scope
 unchanged).
+
+## Addendum — Persist PNG for dashboard reuse (Issue #76)
+
+**Status:** Accepted (2026-07-22). Revises §6 for post-desk reuse.
+
+The research desk (#35) needs the same PNG Telegram already received. Ephemeral
+in-memory discard is no longer enough.
+
+**Decision:** store the PNG as nullable `bytea` on `research_briefs.chart_png`
+(PostgreSQL, single-tenant). One render feeds both `sendPhoto` and the column.
+List/detail JSON never embed the blob (`select: false` + `chartAvailable` on
+detail). Authenticated read: `GET /briefs/:id/chart` (`x-dashboard-api-key`) →
+`image/png` or `404`.
+
+**Out of scope here:** object store/S3, backfill of historical briefs, dashboard
+UI (issue #77).
+
+**Degradation unchanged:** render failure → no PNG; textual brief still OK.
+`sendPhoto` failure after a successful render may still leave the PNG persisted
+for the desk.
