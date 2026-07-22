@@ -20,7 +20,7 @@ on credit, cash-flow timing, and policy — not equity narrative.
 | Signal | Suggested materiality | Notes |
 |--------|----------------------|-------|
 | Default, missed coupon, restructuring | high | Confirm which instrument |
-| Rating downgrade/upgrade (agency) | medium–high | Multi-notch or watchlist matters more |
+| Rating downgrade/upgrade (agency) | medium–high | Multi-notch or watchlist matters more; `event_type` = `other` |
 | Central-bank policy surprise affecting the curve | medium–high | Tie to the held tenor if possible |
 | Auction / reopening / tap without stress | low–medium | Operational unless failed auction |
 | Spread gossip without primary source | low | Soft; prefer digest |

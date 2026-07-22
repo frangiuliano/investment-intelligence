@@ -11,7 +11,7 @@ when not CEDEARs). Method only — do not invent prices or fundamentals.
 
 - Identify primary ticker(s) and whether the story is company-specific or sector-wide.
 - Separate fact (filed number, announced date) from opinion/rumor.
-- Map to an `event_type` from the event-types rubric before scoring materiality.
+- Map to an `event_type` from the event-types rubric (runtime codes only) before scoring materiality.
 - Prefer primary sources (filing, IR release) over secondary headlines when both appear.
 - Note if the holding is already in the operator portfolio (affects alert priority, not truth).
 
