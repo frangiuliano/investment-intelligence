@@ -454,18 +454,26 @@ describe('BriefService', () => {
     );
   });
 
-  it('reports delivery failure when Telegram send fails after persist', async () => {
+  it('persists the chart even when Telegram text delivery fails after save', async () => {
     const sendMessage = jest
       .fn()
       .mockRejectedValueOnce(new Error('telegram down'))
       .mockResolvedValue(undefined);
-    const { service } = createService({ sendMessage });
+    const { service, update, sendPhoto } = createService({ sendMessage });
 
     const result = await service.requestBrief('AAPL');
 
     expect(result.ok).toBe(false);
     expect(result.brief?.symbol).toBe('AAPL');
     expect(result.message).toContain('delivery failed');
+    expect(update).toHaveBeenCalledWith(
+      'brief-1',
+      expect.objectContaining({
+        chartPng: expect.any(Buffer) as Buffer,
+      }),
+    );
+    expect(sendPhoto).toHaveBeenCalledTimes(1);
+    // brief text (failed) + delivery-error notice
     expect(sendMessage).toHaveBeenCalledTimes(2);
   });
 

@@ -128,6 +128,9 @@ describe('BriefsQueryService', () => {
       });
       expect(findOne).toHaveBeenCalledWith({ where: { id: 'b1' } });
       expect(qb.andWhere).toHaveBeenCalledWith('brief.chart_png IS NOT NULL');
+      expect(qb.andWhere).toHaveBeenCalledWith(
+        'octet_length(brief.chart_png) > 0',
+      );
     });
 
     it('throws NotFound when the brief does not exist', async () => {

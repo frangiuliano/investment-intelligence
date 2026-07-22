@@ -60,6 +60,7 @@ export class BriefsQueryService {
       .createQueryBuilder('brief')
       .where('brief.id = :id', { id })
       .andWhere('brief.chart_png IS NOT NULL')
+      .andWhere('octet_length(brief.chart_png) > 0')
       .getExists();
 
     return {
