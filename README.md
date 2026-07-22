@@ -799,7 +799,8 @@ brief se persista (puede tardar decenas de segundos por Gemini/Yahoo).
 | Endpoint | Descripción |
 |----------|-------------|
 | `GET /briefs` | Briefs paginados (orden `created_at` DESC) |
-| `GET /briefs/:id` | Detalle de un brief (`404` si no existe) |
+| `GET /briefs/:id` | Detalle de un brief (`chartAvailable`; `404` si no existe) |
+| `GET /briefs/:id/chart` | PNG del chart técnico (`image/png`; `404` si no hay chart) |
 | `POST /briefs` | Solicita un brief para `{ "ticker": "AAPL" }` → `201` + fila persistida |
 
 Query params (list): `page` (default `1`), `limit` (default `20`, máx `100`),
@@ -809,9 +810,10 @@ Query params (list): `page` (default `1`), `limit` (default `20`, máx `100`),
 Cada brief expone `id`, `symbol`, `locale`, `sections` (overview / fundamental /
 technical / risks / invalidation / disclaimer), `promptVersion`, `stance`,
 `stanceRationale`, `marketAsOf`, `marketSource`, `holdingId`, `createdAt`.
-Sin market data o fallo de Gemini → `stance`/`market*` en `null` o error HTTP
-explícito (`400` / `409` si ya hay un brief en curso); **nunca** inventa
-números de mercado.
+El detalle incluye además `chartAvailable` (boolean); el blob PNG **no** viaja
+en el JSON de listado ni de detalle. Sin market data o fallo de Gemini →
+`stance`/`market*` en `null` o error HTTP explícito (`400` / `409` si ya hay
+un brief en curso); **nunca** inventa números de mercado.
 
 ```bash
 export DASHBOARD_API_KEY=pick_a_long_random_string
@@ -829,6 +831,11 @@ curl -s 'http://localhost:3000/briefs?page=1&limit=20&ticker=AAPL' \
 # Detalle
 curl -s "http://localhost:3000/briefs/<id>" \
   -H "x-dashboard-api-key: $DASHBOARD_API_KEY" | jq
+
+# Chart PNG (si chartAvailable=true)
+curl -s "http://localhost:3000/briefs/<id>/chart" \
+  -H "x-dashboard-api-key: $DASHBOARD_API_KEY" \
+  -o chart.png
 ```
 
 Si Telegram falla **después** de persistir, `POST` igual responde `201` con el
@@ -915,8 +922,8 @@ Límites: 1 brief a la vez; no es asesoramiento de inversión ni ejecución de
 Cuando el brief tiene market data adjunto y `TECHNICAL_CHART_ENABLED=true`
 (default), después del texto llega una **imagen PNG** (~1280×720) por
 `sendPhoto`, renderizada de forma **determinista** desde las mismas barras
-OHLCV del provider (ADR 004). No se persiste: se genera en memoria, se envía
-y se descarta.
+OHLCV del provider (ADR 004). El mismo buffer se persiste en
+`research_briefs.chart_png` para reutilizarlo en el desk (`GET /briefs/:id/chart`).
 
 Marcas incluidas (ilustrativas, computadas solo desde OHLCV — no "confirman"
 la postura):
@@ -930,8 +937,9 @@ la postura):
   cierre.
 
 Degradación: sin market data no hay chart (consistente con stance `null`).
-Si el render o el `sendPhoto` fallan, el brief textual ya fue entregado y
-llega un aviso corto de "chart no disponible" — el error del chart nunca
+Si el render falla, no hay PNG; el brief textual ya fue entregado y llega un
+aviso corto de "chart no disponible". Si `sendPhoto` falla tras un render OK,
+el PNG puede quedar persistido igual para el desk. El error del chart nunca
 tira el brief. Render server-side con `@napi-rs/canvas` (binarios prebuilt
 glibc/musl; sin cairo/pango en Alpine).
 
@@ -942,6 +950,8 @@ npm run migration:run
 npm run brief:once -- AAPL
 # En Telegram: primero el texto del brief, luego la foto del chart.
 # TECHNICAL_CHART_ENABLED=false npm run brief:once -- AAPL → solo texto.
+# curl -H "x-dashboard-api-key: $DASHBOARD_API_KEY" \
+#   http://localhost:3000/briefs/<id>/chart -o chart.png
 ```
 
 ## Market data OHLCV

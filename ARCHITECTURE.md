@@ -26,7 +26,7 @@ Mapa de módulos del backend NestJS y su relación con el backlog del MVP.
 | `telegram-bot/` | Implementado | Inbound Telegram (`/brief`, `/review`, webhook/poll) | #32, #34 |
 | `research/` | Implementado | Journal de hipótesis + reviews de período | #33, #34 |
 | `market-data/` | Implementado | Port + adapter Yahoo para OHLCV histórico | #55 |
-| `charts/` | Implementado | Render determinista de chart técnico PNG desde OHLCV (ADR 004) | #57 |
+| `charts/` | Implementado | Render determinista de chart técnico PNG desde OHLCV; persistido en `research_briefs.chart_png` (ADR 004 addendum) | #57, #76 |
 | `web/` | Implementado | Dashboard Next.js (research desk): Holdings, Hypotheses, Alerts, Briefs, Reviews vía BFF → Nest | #64, #35 |
 
 ## Diagrama de dependencias (MVP)
@@ -79,6 +79,9 @@ Ver `docs/adr/003-dashboard-web.md`.
   `technical`, `risks`, `invalidation`, `disclaimer`) + `prompt_version`, y
   columnas de postura (`stance`, `stance_rationale`, `market_as_of`,
   `market_source`). Sin market data → `stance` null (nunca inventa precios).
+  El chart técnico opcional vive en `chart_png` (`bytea` nullable); el listado
+  no lo carga; el detalle expone `chartAvailable` y `GET /briefs/:id/chart`
+  sirve el PNG.
 - `hypotheses` guarda tesis, invalidación, horizonte, sesgo acotado y origen.
   `source_ref_id` es un UUID opaco sin FK porque puede referir a un brief o una
   alerta. El cierre registra `closed_at` y una nota opcional.
