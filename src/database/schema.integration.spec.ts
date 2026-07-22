@@ -36,6 +36,7 @@ import { CreateResearchBriefs1752560000000 } from './migrations/1752560000000-Cr
 import { CreateHypotheses1752570000000 } from './migrations/1752570000000-CreateHypotheses';
 import { CreateHypothesisReviews1752580000000 } from './migrations/1752580000000-CreateHypothesisReviews';
 import { AddResearchBriefStance1752590000000 } from './migrations/1752590000000-AddResearchBriefStance';
+import { AddResearchBriefChartPng1752600000000 } from './migrations/1752600000000-AddResearchBriefChartPng';
 import {
   DEFAULT_TEST_DATABASE_URL,
   resolveTestDatabaseUrl,
@@ -94,6 +95,7 @@ describe('Database schema (integration)', () => {
         CreateHypotheses1752570000000,
         CreateHypothesisReviews1752580000000,
         AddResearchBriefStance1752590000000,
+        AddResearchBriefChartPng1752600000000,
       ],
       synchronize: false,
       logging: false,
@@ -497,6 +499,20 @@ describe('Database schema (integration)', () => {
     );
     expect(brief.stance).toBe('watch');
     expect(brief.marketSource).toBe('yahoo-finance-chart');
+
+    await researchBriefs.update(brief.id, {
+      chartPng: Buffer.from([0x89, 0x50, 0x4e, 0x47]),
+    });
+    const withChart = await researchBriefs
+      .createQueryBuilder('brief')
+      .select('brief.id')
+      .addSelect('brief.chartPng')
+      .where('brief.id = :id', { id: brief.id })
+      .getOne();
+    expect(withChart?.chartPng?.length).toBe(4);
+
+    const listed = await researchBriefs.findOne({ where: { id: brief.id } });
+    expect(listed?.chartPng).toBeUndefined();
 
     const fromBrief = await hypotheses.save(
       hypotheses.create({

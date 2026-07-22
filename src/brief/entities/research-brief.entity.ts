@@ -46,6 +46,9 @@ export class ResearchBrief {
   @Column({ name: 'holding_id', type: 'uuid', nullable: true })
   holdingId!: string | null;
 
+  @Column({ name: 'chart_png', type: 'bytea', nullable: true, select: false })
+  chartPng!: Buffer | null;
+
   @ManyToOne(() => Holding, { nullable: true, onDelete: 'SET NULL' })
   @JoinColumn({ name: 'holding_id' })
   holding!: Holding | null;
