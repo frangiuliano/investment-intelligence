@@ -27,7 +27,7 @@ Mapa de módulos del backend NestJS y su relación con el backlog del MVP.
 | `research/` | Implementado | Journal de hipótesis + reviews de período | #33, #34 |
 | `market-data/` | Implementado | Port + adapter Yahoo para OHLCV histórico | #55 |
 | `charts/` | Implementado | Render determinista de chart técnico PNG desde OHLCV (ADR 004) | #57 |
-| `web/` | Scaffold implementado | Dashboard Next.js con auth y BFF → Nest; áreas de producto pendientes | #64, #35 |
+| `web/` | Implementado | Dashboard Next.js (research desk): Holdings, Hypotheses, Alerts, Briefs, Reviews vía BFF → Nest | #64, #35 |
 
 ## Diagrama de dependencias (MVP)
 

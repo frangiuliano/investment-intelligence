@@ -10,6 +10,16 @@ export type BackendHealthResult = {
   body: BackendHealth
 }
 
+export class BackendApiError extends Error {
+  constructor(
+    readonly status: number,
+    message: string
+  ) {
+    super(message)
+    this.name = "BackendApiError"
+  }
+}
+
 function getApiConfig() {
   const baseUrl = process.env.API_BASE_URL
   const apiKey = process.env.DASHBOARD_API_KEY
@@ -22,6 +32,60 @@ function getApiConfig() {
     baseUrl: new URL(baseUrl),
     apiKey,
   }
+}
+
+async function readErrorMessage(response: Response): Promise<string> {
+  try {
+    const body = (await response.json()) as { message?: string | string[] }
+    if (Array.isArray(body.message)) {
+      return body.message.join(", ")
+    }
+    if (typeof body.message === "string" && body.message.length > 0) {
+      return body.message
+    }
+  } catch {
+    // Non-JSON error bodies fall through to the generic message.
+  }
+  return `Backend request failed with status ${response.status}`
+}
+
+type BackendRequestOptions = {
+  method?: "GET" | "POST" | "PATCH" | "DELETE"
+  body?: unknown
+  timeoutMs?: number
+}
+
+export async function backendFetch<T>(
+  path: string,
+  options: BackendRequestOptions = {}
+): Promise<T> {
+  const { baseUrl, apiKey } = getApiConfig()
+  const url = new URL(path, baseUrl)
+  const { method = "GET", body, timeoutMs = 15_000 } = options
+
+  const response = await fetch(url, {
+    method,
+    headers: {
+      "x-dashboard-api-key": apiKey,
+      ...(body !== undefined ? { "content-type": "application/json" } : {}),
+    },
+    body: body !== undefined ? JSON.stringify(body) : undefined,
+    cache: "no-store",
+    signal: AbortSignal.timeout(timeoutMs),
+  })
+
+  if (!response.ok) {
+    throw new BackendApiError(
+      response.status,
+      await readErrorMessage(response)
+    )
+  }
+
+  if (response.status === 204) {
+    return undefined as T
+  }
+
+  return (await response.json()) as T
 }
 
 // Nest replies 503 with a JSON body when the database is down; that is a

@@ -39,6 +39,26 @@ port `3001`. Open [http://localhost:3001](http://localhost:3001). Requests
 without a valid session redirect to `/login`. After login, the shell exposes
 Holdings, Hypotheses, Alerts, Briefs, and Reviews.
 
+The Nest API must be running with its database migrated
+(`npm run migration:run` at the repo root) and `DASHBOARD_API_KEY` set to the
+same value as this app.
+
+## Research areas
+
+| Area | Read | Write |
+| --- | --- | --- |
+| Holdings | Positions table | Create, edit, remove |
+| Watchlist | Entries table (inside Holdings) | Create, remove |
+| Hypotheses | Open and closed journal | Open, close (with note) |
+| Alerts | Sent notifications, ticker filter, pagination | None (pipeline-only) |
+| Briefs | Paginated list + detail with sections and stance | Request brief per ticker |
+| Reviews | Paginated list + detail with notes | Trigger review for the current month |
+
+All data flows through server code (Server Components and server actions)
+that calls Nest with `x-dashboard-api-key`; the browser never talks to Nest
+directly. Alerts have no write path by design, and briefs always render their
+disclaimer next to any stance.
+
 ## BFF health check
 
 With a valid browser session, verify the Next BFF can reach Nest:

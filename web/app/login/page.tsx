@@ -28,26 +28,26 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
               Investment Intelligence
             </p>
             <p className="font-mono text-[0.65rem] uppercase tracking-[0.2em] text-white/45">
-              Private research system
+              Sistema privado de análisis
             </p>
           </div>
         </div>
 
         <div className="relative max-w-md">
           <p className="mb-5 font-mono text-xs uppercase tracking-[0.22em] text-signal">
-            Operator access / 01
+            Acceso del operador / 01
           </p>
           <h1 className="font-heading text-4xl leading-[1.05] tracking-[-0.035em] sm:text-5xl">
-            A quieter place to test an investment thesis.
+            Un espacio sereno para poner a prueba una tesis de inversión.
           </h1>
           <p className="mt-6 max-w-sm text-sm leading-6 text-white/55">
-            Review evidence, track hypotheses, and keep every decision
-            separated from execution.
+            Revisá evidencia, seguí hipótesis y mantené cada decisión separada
+            de la ejecución.
           </p>
         </div>
 
         <p className="relative hidden font-mono text-[0.65rem] uppercase tracking-[0.16em] text-white/35 lg:block">
-          Single operator · Research only · No broker execution
+          Operador único · Solo análisis · Sin ejecución de órdenes
         </p>
       </section>
 
@@ -55,19 +55,19 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         <Card className="w-full max-w-sm border-0 bg-transparent shadow-none ring-0">
           <CardHeader className="px-0">
             <p className="mb-8 font-mono text-[0.65rem] uppercase tracking-[0.2em] text-muted-foreground">
-              Secure session
+              Sesión segura
             </p>
             <CardTitle className="font-heading text-3xl tracking-tight">
-              Open the research desk
+              Abrí la mesa de análisis
             </CardTitle>
             <CardDescription className="pt-2 leading-6">
-              Enter the operator password configured for this environment.
+              Ingresá la contraseña del operador configurada para este entorno.
             </CardDescription>
           </CardHeader>
           <CardContent className="px-0 pt-4">
             <form action="/api/auth/login" method="post" className="space-y-5">
               <div className="space-y-2">
-                <Label htmlFor="password">Operator password</Label>
+                <Label htmlFor="password">Contraseña del operador</Label>
                 <Input
                   id="password"
                   name="password"
@@ -81,12 +81,12 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
                 />
                 {error === "invalid" ? (
                   <p id="login-error" className="text-sm text-destructive">
-                    The password is invalid or login is not configured.
+                    La contraseña es incorrecta o el acceso no está configurado.
                   </p>
                 ) : null}
               </div>
               <Button type="submit" size="lg" className="h-11 w-full">
-                Start secure session
+                Iniciar sesión segura
               </Button>
             </form>
           </CardContent>
