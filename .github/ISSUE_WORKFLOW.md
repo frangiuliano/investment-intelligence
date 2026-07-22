@@ -90,13 +90,15 @@ ADR: `docs/adr/003-dashboard-web.md` (Next.js + shadcn + Tailwind, BFF, auth).
 | 32 | #65 | Exponer API de lectura y request de research briefs |
 | 33 | #64 | Scaffold `web/` Next.js + shadcn + auth BFF |
 | 34 | #35 | Dashboard research desk (5 áreas, read + write acotado) |
+| 35 | #76 | Persistir imagen del chart técnico al generar un research brief |
+| 36 | #77 | Mostrar chart técnico en el detalle de Informes del dashboard |
 
-Orden vigente v2: **#62 → #63 → #65 → #64 → #35**.
+Orden vigente v2 (desk cerrado / PR #75): **#76 → #77**.
 
-Las APIs (#62/#63/#65) pueden avanzar en paralelo al path bot (#56/#57)
-porque no dependen de Telegram charts. **No empezar #35** hasta:
-cerrar #34 (reviews + API), mergear foundation APIs + scaffold (#62–#65/#64),
-y preferiblemente #56. `#57` no bloquea el dashboard.
+Las APIs (#62/#63/#65) y el scaffold (#64) ya están; el desk (#35) cierra
+con PR #75. Post-desk: persistir PNG del chart (#76) y luego mostrarlo en
+el detalle de Informes (#77). `#77` está bloqueado por `#76`. `#57` (Telegram
+chart) ya entregó el render; no hace falta reabrir charts interactivos.
 
 Si falta el label `order-NN` en GitHub, la sección **Orden de ejecución**
 del body del issue es la fuente de verdad.
