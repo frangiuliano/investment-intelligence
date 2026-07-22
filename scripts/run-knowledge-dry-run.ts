@@ -33,7 +33,7 @@ function parseArgs(argv: string[]) {
 
   if (positional.length !== 1) {
     throw new Error(
-      'Usage: npm run knowledge:dry-run -- <source.txt|pdf> [--target equity|cedear|bond|other] [--apply]',
+      'Usage: npm run knowledge:dry-run -- <path-under-knowledge/sources> [--target equity|cedear|bond|other] [--apply]',
     );
   }
 

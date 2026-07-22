@@ -43,8 +43,10 @@ Ingest progress:
 ### Step details
 
 1. **Source**
-   - Prefer `knowledge/sources/fixtures/*.txt` for demos (no copyright PDFs in git).
+   - Path **must** resolve under `knowledge/sources/` (scripts reject escapes and
+     symlinks that leave the tree). Prefer `fixtures/*.txt` for demos.
    - PDFs stay gitignored; require `pdftotext` (poppler). Empty PDF text → stop (OCR out of scope).
+   - Persist only repo-relative paths in `meta.json` / `manifest.json` (never absolute).
 
 2. **Prepare (no LLM)**
    - Run `knowledge:prepare`. Note `docId`, `cacheHits` / `cacheMisses`.

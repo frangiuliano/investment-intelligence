@@ -1,6 +1,6 @@
 {
   "docId": "sample-equity-earnings-36480bcf",
-  "sourcePath": "/Users/frangiuliano/Desktop/Projects/investment-intelligence/knowledge/sources/fixtures/sample-equity-earnings.txt",
+  "sourcePath": "sources/fixtures/sample-equity-earnings.txt",
   "sourceHash": "36480bcf59a003840d19d85d8ee060beebdbebdfa2c32f5d1642bbf4dbebcd09",
   "target": "equity",
   "chunkCount": 1,

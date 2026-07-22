@@ -7,7 +7,8 @@ const execFileAsync = promisify(execFile);
 
 export type ExtractedSource = {
   text: string;
-  sourcePath: string;
+  /** Absolute real path used for reading. */
+  absolutePath: string;
   format: 'txt' | 'md' | 'pdf';
   extractor: 'read-file' | 'pdftotext';
 };
@@ -38,31 +39,30 @@ async function extractPdfWithPdftotext(filePath: string): Promise<string> {
 }
 
 export async function extractTextFromSource(
-  sourcePath: string,
+  absolutePath: string,
 ): Promise<ExtractedSource> {
-  const absolute = path.resolve(sourcePath);
-  const ext = extensionOf(absolute);
+  const ext = extensionOf(absolutePath);
 
   if (ext === '.txt' || ext === '.md') {
-    const text = await fs.readFile(absolute, 'utf8');
+    const text = await fs.readFile(absolutePath, 'utf8');
     return {
       text,
-      sourcePath: absolute,
+      absolutePath,
       format: ext === '.md' ? 'md' : 'txt',
       extractor: 'read-file',
     };
   }
 
   if (ext === '.pdf') {
-    const text = await extractPdfWithPdftotext(absolute);
+    const text = await extractPdfWithPdftotext(absolutePath);
     if (!text.trim()) {
       throw new Error(
-        `pdftotext returned empty text for ${absolute}. OCR is out of scope for this pipeline; provide a text layer or a .txt extract.`,
+        `pdftotext returned empty text for ${absolutePath}. OCR is out of scope for this pipeline; provide a text layer or a .txt extract.`,
       );
     }
     return {
       text,
-      sourcePath: absolute,
+      absolutePath,
       format: 'pdf',
       extractor: 'pdftotext',
     };

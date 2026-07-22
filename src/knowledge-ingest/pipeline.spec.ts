@@ -7,6 +7,7 @@ import { sha256Hex } from './hash';
 import {
   bumpPatchVersion,
   ensurePlaybookListed,
+  shouldBumpPatchOnApply,
   upsertManifestSource,
 } from './manifest';
 import { assertPlaybookTemplate } from './playbook-template';
@@ -32,7 +33,7 @@ describe('hash and cache', () => {
     const first = await writeChunkCache({
       knowledgeRoot,
       docId: 'doc-a',
-      sourcePath: '/tmp/a.txt',
+      sourcePath: 'sources/fixtures/a.txt',
       sourceText: text,
       sourceHash,
       chunks,
@@ -44,7 +45,7 @@ describe('hash and cache', () => {
     const second = await writeChunkCache({
       knowledgeRoot,
       docId: 'doc-a',
-      sourcePath: '/tmp/a.txt',
+      sourcePath: 'sources/fixtures/a.txt',
       sourceText: text,
       sourceHash,
       chunks,
@@ -73,6 +74,53 @@ describe('playbook template and dry-run synthesize', () => {
 describe('manifest helpers', () => {
   it('should bump patch version', () => {
     expect(bumpPatchVersion('0.1.0')).toBe('0.1.1');
+  });
+
+  it('should merge targets on upsert of the same docId', () => {
+    const base = {
+      knowledgeVersion: '0.1.0',
+      updatedAt: '2026-07-22',
+      playbooks: [],
+      rubrics: [],
+      sources: [],
+    };
+    const first = upsertManifestSource(base, {
+      docId: 'd1',
+      sourceHash: 'abc',
+      sourcePath: 'sources/fixtures/a.txt',
+      targets: ['equity'],
+      ingestedAt: '2026-07-22',
+    });
+    const second = upsertManifestSource(first, {
+      docId: 'd1',
+      sourceHash: 'abc',
+      sourcePath: 'sources/fixtures/a.txt',
+      targets: ['cedear'],
+      ingestedAt: '2026-07-23',
+    });
+    expect(second.sources).toHaveLength(1);
+    expect(second.sources[0].targets).toEqual(['cedear', 'equity']);
+  });
+
+  it('should bump patch on apply only when source hash changes', () => {
+    const withSource = {
+      knowledgeVersion: '0.1.0',
+      updatedAt: '2026-07-22',
+      playbooks: [],
+      rubrics: [],
+      sources: [
+        {
+          docId: 'd1',
+          sourceHash: 'abc',
+          sourcePath: 'sources/fixtures/a.txt',
+          targets: ['equity'],
+          ingestedAt: '2026-07-22',
+        },
+      ],
+    };
+    expect(shouldBumpPatchOnApply(withSource, 'd1', 'abc')).toBe(false);
+    expect(shouldBumpPatchOnApply(withSource, 'd1', 'def')).toBe(true);
+    expect(shouldBumpPatchOnApply(withSource, 'new', 'abc')).toBe(true);
   });
 
   it('should upsert source and list playbook', () => {
@@ -117,6 +165,17 @@ describe('pipeline dry-run against fixture', () => {
     });
     await fs.mkdir(path.join(knowledgeRoot, 'raw'), { recursive: true });
 
+    const manifestPath = path.join(knowledgeRoot, 'manifest.json');
+    const manifestSeed = JSON.parse(
+      await fs.readFile(manifestPath, 'utf8'),
+    ) as { sources: unknown[] };
+    manifestSeed.sources = [];
+    await fs.writeFile(
+      manifestPath,
+      `${JSON.stringify(manifestSeed, null, 2)}\n`,
+      'utf8',
+    );
+
     const relativeFixture = path.join(
       knowledgeRoot,
       'sources/fixtures/sample-equity-earnings.txt',
@@ -133,9 +192,19 @@ describe('pipeline dry-run against fixture', () => {
     expect(first.chunkCount).toBeGreaterThanOrEqual(1);
     expect(first.cacheMisses).toBeGreaterThanOrEqual(1);
     expect(first.appliedPath).toBe('playbooks/equity.md');
+    expect(first.sourceRelative).toBe(
+      'sources/fixtures/sample-equity-earnings.txt',
+    );
 
     const draft = await fs.readFile(first.draftPath, 'utf8');
     expect(assertPlaybookTemplate(draft)).toEqual([]);
+    expect(draft).toContain('knowledgeVersion: `0.1.1`');
+
+    const meta = JSON.parse(
+      await fs.readFile(path.join(first.rawDir, 'meta.json'), 'utf8'),
+    ) as { sourcePath: string };
+    expect(meta.sourcePath).toBe('sources/fixtures/sample-equity-earnings.txt');
+    expect(meta.sourcePath.startsWith('/')).toBe(false);
 
     const manifest = JSON.parse(
       await fs.readFile(path.join(knowledgeRoot, 'manifest.json'), 'utf8'),
@@ -150,6 +219,14 @@ describe('pipeline dry-run against fixture', () => {
     expect(playbook).toContain('## source_refs');
     expect(playbook).toContain('knowledgeVersion: `0.1.1`');
 
+    const reapply = await dryRunKnowledgeIngest({
+      knowledgeRoot,
+      sourcePath: relativeFixture,
+      target: 'equity',
+      apply: true,
+    });
+    expect(reapply.knowledgeVersion).toBe('0.1.1');
+
     const secondPrepare = await prepareKnowledgeIngest({
       knowledgeRoot,
       sourcePath: relativeFixture,
@@ -157,5 +234,23 @@ describe('pipeline dry-run against fixture', () => {
     });
     expect(secondPrepare.cacheHits).toBeGreaterThanOrEqual(1);
     expect(secondPrepare.cacheMisses).toBe(0);
+  });
+
+  it('should reject prepare outside knowledge/sources/', async () => {
+    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'ki-pipe-out-'));
+    const knowledgeRoot = path.join(tmp, 'knowledge');
+    await fs.cp(path.join(process.cwd(), 'knowledge'), knowledgeRoot, {
+      recursive: true,
+    });
+    const outside = path.join(tmp, 'outside.txt');
+    await fs.writeFile(outside, 'nope\n', 'utf8');
+
+    await expect(
+      prepareKnowledgeIngest({
+        knowledgeRoot,
+        sourcePath: outside,
+        target: 'equity',
+      }),
+    ).rejects.toThrow(/must resolve under knowledge\/sources/);
   });
 });

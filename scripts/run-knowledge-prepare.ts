@@ -28,7 +28,7 @@ function parseArgs(argv: string[]) {
 
   if (positional.length !== 1) {
     throw new Error(
-      'Usage: npm run knowledge:prepare -- <source.txt|pdf> [--target equity|cedear|bond|other]',
+      'Usage: npm run knowledge:prepare -- <path-under-knowledge/sources> [--target equity|cedear|bond|other]',
     );
   }
 

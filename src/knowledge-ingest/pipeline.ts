@@ -7,11 +7,13 @@ import { sha256Hex } from './hash';
 import {
   ensurePlaybookListed,
   readManifest,
+  shouldBumpPatchOnApply,
   upsertManifestSource,
   writeManifest,
 } from './manifest';
 import { assertPlaybookTemplate } from './playbook-template';
 import type { PlaybookAssetType } from './playbook-template';
+import { resolveKnowledgeSourcePath } from './source-path';
 import { synthesizePlaybookFromText } from './synthesize-dry-run';
 
 export type PrepareIngestParams = {
@@ -21,15 +23,19 @@ export type PrepareIngestParams = {
 };
 
 export async function prepareKnowledgeIngest(params: PrepareIngestParams) {
-  const extracted = await extractTextFromSource(params.sourcePath);
+  const resolved = await resolveKnowledgeSourcePath({
+    knowledgeRoot: params.knowledgeRoot,
+    sourcePath: params.sourcePath,
+  });
+  const extracted = await extractTextFromSource(resolved.absolutePath);
   const sourceHash = sha256Hex(extracted.text);
-  const docId = resolveDocId(params.sourcePath, sourceHash);
+  const docId = resolveDocId(resolved.relativeToKnowledge, sourceHash);
   const chunks = chunkText(extracted.text);
 
   const result = await writeChunkCache({
     knowledgeRoot: params.knowledgeRoot,
     docId,
-    sourcePath: extracted.sourcePath,
+    sourcePath: resolved.relativeToKnowledge,
     sourceText: extracted.text,
     sourceHash,
     chunks,
@@ -41,6 +47,7 @@ export async function prepareKnowledgeIngest(params: PrepareIngestParams) {
     format: extracted.format,
     extractor: extracted.extractor,
     chunkCount: chunks.length,
+    sourceRelative: resolved.relativeToKnowledge,
   };
 }
 
@@ -50,50 +57,46 @@ export type DryRunIngestParams = PrepareIngestParams & {
 
 export async function dryRunKnowledgeIngest(params: DryRunIngestParams) {
   const prepared = await prepareKnowledgeIngest(params);
-  const sourceRelative = path.relative(
-    path.dirname(params.knowledgeRoot),
-    prepared.sourcePath,
-  );
-  const knowledgeRelativeSource = path.relative(
-    params.knowledgeRoot,
-    prepared.sourcePath,
-  );
+  const sourceRelative = prepared.sourceRelative;
 
   let manifest = await readManifest(params.knowledgeRoot);
-  const { markdown } = synthesizePlaybookFromText({
+  let knowledgeVersionForDraft = manifest.knowledgeVersion;
+  const { markdown: initialMarkdown } = synthesizePlaybookFromText({
     text: await fs.readFile(path.join(prepared.rawDir, 'source.txt'), 'utf8'),
     target: params.target,
-    knowledgeVersion: manifest.knowledgeVersion,
+    knowledgeVersion: knowledgeVersionForDraft,
     docId: prepared.docId,
-    sourceRelativePath: knowledgeRelativeSource.startsWith('..')
-      ? sourceRelative
-      : knowledgeRelativeSource,
+    sourceRelativePath: sourceRelative,
   });
 
-  const missing = assertPlaybookTemplate(markdown);
+  const missing = assertPlaybookTemplate(initialMarkdown);
   if (missing.length > 0) {
     throw new Error(`Dry-run playbook missing sections: ${missing.join(', ')}`);
   }
 
-  const draftPath = path.join(prepared.rawDir, 'playbook.md');
-  await fs.writeFile(draftPath, markdown, 'utf8');
-
   const today = new Date().toISOString().slice(0, 10);
   let appliedPath: string | undefined;
+  let markdown = initialMarkdown;
+
+  const sourceEntry = {
+    docId: prepared.docId,
+    sourceHash: prepared.sourceHash,
+    sourcePath: sourceRelative,
+    targets: [params.target],
+    ingestedAt: today,
+  };
 
   if (params.apply) {
-    manifest = upsertManifestSource(
+    const bumpPatch = shouldBumpPatchOnApply(
       manifest,
-      {
-        docId: prepared.docId,
-        sourceHash: prepared.sourceHash,
-        sourcePath: knowledgeRelativeSource.startsWith('..')
-          ? sourceRelative
-          : knowledgeRelativeSource,
-        targets: [params.target],
-        ingestedAt: today,
-      },
-      { bumpPatch: true },
+      prepared.docId,
+      prepared.sourceHash,
+    );
+    manifest = upsertManifestSource(manifest, sourceEntry, { bumpPatch });
+    knowledgeVersionForDraft = manifest.knowledgeVersion;
+    markdown = initialMarkdown.replace(
+      /knowledgeVersion: `[^`]+`/,
+      `knowledgeVersion: \`${knowledgeVersionForDraft}\``,
     );
 
     const playbookFile =
@@ -101,11 +104,7 @@ export async function dryRunKnowledgeIngest(params: DryRunIngestParams) {
         ? `playbooks/${prepared.docId}.md`
         : `playbooks/${params.target}.md`;
     const absolutePlaybook = path.join(params.knowledgeRoot, playbookFile);
-    const appliedMarkdown = markdown.replace(
-      /knowledgeVersion: `[^`]+`/,
-      `knowledgeVersion: \`${manifest.knowledgeVersion}\``,
-    );
-    await fs.writeFile(absolutePlaybook, appliedMarkdown, 'utf8');
+    await fs.writeFile(absolutePlaybook, markdown, 'utf8');
     manifest = ensurePlaybookListed(manifest, {
       id: params.target === 'other' ? prepared.docId : params.target,
       path: playbookFile,
@@ -113,17 +112,11 @@ export async function dryRunKnowledgeIngest(params: DryRunIngestParams) {
     });
     appliedPath = playbookFile;
   } else {
-    manifest = upsertManifestSource(manifest, {
-      docId: prepared.docId,
-      sourceHash: prepared.sourceHash,
-      sourcePath: knowledgeRelativeSource.startsWith('..')
-        ? sourceRelative
-        : knowledgeRelativeSource,
-      targets: [params.target],
-      ingestedAt: today,
-    });
+    manifest = upsertManifestSource(manifest, sourceEntry);
   }
 
+  const draftPath = path.join(prepared.rawDir, 'playbook.md');
+  await fs.writeFile(draftPath, markdown, 'utf8');
   await writeManifest(params.knowledgeRoot, manifest);
 
   return {
@@ -131,8 +124,6 @@ export async function dryRunKnowledgeIngest(params: DryRunIngestParams) {
     draftPath,
     appliedPath,
     knowledgeVersion: manifest.knowledgeVersion,
-    sourceRelative: knowledgeRelativeSource.startsWith('..')
-      ? sourceRelative
-      : knowledgeRelativeSource,
+    sourceRelative,
   };
 }

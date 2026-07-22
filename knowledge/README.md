@@ -69,6 +69,11 @@ endpoint or cron.
 | `npm run knowledge:prepare -- <file> [--target equity\|cedear\|bond\|other]` | Extract → chunk → `raw/<docId>/` with content-hash cache |
 | `npm run knowledge:dry-run -- <file> [--target …] [--apply]` | Prepare + deterministic playbook draft (no LLM / API key) |
 
+`<file>` must resolve under `knowledge/sources/` (symlink escapes rejected).
+`meta.json` / `manifest.sources` store **repo-relative** paths only. `--apply`
+bumps `knowledgeVersion` patch only when `sourceHash` changes; re-ingest of the
+same `docId` for another target **merges** into `targets[]`.
+
 Agent orchestration: skill `knowledge-ingest`
 (`.cursor/skills/knowledge-ingest` → `.agents/skills/knowledge-ingest`).
 Prompts live in `_prompts/`. **Never** paste an entire book into one LLM call;

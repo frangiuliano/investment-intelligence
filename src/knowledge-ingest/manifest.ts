@@ -37,6 +37,13 @@ export async function writeManifest(
   );
 }
 
+function mergeTargets(
+  existing: string[] | undefined,
+  incoming: string[],
+): string[] {
+  return [...new Set([...(existing ?? []), ...incoming])].sort();
+}
+
 export function upsertManifestSource(
   manifest: KnowledgeManifest,
   entry: ManifestSourceEntry,
@@ -44,10 +51,19 @@ export function upsertManifestSource(
 ): KnowledgeManifest {
   const sources = [...(manifest.sources ?? [])];
   const existingIndex = sources.findIndex((s) => s.docId === entry.docId);
+
+  const mergedEntry: ManifestSourceEntry = {
+    ...entry,
+    targets: mergeTargets(
+      existingIndex >= 0 ? sources[existingIndex].targets : undefined,
+      entry.targets,
+    ),
+  };
+
   if (existingIndex >= 0) {
-    sources[existingIndex] = entry;
+    sources[existingIndex] = mergedEntry;
   } else {
-    sources.push(entry);
+    sources.push(mergedEntry);
   }
 
   let knowledgeVersion = manifest.knowledgeVersion;
@@ -83,4 +99,16 @@ export function ensurePlaybookListed(
     playbooks.push(playbook);
   }
   return { ...manifest, playbooks };
+}
+
+export function shouldBumpPatchOnApply(
+  manifest: KnowledgeManifest,
+  docId: string,
+  sourceHash: string,
+): boolean {
+  const existing = (manifest.sources ?? []).find((s) => s.docId === docId);
+  if (!existing) {
+    return true;
+  }
+  return existing.sourceHash !== sourceHash;
 }
