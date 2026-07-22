@@ -127,7 +127,7 @@ export class BriefService {
 
       try {
         await this.telegramClient.sendMessage(message);
-        await this.sendChartFollowUp(symbol, market, locale);
+        await this.sendChartFollowUp(persistedBrief, market, locale);
         return { brief: persistedBrief, message, ok: true };
       } catch (sendError) {
         const detail =
@@ -175,10 +175,11 @@ export class BriefService {
 
   /**
    * Chart errors are isolated on purpose (ADR 004): a render or sendPhoto
-   * failure must never fail the already-delivered textual brief.
+   * failure must never fail the already-delivered textual brief. One render
+   * feeds both persistence and Telegram (#76).
    */
   private async sendChartFollowUp(
-    symbol: string,
+    brief: ResearchBrief,
     market: BriefMarketContext | null,
     locale: AppLocale,
   ): Promise<void> {
@@ -186,18 +187,44 @@ export class BriefService {
       return;
     }
 
+    let chart: Buffer;
     try {
-      const chart = this.technicalChartService.renderTechnicalChart(
-        market.series,
-      );
-      await this.telegramClient.sendPhoto(
-        chart,
-        formatBriefChartCaption(symbol, locale),
-      );
+      chart = this.technicalChartService.renderTechnicalChart(market.series);
     } catch (chartError) {
       const detail =
         chartError instanceof Error ? chartError.message : String(chartError);
-      this.logger.error(`Technical chart failed for ${symbol}: ${detail}`);
+      this.logger.error(
+        `Technical chart render failed for ${brief.symbol}: ${detail}`,
+      );
+      await this.safeSend(formatBriefChartUnavailableMessage(locale));
+      return;
+    }
+
+    try {
+      await this.researchBriefsRepository.update(brief.id, {
+        chartPng: chart,
+      });
+    } catch (persistError) {
+      const detail =
+        persistError instanceof Error
+          ? persistError.message
+          : String(persistError);
+      this.logger.error(
+        `Technical chart persist failed for ${brief.symbol}: ${detail}`,
+      );
+    }
+
+    try {
+      await this.telegramClient.sendPhoto(
+        chart,
+        formatBriefChartCaption(brief.symbol, locale),
+      );
+    } catch (sendError) {
+      const detail =
+        sendError instanceof Error ? sendError.message : String(sendError);
+      this.logger.error(
+        `Technical chart sendPhoto failed for ${brief.symbol}: ${detail}`,
+      );
       await this.safeSend(formatBriefChartUnavailableMessage(locale));
     }
   }
