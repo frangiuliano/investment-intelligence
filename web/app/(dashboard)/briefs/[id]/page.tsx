@@ -7,9 +7,11 @@ import { Badge } from "@/components/ui/badge"
 import {
   Card,
   CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { briefChartSrc, shouldShowBriefChart } from "@/lib/api/brief-chart"
 import { BackendApiError } from "@/lib/api/client"
 import { getBrief } from "@/lib/api/research"
 import {
@@ -56,6 +58,7 @@ export default async function BriefDetailPage({
   const contentSections = BRIEF_SECTION_KEYS.filter(
     (key) => key !== "disclaimer" && brief.sections[key]
   )
+  const showChart = shouldShowBriefChart(brief.chartAvailable)
 
   return (
     <section className="mx-auto max-w-3xl">
@@ -94,6 +97,30 @@ export default async function BriefDetailPage({
       </div>
 
       <div className="space-y-6">
+        {showChart ? (
+          <Card size="sm" className="overflow-hidden">
+            <CardHeader className="border-b border-ink/10">
+              <CardTitle>Gráfico técnico</CardTitle>
+              <CardDescription>
+                Misma imagen enviada por Telegram al generar el informe.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-0">
+              <figure>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={briefChartSrc(brief.id)}
+                  alt={`Gráfico técnico de ${brief.symbol}`}
+                  className="h-auto w-full bg-paper"
+                />
+                <figcaption className="border-t border-ink/10 px-3 py-3 font-mono text-[0.65rem] uppercase tracking-[0.16em] text-muted-foreground">
+                  {brief.symbol} · análisis técnico
+                </figcaption>
+              </figure>
+            </CardContent>
+          </Card>
+        ) : null}
+
         {contentSections.map((key) => (
           <Card key={key} size="sm">
             <CardHeader>
