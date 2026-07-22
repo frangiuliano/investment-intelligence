@@ -1,0 +1,2 @@
+# Extract/chunk cache from knowledge-ingest (#82).
+# Hash-keyed artifacts may be committed when small; large binaries stay local.

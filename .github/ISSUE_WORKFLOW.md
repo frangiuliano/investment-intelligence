@@ -9,6 +9,8 @@ Este proyecto sigue el estándar definido en
 - **Scope v1:** bot de research (locale, relevancia, cartera, eventos, digesto,
   briefs, journal, review).
 - **Scope v2:** dashboard de lectura.
+- **Scope ai-quality:** Knowledge Pack, ingest PDF→playbooks, puerto LLM,
+  inyección en analysis/briefs, eval harness y feedback del operador.
 - **Tipos usados:** `type:foundation` para setup/infra/DB, `type:feature` para
   funcionalidad de producto, `type:chore` para tooling.
 - **Labels legacy:** algunos issues usan `mvp`, `foundation` y `feature` sin
@@ -106,6 +108,29 @@ del body del issue es la fuente de verdad.
 Skills de UI (uso automático, sin slash): `.agents/skills/frontend-design`,
 `vercel-react-best-practices`, `web-design-guidelines`.
 
+## Orden de ejecución (ai-quality) — Knowledge Pack + LLM portable
+
+Objetivo: educar el análisis con playbooks versionados (agnóstico al vendor),
+sin fine-tuning ni RAG pesado en v1 de este scope.
+
+| Orden | Issue | Título |
+|-------|-------|--------|
+| 37 | #80 | Scaffold Knowledge Pack versionado (playbooks y rúbricas) |
+| 38 | #82 | Crear pipeline knowledge-ingest (PDF → playbooks) con skill Cursor |
+| 39 | #81 | Introducir puerto LLM agnóstico con adapter Gemini |
+| 40 | #83 | Inyectar Knowledge Pack en news analysis y briefs |
+| 41 | #85 | Crear eval harness de calidad de análisis (gold fixtures) |
+| 42 | #84 | Registrar feedback del operador (útil / ruido) sobre análisis y briefs |
+
+Orden vigente: **#80 → #82 → #81 → #83 → #85 → #84**.
+
+`#82` y `#81` dependen de `#80`. `#83` depende de `#80` + `#81`
+(`#82` deseable para contenido real). `#85` depende de `#81` (`#83`
+deseable). `#84` depende de `#83`.
+
+Fuera de este corte (crear después si hace falta): segundo provider real +
+comparación A/B sobre el eval harness; embeddings/vector DB.
+
 ## Fuera de backlog (explícito)
 
 - Trading automático / ejecución de órdenes.
@@ -137,6 +162,8 @@ No compartir la misma key entre ambos: el free tier es por proyecto.
 | Rúbrica de review de hipótesis | Finance Advisor (`/fin`) | Antes o durante #34 |
 | Vocabulario de stance | Finance Advisor (`/fin`) | Antes o durante #56 |
 | Scaffold / pantallas `web/` | Skills automáticas | `frontend-design`, `vercel-react-best-practices` |
+| Puerto LLM / inyección Knowledge Pack | Architect (`/arch`) | Antes o al empezar #81 y #83 |
+| Seeds / gold labels de materialidad | Finance Advisor (`/fin`) | Opcional al completar #80 / #85 |
 | CI setup | DevOps | Antes o durante issue #10 |
 | AI Review workflow | DevOps | Antes o durante issue #11 |
 | Cada feature | Developer | Automático por `order-NN` |
