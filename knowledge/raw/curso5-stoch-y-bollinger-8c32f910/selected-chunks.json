@@ -1,0 +1,108 @@
+{
+  "filterThemesVersion": "1.1.0",
+  "genres": [
+    "technical_analysis"
+  ],
+  "minScore": 4,
+  "maxExtractChunks": 16,
+  "selectedCount": 4,
+  "totalChunks": 5,
+  "selected": [
+    {
+      "file": "chunk-000-2c45d4e2df7a.txt",
+      "score": 6,
+      "matchedKeywords": [
+        "soporte",
+        "resistencia",
+        "tendencia",
+        "media móvil"
+      ],
+      "length": 2948
+    },
+    {
+      "file": "chunk-002-41b96ef74995.txt",
+      "score": 6,
+      "matchedKeywords": [
+        "soporte",
+        "resistencia",
+        "tendencia",
+        "media móvil"
+      ],
+      "length": 2995
+    },
+    {
+      "file": "chunk-001-7e65bc2699d3.txt",
+      "score": 5,
+      "matchedKeywords": [
+        "tendencia",
+        "sma",
+        "media móvil"
+      ],
+      "length": 2997
+    },
+    {
+      "file": "chunk-003-64a15efc0f07.txt",
+      "score": 5,
+      "matchedKeywords": [
+        "vela",
+        "tendencia",
+        "martillo",
+        "ruptura",
+        "media móvil"
+      ],
+      "length": 2998
+    }
+  ],
+  "rankedTop30": [
+    {
+      "file": "chunk-000-2c45d4e2df7a.txt",
+      "score": 6,
+      "matchedKeywords": [
+        "soporte",
+        "resistencia",
+        "tendencia",
+        "media móvil"
+      ],
+      "length": 2948
+    },
+    {
+      "file": "chunk-002-41b96ef74995.txt",
+      "score": 6,
+      "matchedKeywords": [
+        "soporte",
+        "resistencia",
+        "tendencia",
+        "media móvil"
+      ],
+      "length": 2995
+    },
+    {
+      "file": "chunk-001-7e65bc2699d3.txt",
+      "score": 5,
+      "matchedKeywords": [
+        "tendencia",
+        "sma",
+        "media móvil"
+      ],
+      "length": 2997
+    },
+    {
+      "file": "chunk-003-64a15efc0f07.txt",
+      "score": 5,
+      "matchedKeywords": [
+        "vela",
+        "tendencia",
+        "martillo",
+        "ruptura",
+        "media móvil"
+      ],
+      "length": 2998
+    },
+    {
+      "file": "chunk-004-939ab09926eb.txt",
+      "score": 0,
+      "matchedKeywords": [],
+      "length": 661
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 {
-  "knowledgeVersion": "0.1.7",
+  "knowledgeVersion": "0.1.8",
   "updatedAt": "2026-07-23",
   "playbooks": [
     {
@@ -91,6 +91,15 @@
       "docId": "el-patron-bitcoin-4dfea5ea",
       "sourceHash": "4dfea5ea30ec3194f7666c39dd1dd7c1949be84d5c6a2a256e3a03ac98f8249c",
       "sourcePath": "sources/El patron Bitcoin.pdf",
+      "targets": [
+        "equity"
+      ],
+      "ingestedAt": "2026-07-23"
+    },
+    {
+      "docId": "curso5-stoch-y-bollinger-8c32f910",
+      "sourceHash": "8c32f91071cad0f69bda1134fb52f3111622cb679cf8c7c1a1afdff42b42fcea",
+      "sourcePath": "sources/Curso5-Stoch y Bollinger.pdf",
       "targets": [
         "equity"
       ],

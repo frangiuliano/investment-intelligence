@@ -1,0 +1,36 @@
+{
+  "docId": "curso5-stoch-y-bollinger-8c32f910",
+  "sourceHash": "8c32f91071cad0f69bda1134fb52f3111622cb679cf8c7c1a1afdff42b42fcea",
+  "chunks": [
+    {
+      "id": "chunk-000-2c45d4e2df7a",
+      "index": 0,
+      "contentHash": "2c45d4e2df7aeb5a42b3f1623ebf21e98bbc077bae3681e8882166bb3815561b",
+      "path": "raw/curso5-stoch-y-bollinger-8c32f910/chunk-000-2c45d4e2df7a.txt"
+    },
+    {
+      "id": "chunk-001-7e65bc2699d3",
+      "index": 1,
+      "contentHash": "7e65bc2699d302f7e89f61eee87a7f801f82d94f08ee7de9f52f0d46ea64268a",
+      "path": "raw/curso5-stoch-y-bollinger-8c32f910/chunk-001-7e65bc2699d3.txt"
+    },
+    {
+      "id": "chunk-002-41b96ef74995",
+      "index": 2,
+      "contentHash": "41b96ef74995a7befeda4bb3309ccb2b93846b62fa4a2ae39ab09699326da12f",
+      "path": "raw/curso5-stoch-y-bollinger-8c32f910/chunk-002-41b96ef74995.txt"
+    },
+    {
+      "id": "chunk-003-64a15efc0f07",
+      "index": 3,
+      "contentHash": "64a15efc0f07b00fdaacf7cb71ad25a4a195a7707a6843fd3399a75bebb727c7",
+      "path": "raw/curso5-stoch-y-bollinger-8c32f910/chunk-003-64a15efc0f07.txt"
+    },
+    {
+      "id": "chunk-004-939ab09926eb",
+      "index": 4,
+      "contentHash": "939ab09926ebfcea0749ce58f0e872f3dc663eafdcda0652e9e36922b371c6a9",
+      "path": "raw/curso5-stoch-y-bollinger-8c32f910/chunk-004-939ab09926eb.txt"
+    }
+  ]
+}

@@ -2,7 +2,7 @@
 
 - id: `equity`
 - assetType: `equity`
-- knowledgeVersion: `0.1.7`
+- knowledgeVersion: `0.1.8`
 
 Equity research method: fundamentals, technical lens, and probabilistic
 process discipline. Method only — do not invent prices, bars, or fundamentals.
@@ -26,6 +26,10 @@ educational / process weights for personal recommendations — not broker orders
 - Multi-TF habit: establish structure and key zones on higher timeframes first; use lower timeframes only to observe reaction at a predefined zone — do not start from the lowest TF alone.
 - In ranges, “fair value” / mid-range (~50%) mean-reversion ideas may apply; they weaken or drift in strong one-way trends — state which regime you assume.
 - Prefer setups with **repeatable predictability** (same pattern sequence → same forecast) over one-off stories.
+- When citing **stochastic / Bollinger** (or similar oscillators/bands): state whether the market looks **range-bound vs trending** — these tools are stronger in ranges; weak as sole logic in strong trends.
+- Stochastic cues to note: overbought/oversold near extremes (often both %K and %D), %K/%D crosses, and **divergence** (price extremes without matching oscillator extremes) as caution on trend strength — not an automatic reverse.
+- Bollinger cues: mean-reversion toward the mid band when bands are flat (range); **squeeze** (narrow bands) as volatility contraction that may precede a larger move — direction still needs confirmation; expansion after a squeeze can support continuation narratives with OHLC/structure.
+- Prefer candlestick reliability confluence when price tags outer bands over indicator-only stories.
 - Frame research hypotheses / stance in **probabilities**, not certainty: analysis improves odds; unknown forces can still invalidate the read.
 - Predefine **invalidation** and how much risk you accept before leaning on a stance; keep criteria objective (present vs absent), not ad-hoc mid-stream. Risk only capital you can afford to lose.
 - Weigh whether expected benefit justifies the risk for this review cycle before committing a directional stance.
@@ -64,6 +68,10 @@ educational / process weights for personal recommendations — not broker orders
 | Motivational / destiny / promo framing in a source | low | Ignore for alerts |
 | Pure monetary philosophy / hard-money essay with no ticker or event | low | Prefer digest |
 | Certainty that a monetary asset “must” appreciate as store of value | low | Process smell; SoV ≠ guaranteed return |
+| Headline only names stochastic / Bollinger / overbought / squeeze | low | Indicator jargon ≠ catalyst |
+| Oscillator used as sole reason to upgrade an alert | low | Educational lens only |
+| Verified squeeze or band extreme + structure + company catalyst | low–medium | Technical context; fundamentals still lead |
+| Certainty that 80/20 or outer Bollinger “must” reverse | low | Process smell |
 
 ## Invalidation
 
@@ -85,6 +93,7 @@ educational / process weights for personal recommendations — not broker orders
 - Fear of past failures filtered evidence or blocked acting on a prepared thesis without stating the bias.
 - Micromanaging / rewriting the thesis because chart-watching felt safer than the plan.
 - Hard-money / Austrian / Bitcoin-Standard ideology treated as verified microstructure or as a numeric forecast without sources.
+- Oscillator / Bollinger logic applied in a clear strong trend without stating regime, or a squeeze treated as a timed directional forecast.
 
 ## Do not
 
@@ -102,6 +111,8 @@ educational / process weights for personal recommendations — not broker orders
 - Force noise reads in dead session conditions just to feel active.
 - Invent stock-to-flow ratios, on-chain volumes, or issuance stats not present in tools/sources.
 - Collapse “money / store of value” essays into free-text buy-crypto product orders.
+- Map stochastic 80/20 or “sell upper Bollinger / buy lower” recipes into product orders.
+- Invent universal “correct” indicator period settings as facts.
 
 ## source_refs
 
@@ -113,5 +124,6 @@ educational / process weights for personal recommendations — not broker orders
 - operator: `sources/Mentalidad de trader.pdf` (docId `mentalidad-de-trader-fe38bafb`; Fin-ranked `trading_psychology` via `filter-themes.json` v1.1.0)
 - operator: `sources/Market Makers Method (Order Blocks) ( PDFDrive ).pdf` (docId `market-makers-method-order-blocks-pdfdrive-6c6cb069`; Fin-ranked `technical_analysis` via `filter-themes.json` v1.1.0)
 - operator: `sources/El patron Bitcoin.pdf` (docId `el-patron-bitcoin-4dfea5ea`; Fin-ranked `fundamental_analysis` via `filter-themes.json` v1.1.0 — monetary theory, not chart TA)
+- operator: `sources/Curso5-Stoch y Bollinger.pdf` (docId `curso5-stoch-y-bollinger-8c32f910`; Fin-ranked `technical_analysis` via `filter-themes.json` v1.1.0)
 - rubric: `rubrics/materiality.md`, `rubrics/event-types.md`, `rubrics/stance-invalidation.md`
 - process: issue #92 formalize ingest filter themes (`/fin` ownership); `/processBook` operator entry
