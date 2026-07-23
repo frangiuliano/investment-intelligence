@@ -164,3 +164,27 @@ export type ReviewRunResult = {
   reviews: HypothesisReview[]
   notified: boolean
 }
+
+export const FEEDBACK_TARGET_TYPES = [
+  "analysis",
+  "brief",
+  "notification",
+] as const
+
+export type FeedbackTargetType = (typeof FEEDBACK_TARGET_TYPES)[number]
+
+export const FEEDBACK_LABELS = ["useful", "noise"] as const
+
+export type FeedbackLabel = (typeof FEEDBACK_LABELS)[number]
+
+export type OperatorFeedback = {
+  id: string
+  targetType: FeedbackTargetType
+  targetId: string
+  label: FeedbackLabel
+  promptVersion: string | null
+  knowledgeVersion: string | null
+  source: string
+  actor: string
+  createdAt: string
+}

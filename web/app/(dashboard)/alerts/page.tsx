@@ -1,5 +1,6 @@
 import { ExternalLink } from "lucide-react"
 
+import { FeedbackButtons } from "@/components/feedback-buttons"
 import { EmptyState, ErrorState } from "@/components/data-states"
 import { PageHeader } from "@/components/page-header"
 import { Pagination } from "@/components/pagination"
@@ -79,6 +80,11 @@ function AlertCard({ notification }: { notification: Notification }) {
             <ExternalLink className="size-3" />
           </a>
         ) : null}
+        <FeedbackButtons
+          targetType="notification"
+          targetId={notification.id}
+          revalidatePath="/alerts"
+        />
       </CardContent>
     </Card>
   )
@@ -98,7 +104,7 @@ export default async function AlertsPage({ searchParams }: AlertsPageProps) {
         <PageHeader
           areaCode="03"
           title="Alertas"
-          description="Notificaciones que el proceso automático ya envió. Solo lectura: las alertas nunca se crean manualmente."
+          description="Notificaciones que el proceso automático ya envió. Podés marcar útil/ruido; no se crean alertas a mano."
         />
         <ErrorState message="No se pudieron cargar las alertas. Verificá que la API Nest esté activa y recargá la página." />
       </section>
@@ -110,7 +116,7 @@ export default async function AlertsPage({ searchParams }: AlertsPageProps) {
       <PageHeader
         areaCode="03"
         title="Alertas"
-        description="Notificaciones que el proceso automático ya envió. Solo lectura: las alertas nunca se crean manualmente."
+        description="Notificaciones que el proceso automático ya envió. Podés marcar útil/ruido; no se crean alertas a mano."
       >
         <form action="/alerts" method="get" className="flex items-end gap-2">
           <Input

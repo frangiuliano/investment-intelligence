@@ -72,7 +72,7 @@ falta una variable obligatoria de runtime (mensaje explícito vía Joi).
 | `DIGEST_LOOKBACK_HOURS` | No (default `24`) | Ventana de candidatos al digesto (1–168) |
 | `STORY_CLUSTER_WINDOW_HOURS` | No (default `24`) | Ventana para colapsar historias duplicadas en un solo push |
 | `WATCHLIST_TICKERS` | No | Filtro opcional de tickers para relevancia |
-| `DASHBOARD_API_KEY` | No (default vacío) | Secret BFF → Nest (`x-dashboard-api-key`); vacío = `/reviews`, `/news/*`, `/notifications` y `/briefs` en 401 |
+| `DASHBOARD_API_KEY` | No (default vacío) | Secret BFF → Nest (`x-dashboard-api-key`); vacío = `/reviews`, `/news/*`, `/notifications`, `/briefs` y `/feedback` en 401 |
 | `REVIEW_CRON_SCHEDULE` | No (default `0 12 1 * *`) | Cron mensual: día 1 UTC revisa el **mes UTC anterior** |
 | `TECHNICAL_CHART_ENABLED` | No (default `true`) | Enviar chart técnico en imagen tras un brief con market data |
 | `TECHNICAL_CHART_SMA_PERIODS` | No (default `20`) | Ventanas SMA del overlay, separadas por coma (ej. `20,50`) |
@@ -849,6 +849,43 @@ curl -s "http://localhost:3000/briefs/<id>/chart" \
 Si Telegram falla **después** de persistir, `POST` igual responde `201` con el
 brief guardado (consultable por `GET`); el error de delivery solo afecta el
 canal Telegram.
+
+## API de feedback del operador (dashboard)
+
+Marcas `useful` \| `noise` sobre análisis, briefs o notificaciones (alertas).
+Superficie de producto: research desk (Alertas + detalle de Informes). Requiere
+`x-dashboard-api-key` (`DASHBOARD_API_KEY`); vacío → `401`.
+
+| Endpoint | Descripción |
+|----------|-------------|
+| `POST /feedback` | Crea feedback → `201` + fila en `operator_feedback` |
+
+Body JSON:
+
+```json
+{
+  "targetType": "analysis | brief | notification",
+  "targetId": "<uuid>",
+  "label": "useful | noise",
+  "actor": "desk-operator"
+}
+```
+
+`actor` es opcional (default `desk-operator`). El servicio valida que el target
+exista y guarda un snapshot de `promptVersion` / `knowledgeVersion` cuando
+aplica (para `notification`, desde el analysis embebido del artículo).
+
+Promoción a `knowledge/examples/` es **manual** — ver
+`knowledge/examples/README.md`. El feedback no reescribe playbooks solo.
+
+```bash
+export DASHBOARD_API_KEY=pick_a_long_random_string
+
+curl -s -X POST http://localhost:3000/feedback \
+  -H "Content-Type: application/json" \
+  -H "x-dashboard-api-key: $DASHBOARD_API_KEY" \
+  -d '{"targetType":"brief","targetId":"<brief-uuid>","label":"useful"}' | jq
+```
 
 ## Brief on-demand (`/brief`)
 

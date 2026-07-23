@@ -80,8 +80,8 @@ the VPS.
 | Holdings | Yes | Yes (existing REST) |
 | Watchlist | Yes | Yes (existing REST; can live under Holdings or nav) |
 | Hypotheses | Yes | Yes (create / close; existing REST) |
-| Alerts | Yes | No (pipeline-generated only) |
-| Briefs | Yes | Yes (request brief for ticker via API/BFF) |
+| Alerts | Yes | Feedback only (`useful`/`noise` via `#84`; alerts themselves remain pipeline-generated) |
+| Briefs | Yes | Yes (request brief + feedback useful/noise) |
 | Reviews | Yes | Yes (trigger period review; from #34) |
 
 No buy/sell CTAs. Stance/disclaimer on briefs remain visible when present.

@@ -2,6 +2,11 @@ import { Logger } from '@nestjs/common';
 import { DataSource, QueryFailedError, Repository } from 'typeorm';
 import { NewsAnalysis } from '../analysis/entities/news-analysis.entity';
 import { ResearchBrief } from '../brief/entities/research-brief.entity';
+import {
+  FeedbackLabel,
+  FeedbackTargetType,
+  OperatorFeedback,
+} from '../feedback/entities/operator-feedback.entity';
 import { NewsArticle } from '../news/entities/news-article.entity';
 import { DigestItem } from '../notifications/entities/digest-item.entity';
 import { DigestRun } from '../notifications/entities/digest-run.entity';
@@ -38,6 +43,7 @@ import { CreateHypothesisReviews1752580000000 } from './migrations/1752580000000
 import { AddResearchBriefStance1752590000000 } from './migrations/1752590000000-AddResearchBriefStance';
 import { AddResearchBriefChartPng1752600000000 } from './migrations/1752600000000-AddResearchBriefChartPng';
 import { AddKnowledgeVersionColumns1752610000000 } from './migrations/1752610000000-AddKnowledgeVersionColumns';
+import { CreateOperatorFeedback1752620000000 } from './migrations/1752620000000-CreateOperatorFeedback';
 import {
   DEFAULT_TEST_DATABASE_URL,
   resolveTestDatabaseUrl,
@@ -60,6 +66,7 @@ describe('Database schema (integration)', () => {
   let hypotheses: Repository<Hypothesis>;
   let hypothesisReviewRuns: Repository<HypothesisReviewRun>;
   let hypothesisReviews: Repository<HypothesisReview>;
+  let operatorFeedback: Repository<OperatorFeedback>;
   let databaseUrl: string;
 
   beforeAll(async () => {
@@ -82,6 +89,7 @@ describe('Database schema (integration)', () => {
         Hypothesis,
         HypothesisReviewRun,
         HypothesisReview,
+        OperatorFeedback,
       ],
       migrations: [
         InitialSchema1752180000000,
@@ -98,6 +106,7 @@ describe('Database schema (integration)', () => {
         AddResearchBriefStance1752590000000,
         AddResearchBriefChartPng1752600000000,
         AddKnowledgeVersionColumns1752610000000,
+        CreateOperatorFeedback1752620000000,
       ],
       synchronize: false,
       logging: false,
@@ -131,6 +140,7 @@ describe('Database schema (integration)', () => {
     hypotheses = dataSource.getRepository(Hypothesis);
     hypothesisReviewRuns = dataSource.getRepository(HypothesisReviewRun);
     hypothesisReviews = dataSource.getRepository(HypothesisReview);
+    operatorFeedback = dataSource.getRepository(OperatorFeedback);
   }, 30_000);
 
   afterAll(async () => {
@@ -141,7 +151,7 @@ describe('Database schema (integration)', () => {
 
   beforeEach(async () => {
     await dataSource.query(
-      'TRUNCATE TABLE "hypothesis_reviews", "hypothesis_review_runs", "hypotheses", "research_briefs", "digest_items", "digest_runs", "notifications", "news_story_cluster_members", "news_story_clusters", "news_analysis", "news_articles", "holdings", "watchlist_entries" RESTART IDENTITY CASCADE',
+      'TRUNCATE TABLE "operator_feedback", "hypothesis_reviews", "hypothesis_review_runs", "hypotheses", "research_briefs", "digest_items", "digest_runs", "notifications", "news_story_cluster_members", "news_story_clusters", "news_analysis", "news_articles", "holdings", "watchlist_entries" RESTART IDENTITY CASCADE',
     );
   });
 
@@ -163,7 +173,8 @@ describe('Database schema (integration)', () => {
           'research_briefs',
           'hypotheses',
           'hypothesis_review_runs',
-          'hypothesis_reviews'
+          'hypothesis_reviews',
+          'operator_feedback'
         )
       ORDER BY table_name
     `);
@@ -180,6 +191,7 @@ describe('Database schema (integration)', () => {
       'news_story_cluster_members',
       'news_story_clusters',
       'notifications',
+      'operator_feedback',
       'research_briefs',
       'watchlist_entries',
     ]);
@@ -604,5 +616,48 @@ describe('Database schema (integration)', () => {
         }),
       ),
     ).rejects.toBeInstanceOf(QueryFailedError);
+  });
+
+  it('should persist operator feedback against an analysis', async () => {
+    const article = await articles.save(
+      articles.create({
+        title: 'Feedback fixture',
+        url: 'https://example.com/feedback',
+        content: 'body',
+        source: 'fixture',
+        contentHash: 'feedback-hash',
+        publishedAt: new Date('2026-07-01T00:00:00.000Z'),
+      }),
+    );
+    const analysis = await analyses.save(
+      analyses.create({
+        articleId: article.id,
+        headline: 'Useful signal',
+        summary: 'Summary',
+        sentiment: 'bullish',
+        tickers: ['AAPL'],
+        materiality: 'high',
+        eventType: 'earnings',
+        model: 'mock',
+        promptVersion: 'news-analysis-v2',
+        knowledgeVersion: '0.1.0',
+      }),
+    );
+
+    const feedback = await operatorFeedback.save(
+      operatorFeedback.create({
+        targetType: FeedbackTargetType.ANALYSIS,
+        targetId: analysis.id,
+        label: FeedbackLabel.USEFUL,
+        promptVersion: analysis.promptVersion,
+        knowledgeVersion: analysis.knowledgeVersion,
+        actor: 'desk-operator',
+      }),
+    );
+
+    expect(feedback.id).toBeDefined();
+    expect(feedback.label).toBe(FeedbackLabel.USEFUL);
+    expect(feedback.promptVersion).toBe('news-analysis-v2');
+    expect(feedback.knowledgeVersion).toBe('0.1.0');
   });
 });

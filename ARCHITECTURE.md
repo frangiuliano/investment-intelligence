@@ -28,6 +28,7 @@ Mapa de módulos del backend NestJS y su relación con el backlog del MVP.
 | `market-data/` | Implementado | Port + adapter Yahoo para OHLCV histórico | #55 |
 | `llm/` | Implementado | Port `LlmClient` + adapter Gemini (`completeJson`) | #81 |
 | `knowledge/` | Implementado | Runtime Knowledge Pack loader/selector + prompt injection | #83 |
+| `feedback/` | Implementado | Feedback useful/noise del operador (`POST /feedback`) | #84 |
 | `charts/` | Implementado | Render determinista de chart técnico PNG desde OHLCV; persistido en `research_briefs.chart_png` (ADR 004 addendum) | #57, #76 |
 | `web/` | Implementado | Dashboard Next.js (research desk): Holdings, Hypotheses, Alerts, Briefs, Reviews vía BFF → Nest | #64, #35 |
 
@@ -47,6 +48,7 @@ research   ← hypotheses + reviews (REST + /review Telegram; market-data para r
 market-data ← MarketDataService → MarketDataPort → Yahoo adapter
 llm        ← LlmClient port → Gemini adapter (analysis + brief)
 knowledge  ← Knowledge Pack (metadata/keyword) → system prompt injection
+feedback   ← operator_feedback (useful|noise) → desk BFF; promote manual a knowledge/examples
 charts     ← TechnicalChartService → ChartRendererPort → canvas PNG (brief lo consume)
 telegram-bot ← inbound webhook/commands → brief + review
 
@@ -93,6 +95,10 @@ Ver `docs/adr/003-dashboard-web.md`.
   con outcomes `thesis_confirmed` \| `thesis_rejected` \| `timing_issue` \|
   `inconclusive`, notas (thesis/timing/learning) y retorno de precio nullable
   (nunca inventado). API `GET/POST /reviews*` protegida con `DASHBOARD_API_KEY`.
+- `operator_feedback` guarda marcas `useful` \| `noise` sobre `analysis`,
+  `brief` o `notification`, con `actor`, `source=desk` y snapshot de
+  `prompt_version` / `knowledge_version`. No actualiza playbooks solos;
+  promoción a `knowledge/examples/` es manual.
 
 ## Health check
 
