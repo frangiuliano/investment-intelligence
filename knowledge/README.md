@@ -109,7 +109,6 @@ skill + LLM extract/merge/QA for real books (local PDFs only).
 
 ## Out of scope here
 
-- Runtime LLM port / Gemini wiring (#81)
 - Prompt injection at runtime (#83)
 - Eval harness (#85) and operator feedback (#84)
 - NestJS ingest API, cron, or mandatory production Finance API key for ingest
