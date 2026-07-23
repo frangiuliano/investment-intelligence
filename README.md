@@ -209,6 +209,7 @@ holdings/watchlist).
 | `npm run migration:show` | Lista migraciones y su estado |
 | `npm run migration:revert` | Revierte la última migración |
 | `npm run pipeline:once` | Pipeline MVP completo (one-shot) |
+| `npm run eval:analysis` | Eval de calidad de análisis (mock default; `--live` opt-in) |
 | `npm run verify:lockfile` | `npm ci` en Linux (Docker) para raíz y `web/` — evita drift macOS→CI |
 
 Pre-push obligatorio: `verify:lockfile` → `lint` → `test` → `build`.
