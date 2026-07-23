@@ -3,6 +3,7 @@ import { config as loadEnv } from 'dotenv';
 import { DataSource } from 'typeorm';
 import { NewsAnalysis } from '../analysis/entities/news-analysis.entity';
 import { ResearchBrief } from '../brief/entities/research-brief.entity';
+import { OperatorFeedback } from '../feedback/entities/operator-feedback.entity';
 import { NewsArticle } from '../news/entities/news-article.entity';
 import { NewsStoryClusterMember } from '../notifications/entities/news-story-cluster-member.entity';
 import { NewsStoryCluster } from '../notifications/entities/news-story-cluster.entity';
@@ -28,6 +29,7 @@ import { CreateHypothesisReviews1752580000000 } from './migrations/1752580000000
 import { AddResearchBriefStance1752590000000 } from './migrations/1752590000000-AddResearchBriefStance';
 import { AddResearchBriefChartPng1752600000000 } from './migrations/1752600000000-AddResearchBriefChartPng';
 import { AddKnowledgeVersionColumns1752610000000 } from './migrations/1752610000000-AddKnowledgeVersionColumns';
+import { CreateOperatorFeedback1752620000000 } from './migrations/1752620000000-CreateOperatorFeedback';
 
 loadEnv();
 
@@ -56,6 +58,7 @@ export default new DataSource({
     Hypothesis,
     HypothesisReviewRun,
     HypothesisReview,
+    OperatorFeedback,
   ],
   migrations: [
     InitialSchema1752180000000,
@@ -72,6 +75,7 @@ export default new DataSource({
     AddResearchBriefStance1752590000000,
     AddResearchBriefChartPng1752600000000,
     AddKnowledgeVersionColumns1752610000000,
+    CreateOperatorFeedback1752620000000,
   ],
   synchronize: false,
   logging: false,
