@@ -2,12 +2,12 @@
 
 - id: `equity`
 - assetType: `equity`
-- knowledgeVersion: `0.1.3`
+- knowledgeVersion: `0.1.4`
 
 Equity research method: fundamentals, technical lens, and probabilistic
 process discipline. Method only — do not invent prices, bars, or fundamentals.
-Technical patterns and psychology rules are educational / process weights, not
-trade orders.
+Technical patterns, order-block / SMC labels, and psychology rules are
+educational / process weights, not trade orders.
 
 ## Always check
 
@@ -18,11 +18,15 @@ trade orders.
 - Note if the holding is already in the operator portfolio (affects alert priority, not truth).
 - When discussing chart structure: classify candlestick reversals by reliability band (highly / moderately / weakly) and require verified OHLCV before asserting a pattern completed.
 - Prefer highly reliable patterns (e.g. Evening/Morning Star, Abandoned Baby, Three White Soldiers, Three Inside/Outside Up or Down) over weak ones (Harami, Shooting Star, Belt Hold, Tweezers) for technical rationale.
+- If a source cites an **order block / mitigation / breaker** (or similar SMC label): require verified OHLC, state bullish vs bearish definition (last opposing candle before an impulse), and note higher-timeframe trend / range context before echoing the label.
+- Prefer hunting alleged blocks as **pullbacks in a clear trend** (bullish blocks in uptrends, bearish in downtrends); isolated labels without trend context are weak.
+- Hold competing explanations for the same zone: re-offer of prior interest vs **mitigation** (failed block revisited to flatten losers) vs stop-sweep / breaker structure — do not collapse them into one story.
 - Frame research hypotheses / stance in **probabilities**, not certainty: analysis improves odds; unknown forces can still invalidate the read.
 - Predefine **invalidation** (what would prove the thesis wrong) before leaning on a stance; keep criteria objective (present vs absent), not ad-hoc mid-stream.
 - Judge process quality over a *series* of similar setups — each outcome is independent; one win/loss does not prove or kill the method.
 - Do not let only the last 2–3 outcomes dominate how risky the next read “feels.”
 - Same chart pattern ≠ same participants or path; leave room for uncertainty in technical rationale.
+- Prefer anchoring long-horizon direction on fundamentals / primary news over obsessing block timing when both appear.
 
 ## Materiality heuristics
 
@@ -38,6 +42,10 @@ trade orders.
 | Headline names a candlestick with no company event | low | Chart jargon ≠ fundamental materiality |
 | Weak candlestick cited as sole “signal” | low | Educational only; do not upgrade alerts |
 | Highly reliable pattern used only with attached bars in a brief | low–medium | Technical lens / invalidation context — does not replace fundamentals |
+| Headline only names order block / ICT / mitigation / breaker | low | SMC jargon ≠ catalyst |
+| OB / mitigation used as sole reason to upgrade an alert | low | Educational lens only |
+| Verified OB-style structure + HTF trend + company catalyst | low–medium | Technical context; fundamentals still lead |
+| Certainty language that a zone “must” bounce | low | Process smell |
 | Narrative that “more analysis will remove uncertainty” | low | Process smell; does not upgrade news materiality |
 | Single win/loss treated as proof the whole method is fixed | low | Series thinking; avoid overconfidence or revenge bias |
 | Risk view driven only by recent streak of outcomes | low | Noise for alerts; note bias in brief risks if relevant |
@@ -50,6 +58,9 @@ trade orders.
 - Ticker was mis-attributed (wrong company / similar name).
 - Claimed candlestick was incomplete (missing confirming close) or only a weak pattern treated as highly reliable.
 - Multi-timeframe chart conflict left unstated.
+- Claimed order block used the wrong candle, lacked impulsive follow-through, or had unverified bars.
+- Zone story rewritten after the fact (post-hoc) so the “block” never fails.
+- Mitigation / breakeven unwind fits better than “fresh institutional interest” and was ignored.
 - Thesis had no predefined invalidation / risk boundary (“must be right” framing).
 - Rules changed after a few outcomes instead of evaluating a planned sample of similar setups.
 - Contradictory market information was ignored because it threatened an expectation.
@@ -61,7 +72,9 @@ trade orders.
 - Invent revenue, EPS, multiples, or candlestick completions not present in the article or market-data tools.
 - Upgrade materiality solely because the ticker is popular, volatile, or a pattern name appeared.
 - Collapse multiple unrelated tickers into one thesis without stating uncertainty.
-- Treat chart patterns as `event_type` catalysts or as buy/sell instructions.
+- Treat chart patterns or SMC labels (order block, mitigation, breaker) as `event_type` catalysts or as buy/sell instructions.
+- Map “entrada / R:R / comprar el open del bloque” language into product orders.
+- Invent institutional intent, hidden order flow, or pip counts not in tools/sources.
 - Claim certainty from more chart study alone; markets can always surprise.
 - Map trading stop-loss language into product “orders” — use research invalidation and horizon only.
 - Let fear of being wrong, FOMO, or revenge after a miss rewrite what evidence is considered.
@@ -73,5 +86,6 @@ trade orders.
 - fixture: `sources/fixtures/sample-equity-earnings.txt`
 - operator: `sources/velas-importantes.txt` (from `sources/velas importantes.pdf`, docId `velas-importantes-c6d2ee47`)
 - operator: `sources/pdfcoffee.com_trading-en-la-zona-pdf-free.pdf` (docId `pdfcoffee-com-trading-en-la-zona-pdf-free-71f96a6b`; Fin-ranked `trading_psychology` chunks via `filter-themes.json` v1.0.0)
+- operator: `sources/Order Blocks Bryan Lopez.pdf` (docId `order-blocks-bryan-lopez-fcdaecc0`; Fin-ranked `technical_analysis` chunks via `filter-themes.json` v1.0.0)
 - rubric: `rubrics/materiality.md`, `rubrics/event-types.md`, `rubrics/stance-invalidation.md`
 - process: issue #92 formalize ingest filter themes (`/fin` ownership)

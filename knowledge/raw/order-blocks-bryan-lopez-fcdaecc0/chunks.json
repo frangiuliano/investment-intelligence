@@ -1,0 +1,60 @@
+{
+  "docId": "order-blocks-bryan-lopez-fcdaecc0",
+  "sourceHash": "fcdaecc07e3754a80c9e8692a913685fa4f25e08d78f2062fe369503696f97a0",
+  "chunks": [
+    {
+      "id": "chunk-000-51f45843ddd2",
+      "index": 0,
+      "contentHash": "51f45843ddd2581acdf4ff5c9304c662bc463ead3d3093f851cc00948c32f0d4",
+      "path": "raw/order-blocks-bryan-lopez-fcdaecc0/chunk-000-51f45843ddd2.txt"
+    },
+    {
+      "id": "chunk-001-c42e95827278",
+      "index": 1,
+      "contentHash": "c42e95827278e89a7b70a6032793aa351908adb087839362ae5cd766f2705bc2",
+      "path": "raw/order-blocks-bryan-lopez-fcdaecc0/chunk-001-c42e95827278.txt"
+    },
+    {
+      "id": "chunk-002-f7ded9cd44b8",
+      "index": 2,
+      "contentHash": "f7ded9cd44b868b802a46eb432d7f651733b2b4f188df05824eb0c3484615209",
+      "path": "raw/order-blocks-bryan-lopez-fcdaecc0/chunk-002-f7ded9cd44b8.txt"
+    },
+    {
+      "id": "chunk-003-010dcfd05d25",
+      "index": 3,
+      "contentHash": "010dcfd05d25426f9c705a09c5cbc8149c11ec0300240260a32af6103f6b1066",
+      "path": "raw/order-blocks-bryan-lopez-fcdaecc0/chunk-003-010dcfd05d25.txt"
+    },
+    {
+      "id": "chunk-004-f909d56ac970",
+      "index": 4,
+      "contentHash": "f909d56ac9702fc5b17022005981c5a814ee45ad693e48ed34970d75a363358b",
+      "path": "raw/order-blocks-bryan-lopez-fcdaecc0/chunk-004-f909d56ac970.txt"
+    },
+    {
+      "id": "chunk-005-78832be9e354",
+      "index": 5,
+      "contentHash": "78832be9e354a36fee9228678dec81af7e877a78c532f8f7367cd501967b8b7f",
+      "path": "raw/order-blocks-bryan-lopez-fcdaecc0/chunk-005-78832be9e354.txt"
+    },
+    {
+      "id": "chunk-006-a72ece47c28d",
+      "index": 6,
+      "contentHash": "a72ece47c28db1bdcb54427dc4780105478a134852474ba4e45655567e4bc5bc",
+      "path": "raw/order-blocks-bryan-lopez-fcdaecc0/chunk-006-a72ece47c28d.txt"
+    },
+    {
+      "id": "chunk-007-75c7dd94464a",
+      "index": 7,
+      "contentHash": "75c7dd94464aea9320766ac33059ff74c7f10bede0864d0d67c400cbcf455aaa",
+      "path": "raw/order-blocks-bryan-lopez-fcdaecc0/chunk-007-75c7dd94464a.txt"
+    },
+    {
+      "id": "chunk-008-3eb3e514d076",
+      "index": 8,
+      "contentHash": "3eb3e514d076f8fde427c889b9343502c4e1f6cf900e81b07ab8f1418e614f36",
+      "path": "raw/order-blocks-bryan-lopez-fcdaecc0/chunk-008-3eb3e514d076.txt"
+    }
+  ]
+}

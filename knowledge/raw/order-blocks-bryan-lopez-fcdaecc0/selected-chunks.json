@@ -1,0 +1,174 @@
+{
+  "filterThemesVersion": "1.0.0",
+  "genres": [
+    "technical_analysis"
+  ],
+  "minScore": 4,
+  "maxExtractChunks": 16,
+  "selectedCount": 6,
+  "totalChunks": 9,
+  "selected": [
+    {
+      "file": "chunk-003-010dcfd05d25.txt",
+      "score": 7,
+      "matchedKeywords": [
+        "risk",
+        "probabilidad",
+        "vela",
+        "patrón",
+        "tendencia"
+      ],
+      "length": 2997
+    },
+    {
+      "file": "chunk-004-f909d56ac970.txt",
+      "score": 6,
+      "matchedKeywords": [
+        "tendencia",
+        "ruptura",
+        "sma",
+        "temporalidad"
+      ],
+      "length": 2994
+    },
+    {
+      "file": "chunk-001-c42e95827278.txt",
+      "score": 5,
+      "matchedKeywords": [
+        "probabilidad",
+        "vela",
+        "timeframe"
+      ],
+      "length": 2996
+    },
+    {
+      "file": "chunk-000-51f45843ddd2.txt",
+      "score": 4,
+      "matchedKeywords": [
+        "riesgo",
+        "probabilidad",
+        "vela",
+        "tendencia"
+      ],
+      "length": 2997
+    },
+    {
+      "file": "chunk-007-75c7dd94464a.txt",
+      "score": 4,
+      "matchedKeywords": [
+        "vela",
+        "resistencia",
+        "reversión",
+        "sma"
+      ],
+      "length": 2997
+    },
+    {
+      "file": "chunk-008-3eb3e514d076.txt",
+      "score": 4,
+      "matchedKeywords": [
+        "guía",
+        "reversión",
+        "volumen",
+        "volume"
+      ],
+      "length": 2299
+    }
+  ],
+  "rankedTop30": [
+    {
+      "file": "chunk-003-010dcfd05d25.txt",
+      "score": 7,
+      "matchedKeywords": [
+        "risk",
+        "probabilidad",
+        "vela",
+        "patrón",
+        "tendencia"
+      ],
+      "length": 2997
+    },
+    {
+      "file": "chunk-004-f909d56ac970.txt",
+      "score": 6,
+      "matchedKeywords": [
+        "tendencia",
+        "ruptura",
+        "sma",
+        "temporalidad"
+      ],
+      "length": 2994
+    },
+    {
+      "file": "chunk-001-c42e95827278.txt",
+      "score": 5,
+      "matchedKeywords": [
+        "probabilidad",
+        "vela",
+        "timeframe"
+      ],
+      "length": 2996
+    },
+    {
+      "file": "chunk-000-51f45843ddd2.txt",
+      "score": 4,
+      "matchedKeywords": [
+        "riesgo",
+        "probabilidad",
+        "vela",
+        "tendencia"
+      ],
+      "length": 2997
+    },
+    {
+      "file": "chunk-007-75c7dd94464a.txt",
+      "score": 4,
+      "matchedKeywords": [
+        "vela",
+        "resistencia",
+        "reversión",
+        "sma"
+      ],
+      "length": 2997
+    },
+    {
+      "file": "chunk-008-3eb3e514d076.txt",
+      "score": 4,
+      "matchedKeywords": [
+        "guía",
+        "reversión",
+        "volumen",
+        "volume"
+      ],
+      "length": 2299
+    },
+    {
+      "file": "chunk-005-78832be9e354.txt",
+      "score": 3,
+      "matchedKeywords": [
+        "patrón",
+        "resistencia",
+        "tendencia"
+      ],
+      "length": 2999
+    },
+    {
+      "file": "chunk-006-a72ece47c28d.txt",
+      "score": 3,
+      "matchedKeywords": [
+        "probabilidad",
+        "vela",
+        "resistencia"
+      ],
+      "length": 2991
+    },
+    {
+      "file": "chunk-002-f7ded9cd44b8.txt",
+      "score": 1,
+      "matchedKeywords": [
+        "vela"
+      ],
+      "length": 2998
+    }
+  ]
+}
