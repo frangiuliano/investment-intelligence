@@ -6,6 +6,7 @@ import {
   DEFAULT_GEMINI_ANALYSIS_BATCH_SIZE,
   DEFAULT_GEMINI_MODEL,
   DEFAULT_GEMINI_REQUEST_DELAY_MS,
+  DEFAULT_LLM_PROVIDER,
   DEFAULT_MARKET_DATA_PROVIDER,
   DEFAULT_MARKET_DATA_TIMEOUT_MS,
   DEFAULT_REVIEW_CRON_SCHEDULE,
@@ -38,6 +39,7 @@ type ValidatedEnv = {
   DIGEST_LOOKBACK_HOURS: number;
   MARKET_DATA_PROVIDER: string;
   MARKET_DATA_TIMEOUT_MS: number;
+  LLM_PROVIDER: string;
   DASHBOARD_API_KEY: string;
   REVIEW_CRON_SCHEDULE: string;
 };
@@ -65,6 +67,7 @@ describe('envValidationSchema', () => {
     expect(value.DIGEST_LOOKBACK_HOURS).toBe(DEFAULT_DIGEST_LOOKBACK_HOURS);
     expect(value.MARKET_DATA_PROVIDER).toBe(DEFAULT_MARKET_DATA_PROVIDER);
     expect(value.MARKET_DATA_TIMEOUT_MS).toBe(DEFAULT_MARKET_DATA_TIMEOUT_MS);
+    expect(value.LLM_PROVIDER).toBe(DEFAULT_LLM_PROVIDER);
     expect(value.DASHBOARD_API_KEY).toBe('');
     expect(value.REVIEW_CRON_SCHEDULE).toBe(DEFAULT_REVIEW_CRON_SCHEDULE);
     expect(
@@ -201,6 +204,16 @@ describe('envValidationSchema', () => {
 
     expect(error).toBeDefined();
     expect(error?.message).toContain('MARKET_DATA_PROVIDER');
+  });
+
+  it('rejects unsupported LLM providers', () => {
+    const { error } = envValidationSchema.validate({
+      ...validEnv,
+      LLM_PROVIDER: 'openai',
+    });
+
+    expect(error).toBeDefined();
+    expect(error?.message).toContain('LLM_PROVIDER');
   });
 
   it('rejects market data timeouts outside the supported range', () => {

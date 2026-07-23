@@ -8,8 +8,10 @@ import {
   DEFAULT_GEMINI_REQUEST_DELAY_MS,
   DEFAULT_DIGEST_CRON_SCHEDULE,
   DEFAULT_DIGEST_LOOKBACK_HOURS,
+  DEFAULT_LLM_PROVIDER,
   DEFAULT_MARKET_DATA_PROVIDER,
   DEFAULT_MARKET_DATA_TIMEOUT_MS,
+  LlmProvider,
   DEFAULT_REVIEW_CRON_SCHEDULE,
   DEFAULT_STORY_CLUSTER_WINDOW_HOURS,
   DEFAULT_TECHNICAL_CHART_ENABLED,
@@ -76,6 +78,9 @@ export type AppConfig = {
   marketData: {
     provider: typeof DEFAULT_MARKET_DATA_PROVIDER;
     timeoutMs: number;
+  };
+  llm: {
+    provider: LlmProvider;
   };
   dashboard: {
     apiKey: string;
@@ -151,6 +156,10 @@ export default (): AppConfig => ({
         String(DEFAULT_MARKET_DATA_TIMEOUT_MS),
       10,
     ),
+  },
+  llm: {
+    provider: (process.env.LLM_PROVIDER?.trim().toLowerCase() ||
+      DEFAULT_LLM_PROVIDER) as LlmProvider,
   },
   dashboard: {
     apiKey: (process.env.DASHBOARD_API_KEY ?? '').trim(),
