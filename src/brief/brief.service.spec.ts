@@ -68,6 +68,7 @@ describe('BriefService', () => {
         sections,
         stance: 'watch',
         stanceRationale: 'Range-bound on verified closes',
+        knowledgeVersion: '0.1.0',
       } satisfies BriefGenerationResult);
     const briefGeminiClient = {
       generateBrief,
@@ -101,13 +102,15 @@ describe('BriefService', () => {
       symbol: 'AAPL',
       locale: 'en',
       sections,
-      promptVersion: 'brief-v2',
+      promptVersion: 'brief-v3',
+      knowledgeVersion: '0.1.0',
       stance: 'watch',
       stanceRationale: 'Range-bound on verified closes',
       marketAsOf: new Date(seriesFixture.asOf),
       marketSource: seriesFixture.source,
       holdingId: null,
       holding: null,
+      chartPng: null,
       createdAt: new Date(),
     };
 
@@ -161,6 +164,7 @@ describe('BriefService', () => {
       sections,
       stance: 'enter',
       stanceRationale: 'Uptrend on verified window closes',
+      knowledgeVersion: '0.1.0',
     } satisfies BriefGenerationResult);
     const {
       service,
@@ -206,6 +210,7 @@ describe('BriefService', () => {
       sections,
       stance: 'hold',
       stanceRationale: 'Position intact; no exit trigger on verified data',
+      knowledgeVersion: '0.1.0',
     } satisfies BriefGenerationResult);
     const {
       service,
@@ -255,6 +260,7 @@ describe('BriefService', () => {
       sections,
       stance: null,
       stanceRationale: null,
+      knowledgeVersion: '0.1.0',
     } satisfies BriefGenerationResult);
     const getSeries = jest
       .fn()
@@ -292,6 +298,7 @@ describe('BriefService', () => {
       sections,
       stance: null,
       stanceRationale: null,
+      knowledgeVersion: '0.1.0',
     } satisfies BriefGenerationResult);
     const { service, save, sendMessage } = createService({ generateBrief });
 
@@ -355,6 +362,7 @@ describe('BriefService', () => {
       sections,
       stance: 'watch',
       stanceRationale: 'wait',
+      knowledgeVersion: '0.1.0',
     });
     const first = await firstPromise;
     expect(first.ok).toBe(true);
@@ -530,6 +538,7 @@ describe('BriefService', () => {
         sections,
         stance: 'watch',
         stanceRationale: 'wait',
+        knowledgeVersion: '0.1.0',
       });
       await firstPromise;
     });

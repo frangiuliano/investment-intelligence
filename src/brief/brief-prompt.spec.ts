@@ -48,7 +48,7 @@ describe('brief-prompt', () => {
     expect(prompt).toContain(
       '<<OPERATOR_NOTES>>long thesis<</OPERATOR_NOTES>>',
     );
-    expect(BRIEF_PROMPT_VERSION).toBe('brief-v2');
+    expect(BRIEF_PROMPT_VERSION).toBe('brief-v3');
   });
 
   it('neutralizes operator-notes delimiters in holding notes', () => {

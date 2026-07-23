@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ChartsModule } from '../charts/charts.module';
 import { DashboardApiKeyGuard } from '../common/guards/dashboard-api-key.guard';
+import { KnowledgeModule } from '../knowledge/knowledge.module';
 import { LlmModule } from '../llm/llm.module';
 import { MarketDataModule } from '../market-data/market-data.module';
 import { NotificationsModule } from '../notifications/notifications.module';
@@ -20,6 +21,7 @@ import { ResearchBrief } from './entities/research-brief.entity';
     MarketDataModule,
     NotificationsModule,
     LlmModule,
+    KnowledgeModule,
   ],
   controllers: [BriefsController],
   providers: [

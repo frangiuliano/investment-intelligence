@@ -26,6 +26,14 @@ export class ResearchBrief {
   @Column({ name: 'prompt_version', type: 'varchar', length: 64 })
   promptVersion!: string;
 
+  @Column({
+    name: 'knowledge_version',
+    type: 'varchar',
+    length: 32,
+    nullable: true,
+  })
+  knowledgeVersion!: string | null;
+
   @Column({ type: 'varchar', length: 16, nullable: true })
   stance!: BriefStance | null;
 

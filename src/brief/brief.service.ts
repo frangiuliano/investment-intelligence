@@ -104,6 +104,7 @@ export class BriefService {
           locale,
           sections: generated.sections,
           promptVersion: BRIEF_PROMPT_VERSION,
+          knowledgeVersion: generated.knowledgeVersion,
           stance,
           stanceRationale,
           marketAsOf: market?.asOf ?? null,

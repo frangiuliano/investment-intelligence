@@ -43,6 +43,22 @@ export class NewsAnalysis {
   @Column({ type: 'varchar', length: 128 })
   model!: string;
 
+  @Column({
+    name: 'prompt_version',
+    type: 'varchar',
+    length: 64,
+    nullable: true,
+  })
+  promptVersion!: string | null;
+
+  @Column({
+    name: 'knowledge_version',
+    type: 'varchar',
+    length: 32,
+    nullable: true,
+  })
+  knowledgeVersion!: string | null;
+
   @CreateDateColumn({ name: 'analyzed_at', type: 'timestamptz' })
   analyzedAt!: Date;
 }

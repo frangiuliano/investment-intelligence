@@ -1,6 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AppLocale } from '../config/env.validation';
+import { KnowledgePackService } from '../knowledge/knowledge-pack.service';
+import { appendKnowledgePackToSystemPrompt } from '../knowledge/knowledge-prompt';
 import { LlmApiError } from '../llm/llm.errors';
 import { LLM_CLIENT } from '../llm/llm.port';
 import type { LlmClient } from '../llm/llm.port';
@@ -38,6 +40,7 @@ export class BriefGeminiClient {
   constructor(
     private readonly configService: ConfigService,
     @Inject(LLM_CLIENT) private readonly llmClient: LlmClient,
+    private readonly knowledgePackService: KnowledgePackService,
   ) {}
 
   async generateBrief(
@@ -46,13 +49,22 @@ export class BriefGeminiClient {
     const locale = this.configService.getOrThrow<AppLocale>('locale');
     const expectStance = input.marketFacts !== null;
     const hasHolding = input.holding !== null;
+    const knowledge = await this.knowledgePackService.buildInjection({
+      useCase: 'research-brief',
+      assetTypes: input.holding?.assetTypes,
+      includeStanceRubric: expectStance,
+    });
+    const system = appendKnowledgePackToSystemPrompt(
+      buildBriefSystemPrompt(locale, {
+        hasHolding,
+        expectStance,
+      }),
+      knowledge.injection,
+    );
 
     try {
       const completion = await this.llmClient.completeJson({
-        system: buildBriefSystemPrompt(locale, {
-          hasHolding,
-          expectStance,
-        }),
+        system,
         user: buildBriefUserPrompt(input),
         schemaVersion: BRIEF_PROMPT_VERSION,
         temperature: 0.3,
@@ -61,10 +73,14 @@ export class BriefGeminiClient {
       });
 
       try {
-        return parseBriefResponseText(completion.text, {
+        const parsed = parseBriefResponseText(completion.text, {
           expectStance,
           hasHolding,
         });
+        return {
+          ...parsed,
+          knowledgeVersion: knowledge.injection?.knowledgeVersion ?? null,
+        };
       } catch (parseError) {
         throw new BriefGeminiApiError(
           `Brief Gemini response parse failed: ${errorMessage(parseError)}`,

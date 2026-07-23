@@ -67,6 +67,8 @@ export type NewsAnalysis = {
   materiality: string
   eventType: string
   model: string
+  promptVersion?: string | null
+  knowledgeVersion?: string | null
   analyzedAt: string
 }
 
@@ -115,6 +117,7 @@ export type ResearchBrief = {
   locale: string
   sections: Record<BriefSectionKey, string>
   promptVersion: string
+  knowledgeVersion?: string | null
   stance: BriefStance | null
   stanceRationale: string | null
   marketAsOf: string | null

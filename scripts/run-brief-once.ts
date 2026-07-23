@@ -31,6 +31,7 @@ async function main() {
         symbol: brief.symbol,
         locale: brief.locale,
         promptVersion: brief.promptVersion,
+        knowledgeVersion: brief.knowledgeVersion,
       }),
     );
   } finally {

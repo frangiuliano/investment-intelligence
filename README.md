@@ -56,6 +56,8 @@ falta una variable obligatoria de runtime (mensaje explícito vía Joi).
 | `GEMINI_API_KEY_REVIEWER` | No | Solo GitHub Actions / Reviewer (Proyecto A) |
 | `LLM_PROVIDER` | No (default `gemini`) | Provider del puerto LLM (`gemini` único soportado hoy) |
 | `GEMINI_MODEL` | No (default `gemini-3.1-flash-lite`) | Modelo cuando `LLM_PROVIDER=gemini` |
+| `KNOWLEDGE_ROOT` | No (default `knowledge`) | Raíz del Knowledge Pack (playbooks/rúbricas) |
+| `KNOWLEDGE_CONTEXT_MAX_CHARS` | No (default `12000`) | Tope de caracteres inyectados en el system prompt |
 | `GEMINI_REQUEST_DELAY_MS` | No (default `12000`) | Delay entre requests de análisis |
 | `GEMINI_ANALYSIS_BATCH_SIZE` | No (default `5`) | Máx. artículos por corrida de análisis |
 | `MARKET_DATA_PROVIDER` | No (default `yahoo`) | Provider de OHLCV histórico; solo `yahoo` en v1 |
@@ -363,7 +365,9 @@ Para depurar una etapa aislada (también sin cron activo en paralelo):
 El módulo `analysis/` toma artículos de `news_articles` **sin** fila en
 `news_analysis` y los procesa en cola secuencial (concurrencia 1). Las
 llamadas al modelo pasan por el puerto `LlmClient` (`src/llm/`, ADR 005) con
-adapter Gemini (`LLM_PROVIDER=gemini`):
+adapter Gemini (`LLM_PROVIDER=gemini`). El system prompt incluye el
+Knowledge Pack seleccionado por metadata/keyword (`src/knowledge/`, ADR 006);
+se persisten `prompt_version` y `knowledge_version` en cada análisis:
 
 1. Prompt estructurado vía `completeJson` (`GEMINI_MODEL`, default
    `gemini-3.1-flash-lite`) pidiendo JSON:

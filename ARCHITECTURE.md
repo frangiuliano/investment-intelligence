@@ -27,6 +27,7 @@ Mapa de módulos del backend NestJS y su relación con el backlog del MVP.
 | `research/` | Implementado | Journal de hipótesis + reviews de período | #33, #34 |
 | `market-data/` | Implementado | Port + adapter Yahoo para OHLCV histórico | #55 |
 | `llm/` | Implementado | Port `LlmClient` + adapter Gemini (`completeJson`) | #81 |
+| `knowledge/` | Implementado | Runtime Knowledge Pack loader/selector + prompt injection | #83 |
 | `charts/` | Implementado | Render determinista de chart técnico PNG desde OHLCV; persistido en `research_briefs.chart_png` (ADR 004 addendum) | #57, #76 |
 | `web/` | Implementado | Dashboard Next.js (research desk): Holdings, Hypotheses, Alerts, Briefs, Reviews vía BFF → Nest | #64, #35 |
 
@@ -45,6 +46,7 @@ telegram-bot ← inbound webhook/commands → brief
 research   ← hypotheses + reviews (REST + /review Telegram; market-data para returns)
 market-data ← MarketDataService → MarketDataPort → Yahoo adapter
 llm        ← LlmClient port → Gemini adapter (analysis + brief)
+knowledge  ← Knowledge Pack (metadata/keyword) → system prompt injection
 charts     ← TechnicalChartService → ChartRendererPort → canvas PNG (brief lo consume)
 telegram-bot ← inbound webhook/commands → brief + review
 

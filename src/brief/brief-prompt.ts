@@ -148,6 +148,7 @@ export function parseBriefResponseText(
       sections,
       stance: null,
       stanceRationale: null,
+      knowledgeVersion: null,
     };
   }
 
@@ -156,6 +157,7 @@ export function parseBriefResponseText(
     sections,
     stance: stanceFields.stance,
     stanceRationale: stanceFields.stanceRationale,
+    knowledgeVersion: null,
   };
 }
 

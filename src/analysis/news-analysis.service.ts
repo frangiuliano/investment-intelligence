@@ -10,8 +10,11 @@ import {
   GEMINI_MAX_RETRY_AFTER_MS,
 } from './gemini.constants';
 import { resolveRetryDelayMs } from './gemini-retry';
-import { GeminiApiError, GeminiClient } from './gemini.client';
-import type { GeminiAnalysisResult } from './gemini-response';
+import {
+  AnalyzeArticleResult,
+  GeminiApiError,
+  GeminiClient,
+} from './gemini.client';
 
 export type AnalysisRunResult = {
   pending: number;
@@ -27,7 +30,7 @@ export class NewsAnalysisService {
   /** Process-local skip set so permanent/exhausted failures do not stall the batch head. */
   private readonly deferredArticleIds = new Set<string>();
   /** Successful Gemini results awaiting DB persist (avoids re-calling Gemini). */
-  private readonly pendingPersist = new Map<string, GeminiAnalysisResult>();
+  private readonly pendingPersist = new Map<string, AnalyzeArticleResult>();
 
   constructor(
     private readonly configService: ConfigService,
@@ -130,6 +133,8 @@ export class NewsAnalysisService {
           materiality: analysis.materiality,
           eventType: analysis.eventType,
           model,
+          promptVersion: analysis.promptVersion,
+          knowledgeVersion: analysis.knowledgeVersion,
         }),
       );
       this.pendingPersist.delete(article.id);

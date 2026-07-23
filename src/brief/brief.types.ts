@@ -40,6 +40,7 @@ export type BriefGenerationResult = {
   sections: BriefSections;
   stance: BriefStance | null;
   stanceRationale: string | null;
+  knowledgeVersion: string | null;
 };
 
 export type BriefMarketContext = {
