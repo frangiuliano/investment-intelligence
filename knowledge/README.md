@@ -71,7 +71,14 @@ endpoint or cron.
 | Command | What it does |
 |---------|----------------|
 | `npm run knowledge:prepare -- <file> [--target equity\|cedear\|bond\|other]` | Extract → chunk → `raw/<docId>/` with content-hash cache |
+| `npm run knowledge:rank-chunks -- <rawDocDir> --genre <id>[,…]` | Score chunks with Finance Advisor themes (`_prompts/filter-themes.json`); writes `selected-chunks.json` |
 | `npm run knowledge:dry-run -- <file> [--target …] [--apply]` | Prepare + deterministic playbook draft (no LLM / API key) |
+
+**Who decides “important” chunks?** Chunking is mechanical (whole text).
+Ranking keywords/themes are owned by **`/fin`**
+(`knowledge/_prompts/filter-themes.md` + `.json`). Agents must not invent
+ad-hoc keyword lists when those files exist. Extract + human Accept still
+decide what enters playbooks.
 
 `<file>` must resolve under `knowledge/sources/` (symlink escapes rejected).
 `meta.json` / `manifest.sources` store **repo-relative** paths only. `--apply`
