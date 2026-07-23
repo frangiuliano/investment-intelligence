@@ -22,28 +22,28 @@ type BriefMessageLabels = {
 
 const STANCE_LABELS: Record<AppLocale, Record<BriefStance, string>> = {
   en: {
-    enter: 'Enter (research hypothesis)',
-    avoid: 'Avoid (research hypothesis)',
-    watch: 'Watch (research hypothesis)',
-    hold: 'Hold (research hypothesis)',
-    add: 'Add (research hypothesis)',
-    reduce: 'Reduce (research hypothesis)',
-    exit: 'Exit (research hypothesis)',
+    enter: 'Enter (personal recommendation)',
+    avoid: 'Avoid (personal recommendation)',
+    watch: 'Watch (personal recommendation)',
+    hold: 'Hold (personal recommendation)',
+    add: 'Add (personal recommendation)',
+    reduce: 'Reduce (personal recommendation)',
+    exit: 'Exit (personal recommendation)',
   },
   es: {
-    enter: 'Entrar (hipótesis de research)',
-    avoid: 'Evitar (hipótesis de research)',
-    watch: 'Observar (hipótesis de research)',
-    hold: 'Mantener (hipótesis de research)',
-    add: 'Agregar (hipótesis de research)',
-    reduce: 'Reducir (hipótesis de research)',
-    exit: 'Salir (hipótesis de research)',
+    enter: 'Entrar (recomendación personal)',
+    avoid: 'Evitar (recomendación personal)',
+    watch: 'Observar (recomendación personal)',
+    hold: 'Mantener (recomendación personal)',
+    add: 'Agregar (recomendación personal)',
+    reduce: 'Reducir (recomendación personal)',
+    exit: 'Salir (recomendación personal)',
   },
 };
 
 const LABELS_BY_LOCALE: Record<AppLocale, BriefMessageLabels> = {
   en: {
-    header: 'Educational research brief',
+    header: 'Personal research brief',
     overview: 'Overview',
     fundamental: 'Fundamentals to review',
     technical: 'Technical lens',
@@ -52,19 +52,19 @@ const LABELS_BY_LOCALE: Record<AppLocale, BriefMessageLabels> = {
     disclaimer: 'Disclaimer',
     holdingContext: 'Holdings context',
     holdingPresent:
-      'You have a recorded position in this ticker. Any stance below is relative to that position — a research hypothesis, not a broker order.',
+      'You have a recorded position in this ticker. Any stance below is relative to that position — a personal recommendation, not a broker order.',
     noLivePrices:
       'No live market quotes are attached to this brief. Stance was not issued. Do not treat any numbers as verified prices.',
     marketAttached: 'Market data attached from provider',
-    stance: 'Research stance',
+    stance: 'Recommendation stance',
     stanceRationale: 'Stance rationale',
     stanceUnavailable:
-      'A labeled stance could not be validated for this brief. Educational sections only — no invented posture.',
+      'A labeled stance could not be validated for this brief. Research sections only — no invented posture.',
     researchHypothesisBanner:
-      'Labeled stance is a research hypothesis for the operator only. Not investment advice. Not a broker order.',
+      'Labeled stance is a personal research recommendation for the operator. You own outcomes; review after the horizon. Not regulated advice for third parties. Not a broker order.',
   },
   es: {
-    header: 'Brief educativo de research',
+    header: 'Brief personal de research',
     overview: 'Overview',
     fundamental: 'Fundamentales a revisar',
     technical: 'Lente técnico',
@@ -73,16 +73,16 @@ const LABELS_BY_LOCALE: Record<AppLocale, BriefMessageLabels> = {
     disclaimer: 'Disclaimer',
     holdingContext: 'Contexto de cartera',
     holdingPresent:
-      'Tenés una posición registrada en este ticker. Cualquier postura abajo es relativa a esa posición — hipótesis de research, no una orden de broker.',
+      'Tenés una posición registrada en este ticker. Cualquier postura abajo es relativa a esa posición — recomendación personal, no una orden de broker.',
     noLivePrices:
       'Este brief no incluye cotizaciones en vivo. No se emitió postura. No trates ningún número como precio verificado.',
     marketAttached: 'Datos de mercado adjuntos del proveedor',
-    stance: 'Postura de research',
+    stance: 'Postura recomendada',
     stanceRationale: 'Justificación de la postura',
     stanceUnavailable:
-      'No se pudo validar una postura etiquetada para este brief. Solo secciones educativas — sin postura inventada.',
+      'No se pudo validar una postura etiquetada para este brief. Solo secciones de research — sin postura inventada.',
     researchHypothesisBanner:
-      'La postura etiquetada es una hipótesis de research para el operador. No es asesoramiento de inversión ni una orden de broker.',
+      'La postura etiquetada es una recomendación personal de research para el operador. Vos asumís el resultado; revisá tras el horizonte. No es asesoramiento regulado para terceros ni una orden de broker.',
   },
 };
 
@@ -110,21 +110,21 @@ export function formatBriefHelpMessage(locale: AppLocale): string {
   if (locale === 'es') {
     return [
       'Comandos disponibles:',
-      '/brief TICKER — brief educativo (TA/FA) con postura etiquetada si hay market data (no es orden de broker)',
+      '/brief TICKER — brief personal (TA/FA) con recomendación etiquetada si hay market data (no es orden de broker)',
       '/review [YYYY-MM] — review de hipótesis del mes (UTC)',
       '/help — esta ayuda',
       '',
-      'Límites: research only; no es asesoramiento de inversión ni backtest científico.',
+      'Límites: recomendación personal single-tenant; no es asesoramiento regulado para terceros ni backtest científico.',
     ].join('\n');
   }
 
   return [
     'Available commands:',
-    '/brief TICKER — educational TA/FA brief with labeled stance when market data is available (not a broker order)',
+    '/brief TICKER — personal TA/FA brief with labeled recommendation when market data is available (not a broker order)',
     '/review [YYYY-MM] — hypothesis review for the UTC calendar month',
     '/help — this help',
     '',
-    'Limits: research only; not investment advice or a scientific backtest.',
+    'Limits: personal single-tenant recommendation; not regulated advice for third parties or a scientific backtest.',
   ].join('\n');
 }
 
@@ -157,8 +157,8 @@ export function formatBriefChartCaption(
   locale: AppLocale,
 ): string {
   return locale === 'es'
-    ? `${symbol} — velas diarias con SMA, máximo/mínimo de la ventana y último cierre. Chart ilustrativo de research desde OHLCV verificado. No es asesoramiento de inversión.`
-    : `${symbol} — daily candles with SMA, window high/low and last close. Illustrative research chart from verified OHLCV. Not investment advice.`;
+    ? `${symbol} — velas diarias con SMA, máximo/mínimo de la ventana y último cierre. Chart ilustrativo desde OHLCV verificado. Recomendación personal; no es orden de broker.`
+    : `${symbol} — daily candles with SMA, window high/low and last close. Illustrative chart from verified OHLCV. Personal recommendation; not a broker order.`;
 }
 
 export function formatBriefChartUnavailableMessage(locale: AppLocale): string {

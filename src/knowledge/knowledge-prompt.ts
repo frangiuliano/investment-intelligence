@@ -15,7 +15,7 @@ export function appendKnowledgePackToSystemPrompt(
   return [
     systemPrompt,
     '',
-    '## Knowledge Pack (research method only; never invent prices or broker orders)',
+    '## Knowledge Pack (research method for personal recommendations; never invent prices or broker orders)',
     `knowledgeVersion: ${injection.knowledgeVersion}`,
     `matched: ${injection.matchedIds.join(', ') || '(none)'}`,
     injection.truncated ? 'note: context truncated to character budget' : null,

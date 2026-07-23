@@ -133,10 +133,11 @@ comparación A/B sobre el eval harness; embeddings/vector DB.
 
 ## Fuera de backlog (explícito)
 
-- Trading automático / ejecución de órdenes.
-- Señales buy/sell presentadas como **orden de broker** o consejo regulado
-  sin disclaimer / sin datos de mercado (las posturas etiquetadas de #56
-  son hipótesis de research para operador single-tenant).
+- Trading automático / ejecución de órdenes en un broker.
+- Señales buy/sell como **orden de broker** o asesoramiento regulado para
+  terceros. Las posturas etiquetadas (#56) **sí** son recomendaciones
+  personales de research para el operador single-tenant (con horizonte +
+  review); el operador asume el riesgo de actuar.
 - Backtesting “científico” con promesa de edge (fase futura aparte, si aplica).
 
 ## Gemini: dos proyectos / API keys

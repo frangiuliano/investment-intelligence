@@ -83,6 +83,19 @@ describe('HypothesesService', () => {
     expect(hypothesis.status).toBe(HypothesisStatus.OPEN);
   });
 
+  it('should default horizonDays to 30 when omitted', async () => {
+    await service.create({
+      symbol: 'AAPL',
+      bias: 'watch',
+      thesis: 'Wait for catalyst.',
+      invalidation: 'Break of range without news.',
+    });
+
+    expect(create).toHaveBeenCalledWith(
+      expect.objectContaining({ horizonDays: 30 }),
+    );
+  });
+
   it('should list open hypotheses by default', async () => {
     find.mockResolvedValue([sampleHypothesis]);
 

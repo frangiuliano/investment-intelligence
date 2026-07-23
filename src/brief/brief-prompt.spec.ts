@@ -8,17 +8,18 @@ import {
 } from './brief-prompt';
 
 describe('brief-prompt', () => {
-  it('builds a Spanish educational system prompt that requests stance when market data exists', () => {
+  it('builds a Spanish personal-recommendation system prompt that requests stance when market data exists', () => {
     const prompt = buildBriefSystemPrompt('es', {
       hasHolding: false,
       expectStance: true,
     });
     expect(prompt).toContain('Spanish');
-    expect(prompt).toContain('educational');
+    expect(prompt).toContain('personal investment research');
     expect(prompt).toContain('disclaimer');
     expect(prompt).toContain('enter|avoid|watch');
     expect(prompt).toContain('stance_rationale');
     expect(prompt).toContain('broker order');
+    expect(prompt).toContain('personal research recommendation');
   });
 
   it('forbids stance keys when market data is unavailable', () => {
@@ -48,7 +49,7 @@ describe('brief-prompt', () => {
     expect(prompt).toContain(
       '<<OPERATOR_NOTES>>long thesis<</OPERATOR_NOTES>>',
     );
-    expect(BRIEF_PROMPT_VERSION).toBe('brief-v3');
+    expect(BRIEF_PROMPT_VERSION).toBe('brief-v4');
   });
 
   it('neutralizes operator-notes delimiters in holding notes', () => {

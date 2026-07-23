@@ -102,7 +102,7 @@ describe('BriefService', () => {
       symbol: 'AAPL',
       locale: 'en',
       sections,
-      promptVersion: 'brief-v3',
+      promptVersion: 'brief-v4',
       knowledgeVersion: '0.1.0',
       stance: 'watch',
       stanceRationale: 'Range-bound on verified closes',
@@ -198,7 +198,7 @@ describe('BriefService', () => {
       }),
     );
     expect(sendMessage).toHaveBeenCalledWith(
-      expect.stringContaining('Research stance: Enter'),
+      expect.stringContaining('Recommendation stance: Enter'),
     );
     expect(sendMessage).toHaveBeenCalledWith(
       expect.stringContaining('Not a broker order'),
@@ -248,7 +248,7 @@ describe('BriefService', () => {
       }),
     );
     expect(sendMessage).toHaveBeenCalledWith(
-      expect.stringContaining('Hold (research hypothesis)'),
+      expect.stringContaining('Hold (personal recommendation)'),
     );
     expect(sendMessage).toHaveBeenCalledWith(
       expect.stringContaining('relative to that position'),
@@ -388,7 +388,7 @@ describe('BriefService', () => {
     const [photo, caption] = sendPhoto.mock.calls[0] as [Buffer, string];
     expect(Buffer.isBuffer(photo)).toBe(true);
     expect(caption).toContain('AAPL');
-    expect(caption).toContain('Not investment advice');
+    expect(caption).toContain('not a broker order');
     expect(sendMessage).toHaveBeenCalledTimes(1);
   });
 
@@ -438,7 +438,7 @@ describe('BriefService', () => {
     expect(sendPhoto).not.toHaveBeenCalled();
     expect(sendMessage).toHaveBeenCalledWith(expect.stringContaining('chart'));
     expect(sendMessage).toHaveBeenCalledWith(
-      expect.stringContaining('Research stance'),
+      expect.stringContaining('Recommendation stance'),
     );
   });
 

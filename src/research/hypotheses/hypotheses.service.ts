@@ -24,10 +24,14 @@ export interface CreateHypothesisInput {
   bias: string;
   thesis: string;
   invalidation: string;
-  horizonDays: number;
+  /** Positive days; defaults to {@link DEFAULT_HYPOTHESIS_HORIZON_DAYS}. */
+  horizonDays?: number;
   source?: string;
   sourceRefId?: string | null;
 }
+
+/** Default review horizon when the operator omits `horizonDays`. */
+export const DEFAULT_HYPOTHESIS_HORIZON_DAYS = 30;
 
 export interface CloseHypothesisInput {
   closeNote?: string | null;
@@ -148,7 +152,10 @@ export class HypothesesService {
     return status as HypothesisStatus;
   }
 
-  private parseHorizonDays(horizonDays: number): number {
+  private parseHorizonDays(horizonDays: number | undefined): number {
+    if (horizonDays === undefined || horizonDays === null) {
+      return DEFAULT_HYPOTHESIS_HORIZON_DAYS;
+    }
     if (
       typeof horizonDays !== 'number' ||
       !Number.isInteger(horizonDays) ||

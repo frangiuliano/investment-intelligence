@@ -111,7 +111,7 @@ describe('BriefsQueryService', () => {
         symbol: 'AAPL',
         locale: 'en',
         sections: {},
-        promptVersion: 'brief-v3',
+        promptVersion: 'brief-v4',
         knowledgeVersion: '0.1.0',
         stance: null,
         stanceRationale: null,

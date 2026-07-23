@@ -34,8 +34,10 @@ describe('brief-message', () => {
       'en',
     );
 
-    expect(message).toContain('Educational research brief: AAPL');
-    expect(message).toContain('Research stance: Hold (research hypothesis)');
+    expect(message).toContain('Personal research brief: AAPL');
+    expect(message).toContain(
+      'Recommendation stance: Hold (personal recommendation)',
+    );
     expect(message).toContain('No exit trigger on verified closes');
     expect(message).toContain('yahoo-finance-chart');
     expect(message).toContain('Not a broker order');
@@ -60,9 +62,9 @@ describe('brief-message', () => {
       'es',
     );
 
-    expect(message).toContain('Brief educativo de research: GGAL');
+    expect(message).toContain('Brief personal de research: GGAL');
     expect(message).toContain('No se emitió postura');
-    expect(message).not.toContain('Postura de research');
+    expect(message).not.toContain('Postura recomendada');
     expect(message).toContain('Qué invalidaría la tesis');
   });
 
@@ -95,8 +97,8 @@ describe('brief-message', () => {
   });
 
   it('returns localized help and usage strings that mention labeled stance', () => {
-    expect(formatBriefHelpMessage('en')).toContain('labeled stance');
-    expect(formatBriefHelpMessage('es')).toContain('postura etiquetada');
+    expect(formatBriefHelpMessage('en')).toContain('labeled recommendation');
+    expect(formatBriefHelpMessage('es')).toContain('recomendación etiquetada');
     expect(formatBriefUsageMessage('en')).toContain('/brief TICKER');
     expect(formatBriefUsageMessage('es')).toContain('/brief TICKER');
   });

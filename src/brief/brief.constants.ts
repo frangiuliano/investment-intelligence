@@ -1,4 +1,4 @@
-export const BRIEF_PROMPT_VERSION = 'brief-v3';
+export const BRIEF_PROMPT_VERSION = 'brief-v4';
 export const BRIEF_GEMINI_TIMEOUT_MS = 45_000;
 export const BRIEF_MAX_SECTION_LENGTH = 2_000;
 export const BRIEF_MAX_STANCE_RATIONALE_LENGTH = 1_500;

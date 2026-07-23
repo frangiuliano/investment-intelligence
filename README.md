@@ -8,9 +8,16 @@ accionables por Telegram.
 
 ## Visión
 
-Reducir el tiempo de investigación manual y detectar señales que de otra
-forma pasarían desapercibidas. No predice el mercado ni reemplaza el juicio
-del inversor.
+Reducir el tiempo de investigación manual, detectar señales fáciles de
+perder y emitir **recomendaciones personales de research** (postura
+etiquetada + tesis + invalidación + horizonte) para el operador
+**single-tenant**. El operador asume el riesgo de actuar; el journal +
+review evalúan esas hipótesis después del horizonte.
+
+**Sí:** stance direccional (`enter`/`avoid`/`hold`/…), hipótesis con
+`horizonDays` (default **30**) y chequeo periódico de outcomes.
+**No:** ejecución automática en broker, órdenes listas para enviar, ni
+asesoramiento regulado para terceros.
 
 ## Alcance fase 1 (MVP)
 
@@ -22,10 +29,11 @@ del inversor.
 
 ## Fuera de alcance (por ahora)
 
-- Trading automático / ejecución de órdenes.
-- Análisis técnico de gráficos.
-- Backtesting (fase futura).
-- Múltiples fuentes simultáneas (arrancamos con 1-2 RSS feeds).
+- Trading automático / ejecución de órdenes en un broker.
+- Asesoramiento regulado para terceros (el producto es single-tenant).
+- Backtesting “científico” con promesa de edge (fase futura).
+- Múltiples fuentes simultáneas en el arranque histórico del MVP (hoy ya
+  hay más de un feed vía env).
 
 ## Stack
 
@@ -619,20 +627,21 @@ Si la tabla está vacía, sigue valiendo el env como fallback de transición.
 ## Journal de hipótesis de research
 
 El módulo `research/` registra tesis explícitas para revisarlas después. Una
-hipótesis es memoria de research: **no** representa una orden de broker ni una
-recomendación de compra/venta.
+hipótesis es una **recomendación / memoria de research personal** del
+operador single-tenant: no es una orden de broker ni asesoramiento regulado
+para terceros. El operador asume el riesgo si actúa.
 
 Campos principales:
 
 - `bias`: `bullish`, `bearish` o `watch`.
-- `horizonDays`: horizonte positivo expresado en días.
+- `horizonDays`: horizonte positivo en días (**default API/UI: 30** si se omite).
 - `status`: `open` al crear; pasa a `closed` mediante el endpoint de cierre.
 - `source`: `manual` (default), `brief` o `alert`.
 - `sourceRefId`: UUID opcional y opaco del brief/alerta de origen. No es una FK
   porque puede referenciar distintos tipos de registro.
 
 ```bash
-# Crear una hipótesis manual
+# Crear una hipótesis manual (horizonDays opcional → 30)
 curl -s -X POST http://localhost:3000/hypotheses \
   -H 'Content-Type: application/json' \
   -d '{
@@ -640,7 +649,7 @@ curl -s -X POST http://localhost:3000/hypotheses \
     "bias":"bullish",
     "thesis":"Services growth supports margins.",
     "invalidation":"Services growth falls below 5%.",
-    "horizonDays":90
+    "horizonDays":30
   }' | jq
 
 # Listar abiertas (open es el filtro default)

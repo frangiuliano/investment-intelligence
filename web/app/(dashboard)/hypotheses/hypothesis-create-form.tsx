@@ -50,6 +50,7 @@ export function HypothesisCreateForm() {
             type="number"
             min="1"
             step="1"
+            defaultValue={30}
             placeholder="30"
             required
           />
