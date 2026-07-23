@@ -168,7 +168,8 @@ describe('pipeline dry-run against fixture', () => {
     const manifestPath = path.join(knowledgeRoot, 'manifest.json');
     const manifestSeed = JSON.parse(
       await fs.readFile(manifestPath, 'utf8'),
-    ) as { sources: unknown[] };
+    ) as { knowledgeVersion: string; sources: unknown[] };
+    const expectedVersion = bumpPatchVersion(manifestSeed.knowledgeVersion);
     manifestSeed.sources = [];
     await fs.writeFile(
       manifestPath,
@@ -198,7 +199,7 @@ describe('pipeline dry-run against fixture', () => {
 
     const draft = await fs.readFile(first.draftPath, 'utf8');
     expect(assertPlaybookTemplate(draft)).toEqual([]);
-    expect(draft).toContain('knowledgeVersion: `0.1.1`');
+    expect(draft).toContain(`knowledgeVersion: \`${expectedVersion}\``);
 
     const meta = JSON.parse(
       await fs.readFile(path.join(first.rawDir, 'meta.json'), 'utf8'),
@@ -209,7 +210,7 @@ describe('pipeline dry-run against fixture', () => {
     const manifest = JSON.parse(
       await fs.readFile(path.join(knowledgeRoot, 'manifest.json'), 'utf8'),
     ) as { knowledgeVersion: string; sources: unknown[] };
-    expect(manifest.knowledgeVersion).toBe('0.1.1');
+    expect(manifest.knowledgeVersion).toBe(expectedVersion);
     expect(manifest.sources).toHaveLength(1);
 
     const playbook = await fs.readFile(
@@ -217,7 +218,7 @@ describe('pipeline dry-run against fixture', () => {
       'utf8',
     );
     expect(playbook).toContain('## source_refs');
-    expect(playbook).toContain('knowledgeVersion: `0.1.1`');
+    expect(playbook).toContain(`knowledgeVersion: \`${expectedVersion}\``);
 
     const reapply = await dryRunKnowledgeIngest({
       knowledgeRoot,
@@ -225,7 +226,7 @@ describe('pipeline dry-run against fixture', () => {
       target: 'equity',
       apply: true,
     });
-    expect(reapply.knowledgeVersion).toBe('0.1.1');
+    expect(reapply.knowledgeVersion).toBe(expectedVersion);
 
     const secondPrepare = await prepareKnowledgeIngest({
       knowledgeRoot,
