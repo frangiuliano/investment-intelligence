@@ -32,5 +32,15 @@
       "path": "rubrics/stance-invalidation.md"
     }
   ],
-  "sources": []
+  "sources": [
+    {
+      "docId": "sample-equity-earnings-36480bcf",
+      "sourceHash": "36480bcf59a003840d19d85d8ee060beebdbebdfa2c32f5d1642bbf4dbebcd09",
+      "sourcePath": "sources/fixtures/sample-equity-earnings.txt",
+      "targets": [
+        "equity"
+      ],
+      "ingestedAt": "2026-07-22"
+    }
+  ]
 }

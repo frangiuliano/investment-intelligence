@@ -1,0 +1,12 @@
+{
+  "docId": "sample-equity-earnings-36480bcf",
+  "sourceHash": "36480bcf59a003840d19d85d8ee060beebdbebdfa2c32f5d1642bbf4dbebcd09",
+  "chunks": [
+    {
+      "id": "chunk-000-e0b06c292751",
+      "index": 0,
+      "contentHash": "e0b06c2927513c00e0e787f88bd5dd8f343e2b71b8fcff075d4dccdce63ccd18",
+      "path": "raw/sample-equity-earnings-36480bcf/chunk-000-e0b06c292751.txt"
+    }
+  ]
+}
