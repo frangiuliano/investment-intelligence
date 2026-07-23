@@ -16,7 +16,7 @@ knowledge/
   sources/               # Operator PDFs/text (PDFs gitignored)
     fixtures/            # Short copyright-safe demos for ingest
   raw/                   # Extract/chunk cache from ingest (hash-keyed by docId)
-  examples/              # Reserved for promoted operator feedback (#84)
+  examples/              # Promoted operator feedback (#84); see examples/README.md
 ```
 
 ## Versioning (`knowledgeVersion`)
@@ -118,8 +118,17 @@ Default `npm run eval:analysis` is **mock** (deterministic, no API key). Live
 opt-in uses the LLM port / Gemini key — see `eval/analysis/README.md` for
 pass-rate gates when changing prompts, models, or playbooks.
 
+## Operator feedback (#84)
+
+Desk operators mark alerts/briefs as `useful` or `noise` via the research desk
+(BFF → `POST /feedback`). Rows land in `operator_feedback` with actor, source,
+and a snapshot of `promptVersion` / `knowledgeVersion` when available.
+
+**Promotion to this pack is manual.** See `knowledge/examples/README.md` for
+SQL + JSON steps. Feedback never rewrites playbooks or eval gold by itself.
+
 ## Out of scope here
 
-- Operator feedback UI/API (#84)
 - NestJS ingest API, cron, or mandatory production Finance API key for ingest
 - Vector DB / semantic RAG (runtime injection is metadata/keyword only; ADR 006)
+- Auto-update of playbooks from feedback counts

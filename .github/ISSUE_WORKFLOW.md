@@ -122,10 +122,10 @@ sin fine-tuning ni RAG pesado en v1 de este scope.
 | 41 | #85 | Crear eval harness de calidad de análisis (gold fixtures) |
 | 42 | #84 | Registrar feedback del operador (útil / ruido) sobre análisis y briefs |
 
-Orden vigente (abiertos): **#85 → #84**.
+Orden vigente (abiertos): **#84**.
 
-`#80`/`#82`/`#81`/`#83` cerrados. `#85` depende de `#81` (`#83`
-deseable, cumplido). `#84` depende de `#83`.
+`#80`/`#82`/`#81`/`#83`/`#85` cerrados. `#84` depende de `#83` (`#85`
+deseable, cumplido).
 
 Fuera de este corte (crear después si hace falta): segundo provider real +
 comparación A/B sobre el eval harness; embeddings/vector DB.

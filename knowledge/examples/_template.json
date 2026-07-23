@@ -1,0 +1,20 @@
+{
+  "id": "YYYYMMDD-short-slug",
+  "sourceFeedbackId": "<operator_feedback.id>",
+  "label": "useful",
+  "targetType": "analysis",
+  "targetId": "<uuid>",
+  "promptVersion": "news-analysis-v2",
+  "knowledgeVersion": "0.1.0",
+  "actor": "desk-operator",
+  "capturedAt": "2026-07-23T12:00:00.000Z",
+  "notes": "Why this case is worth keeping.",
+  "snapshot": {
+    "headline": "",
+    "summary": "",
+    "tickers": [],
+    "materiality": "",
+    "eventType": "",
+    "sentiment": ""
+  }
+}
