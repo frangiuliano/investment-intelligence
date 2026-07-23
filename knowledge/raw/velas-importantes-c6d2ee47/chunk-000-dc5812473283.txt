@@ -1,0 +1,60 @@
+VELAS IMPORTANTES — candlestick reversal patterns reference
+Source PDF: knowledge/sources/velas importantes.pdf (operator local copy)
+
+Highly Reliable Bearish Reversal Patterns
+- Abandoned Baby
+- Dark Cloud Cover
+- Evening Doji Star
+- Evening Star
+- Three Inside Down
+- Three Outside Down
+
+Moderately Reliable Bearish Reversal Patterns
+- Advance Block
+- Breakaway Candlestick
+- Deliberation
+- Downside Tasuki
+- Dragonfly Doji (context-dependent when used as bearish)
+- Engulfing (bearish)
+- Meeting Lines
+- Tri Stars
+- Gravestone Doji
+- Hanging Man
+- Meeting Lines Non-Fx
+
+Weak Bearish Reversal Patterns
+- Belt Hold (bearish)
+- Harami
+- Shooting Star
+- Harami Cross
+- Tweezers Top
+
+Highly Reliable Bullish Reversal Patterns
+- Abandoned Baby (bullish)
+- Morning Doji Star
+- Three Inside Up
+- Three Outside Up
+- Three White Soldiers
+
+Moderately Reliable Bullish Reversal Patterns
+- Breakaway
+- Doji Star
+- Dragonfly Doji
+- Engulfing (bullish)
+- Three Stars In The South
+- Hammer
+- Ladder Bottom
+- Morning Star
+- Piercing Line
+- Tri Star
+
+Weak Bullish Reversal Patterns
+- Belt Hold (bullish)
+- Gravestone Doji (context-dependent)
+- Inverted Hammer
+- Tweezers Bottom
+
+Method notes implied by the sheet:
+- Treat pattern class (highly / moderately / weakly reliable) as a confidence weight for technical reads, not as a trade signal.
+- Prefer highly reliable patterns when discussing technical invalidation or stance rationale with chart context.
+- Weak patterns alone should not drive high materiality for news alerts; they are chart-education context.
