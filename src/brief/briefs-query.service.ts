@@ -69,6 +69,7 @@ export class BriefsQueryService {
       locale: brief.locale,
       sections: brief.sections,
       promptVersion: brief.promptVersion,
+      knowledgeVersion: brief.knowledgeVersion,
       stance: brief.stance,
       stanceRationale: brief.stanceRationale,
       marketAsOf: brief.marketAsOf,

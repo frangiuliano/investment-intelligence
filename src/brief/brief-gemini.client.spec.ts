@@ -1,4 +1,5 @@
 import { ConfigService } from '@nestjs/config';
+import { KnowledgePackService } from '../knowledge/knowledge-pack.service';
 import { LlmApiError } from '../llm/llm.errors';
 import type { LlmClient } from '../llm/llm.port';
 import { BriefGeminiClient } from './brief-gemini.client';
@@ -9,7 +10,18 @@ import {
 } from './brief.constants';
 
 describe('BriefGeminiClient', () => {
-  function createClient(completeJson: jest.Mock): BriefGeminiClient {
+  function createClient(
+    completeJson: jest.Mock,
+    buildInjection: jest.Mock = jest.fn().mockResolvedValue({
+      knowledgeVersion: '0.1.0',
+      injection: {
+        knowledgeVersion: '0.1.0',
+        matchedIds: ['equity', 'stance-invalidation'],
+        markdown: '### playbook: equity\n## Always check\n- Check thesis.',
+        truncated: false,
+      },
+    }),
+  ): BriefGeminiClient {
     const llmClient: LlmClient = { completeJson };
     return new BriefGeminiClient(
       {
@@ -21,6 +33,7 @@ describe('BriefGeminiClient', () => {
         },
       } as unknown as ConfigService,
       llmClient,
+      { buildInjection } as unknown as KnowledgePackService,
     );
   }
 
@@ -50,6 +63,7 @@ describe('BriefGeminiClient', () => {
     expect(result.sections.overview).toBe('o');
     expect(result.stance).toBe('watch');
     expect(result.stanceRationale).toBe('Range-bound');
+    expect(result.knowledgeVersion).toBe('0.1.0');
     expect(completeJson).toHaveBeenCalledTimes(1);
     const [request] = completeJson.mock.calls[0] as [
       {
@@ -61,6 +75,8 @@ describe('BriefGeminiClient', () => {
       },
     ];
     expect(request.system).toContain('stance');
+    expect(request.system).toContain('## Knowledge Pack');
+    expect(request.system).toContain('## Always check');
     expect(request.temperature).toBe(0.3);
     expect(request.maxOutputTokens).toBe(BRIEF_MAX_OUTPUT_TOKENS);
     expect(request.timeoutMs).toBe(BRIEF_GEMINI_TIMEOUT_MS);

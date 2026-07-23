@@ -7,6 +7,8 @@ import {
   DEFAULT_GEMINI_MODEL,
   DEFAULT_GEMINI_REQUEST_DELAY_MS,
   DEFAULT_LLM_PROVIDER,
+  DEFAULT_KNOWLEDGE_CONTEXT_MAX_CHARS,
+  DEFAULT_KNOWLEDGE_ROOT,
   DEFAULT_MARKET_DATA_PROVIDER,
   DEFAULT_MARKET_DATA_TIMEOUT_MS,
   DEFAULT_REVIEW_CRON_SCHEDULE,
@@ -68,6 +70,17 @@ describe('envValidationSchema', () => {
     expect(value.MARKET_DATA_PROVIDER).toBe(DEFAULT_MARKET_DATA_PROVIDER);
     expect(value.MARKET_DATA_TIMEOUT_MS).toBe(DEFAULT_MARKET_DATA_TIMEOUT_MS);
     expect(value.LLM_PROVIDER).toBe(DEFAULT_LLM_PROVIDER);
+    expect(
+      (result.value as ValidatedEnv & { KNOWLEDGE_ROOT: string })
+        .KNOWLEDGE_ROOT,
+    ).toBe(DEFAULT_KNOWLEDGE_ROOT);
+    expect(
+      (
+        result.value as ValidatedEnv & {
+          KNOWLEDGE_CONTEXT_MAX_CHARS: number;
+        }
+      ).KNOWLEDGE_CONTEXT_MAX_CHARS,
+    ).toBe(DEFAULT_KNOWLEDGE_CONTEXT_MAX_CHARS);
     expect(value.DASHBOARD_API_KEY).toBe('');
     expect(value.REVIEW_CRON_SCHEDULE).toBe(DEFAULT_REVIEW_CRON_SCHEDULE);
     expect(

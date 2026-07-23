@@ -8,6 +8,8 @@ import {
   DEFAULT_GEMINI_REQUEST_DELAY_MS,
   DEFAULT_DIGEST_CRON_SCHEDULE,
   DEFAULT_DIGEST_LOOKBACK_HOURS,
+  DEFAULT_KNOWLEDGE_CONTEXT_MAX_CHARS,
+  DEFAULT_KNOWLEDGE_ROOT,
   DEFAULT_LLM_PROVIDER,
   DEFAULT_MARKET_DATA_PROVIDER,
   DEFAULT_MARKET_DATA_TIMEOUT_MS,
@@ -81,6 +83,10 @@ export type AppConfig = {
   };
   llm: {
     provider: LlmProvider;
+  };
+  knowledge: {
+    root: string;
+    maxContextChars: number;
   };
   dashboard: {
     apiKey: string;
@@ -160,6 +166,14 @@ export default (): AppConfig => ({
   llm: {
     provider: (process.env.LLM_PROVIDER?.trim().toLowerCase() ||
       DEFAULT_LLM_PROVIDER) as LlmProvider,
+  },
+  knowledge: {
+    root: process.env.KNOWLEDGE_ROOT?.trim() || DEFAULT_KNOWLEDGE_ROOT,
+    maxContextChars: parseInt(
+      process.env.KNOWLEDGE_CONTEXT_MAX_CHARS ??
+        String(DEFAULT_KNOWLEDGE_CONTEXT_MAX_CHARS),
+      10,
+    ),
   },
   dashboard: {
     apiKey: (process.env.DASHBOARD_API_KEY ?? '').trim(),

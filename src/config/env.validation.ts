@@ -29,6 +29,10 @@ export const DEFAULT_REVIEW_CRON_SCHEDULE = '0 12 1 * *';
 export const DEFAULT_TECHNICAL_CHART_ENABLED = true;
 export const DEFAULT_TECHNICAL_CHART_SMA_PERIODS = '20';
 export const DEFAULT_TECHNICAL_CHART_MAX_BARS = 90;
+/** Repo-relative Knowledge Pack root (playbooks/rubrics). */
+export const DEFAULT_KNOWLEDGE_ROOT = 'knowledge';
+/** Soft cap for injected Knowledge Pack markdown in LLM system prompts. */
+export const DEFAULT_KNOWLEDGE_CONTEXT_MAX_CHARS = 12_000;
 
 export function parseFeedUrls(raw: string | undefined): string[] {
   if (!raw) {
@@ -243,4 +247,10 @@ export const envValidationSchema = Joi.object({
     .min(5)
     .max(365)
     .default(DEFAULT_TECHNICAL_CHART_MAX_BARS),
+  KNOWLEDGE_ROOT: Joi.string().trim().min(1).default(DEFAULT_KNOWLEDGE_ROOT),
+  KNOWLEDGE_CONTEXT_MAX_CHARS: Joi.number()
+    .integer()
+    .min(1_000)
+    .max(100_000)
+    .default(DEFAULT_KNOWLEDGE_CONTEXT_MAX_CHARS),
 });

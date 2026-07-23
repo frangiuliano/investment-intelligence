@@ -27,6 +27,7 @@ import { CreateHypotheses1752570000000 } from './migrations/1752570000000-Create
 import { CreateHypothesisReviews1752580000000 } from './migrations/1752580000000-CreateHypothesisReviews';
 import { AddResearchBriefStance1752590000000 } from './migrations/1752590000000-AddResearchBriefStance';
 import { AddResearchBriefChartPng1752600000000 } from './migrations/1752600000000-AddResearchBriefChartPng';
+import { AddKnowledgeVersionColumns1752610000000 } from './migrations/1752610000000-AddKnowledgeVersionColumns';
 
 loadEnv();
 
@@ -70,6 +71,7 @@ export default new DataSource({
     CreateHypothesisReviews1752580000000,
     AddResearchBriefStance1752590000000,
     AddResearchBriefChartPng1752600000000,
+    AddKnowledgeVersionColumns1752610000000,
   ],
   synchronize: false,
   logging: false,

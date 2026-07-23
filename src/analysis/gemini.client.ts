@@ -1,6 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AppLocale } from '../config/env.validation';
+import { ANALYSIS_PROMPT_VERSION } from '../knowledge/knowledge.constants';
+import { KnowledgePackService } from '../knowledge/knowledge-pack.service';
+import { appendKnowledgePackToSystemPrompt } from '../knowledge/knowledge-prompt';
 import { LlmApiError } from '../llm/llm.errors';
 import { LLM_CLIENT } from '../llm/llm.port';
 import type { LlmClient } from '../llm/llm.port';
@@ -31,30 +34,50 @@ export type GeminiAnalyzeArticleInput = {
   content: string | null;
 };
 
+export type AnalyzeArticleResult = GeminiAnalysisResult & {
+  promptVersion: string;
+  knowledgeVersion: string | null;
+};
+
 @Injectable()
 export class GeminiClient {
   constructor(
     private readonly configService: ConfigService,
     @Inject(LLM_CLIENT) private readonly llmClient: LlmClient,
+    private readonly knowledgePackService: KnowledgePackService,
   ) {}
 
   async analyzeArticle(
     input: GeminiAnalyzeArticleInput,
-  ): Promise<GeminiAnalysisResult> {
+  ): Promise<AnalyzeArticleResult> {
     const locale = this.configService.getOrThrow<AppLocale>('locale');
+    const textHints = [input.title, input.content ?? ''].join('\n');
+    const knowledge = await this.knowledgePackService.buildInjection({
+      useCase: 'news-analysis',
+      textHints,
+    });
+    const system = appendKnowledgePackToSystemPrompt(
+      buildAnalysisSystemPrompt(locale),
+      knowledge.injection,
+    );
 
     try {
       const completion = await this.llmClient.completeJson({
-        system: buildAnalysisSystemPrompt(locale),
+        system,
         user: buildAnalysisUserPrompt(input),
-        schemaVersion: 'news-analysis-v1',
+        schemaVersion: ANALYSIS_PROMPT_VERSION,
         temperature: 0.2,
         maxOutputTokens: 1024,
         timeoutMs: GEMINI_REQUEST_TIMEOUT_MS,
       });
 
       try {
-        return parseGeminiAnalysisText(completion.text);
+        const parsed = parseGeminiAnalysisText(completion.text);
+        return {
+          ...parsed,
+          promptVersion: ANALYSIS_PROMPT_VERSION,
+          knowledgeVersion: knowledge.knowledgeVersion,
+        };
       } catch (parseError) {
         throw new GeminiApiError(
           `Gemini response parse failed: ${errorMessage(parseError)}`,

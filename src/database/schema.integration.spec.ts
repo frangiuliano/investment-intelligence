@@ -37,6 +37,7 @@ import { CreateHypotheses1752570000000 } from './migrations/1752570000000-Create
 import { CreateHypothesisReviews1752580000000 } from './migrations/1752580000000-CreateHypothesisReviews';
 import { AddResearchBriefStance1752590000000 } from './migrations/1752590000000-AddResearchBriefStance';
 import { AddResearchBriefChartPng1752600000000 } from './migrations/1752600000000-AddResearchBriefChartPng';
+import { AddKnowledgeVersionColumns1752610000000 } from './migrations/1752610000000-AddKnowledgeVersionColumns';
 import {
   DEFAULT_TEST_DATABASE_URL,
   resolveTestDatabaseUrl,
@@ -96,6 +97,7 @@ describe('Database schema (integration)', () => {
         CreateHypothesisReviews1752580000000,
         AddResearchBriefStance1752590000000,
         AddResearchBriefChartPng1752600000000,
+        AddKnowledgeVersionColumns1752610000000,
       ],
       synchronize: false,
       logging: false,
@@ -489,7 +491,8 @@ describe('Database schema (integration)', () => {
           invalidation: 'Invalidation',
           disclaimer: 'Research only.',
         },
-        promptVersion: 'brief-v2',
+        promptVersion: 'brief-v3',
+        knowledgeVersion: '0.1.0',
         stance: 'watch',
         stanceRationale: 'Range-bound on verified closes; wait for catalysts.',
         marketAsOf: new Date('2026-07-17T12:00:00.000Z'),
