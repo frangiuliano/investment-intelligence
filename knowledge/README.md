@@ -78,11 +78,16 @@ endpoint or cron.
 | `npm run knowledge:rank-chunks -- <rawDocDir> --genre <id>[,…]` | Score chunks with Finance Advisor themes (`_prompts/filter-themes.json`); writes `selected-chunks.json` |
 | `npm run knowledge:dry-run -- <file> [--target …] [--apply]` | Prepare + deterministic playbook draft (no LLM / API key) |
 
+**Who decides `--target` (which playbook)?** **`/fin`** (or the Agent applying
+Fin rules) — not the operator. Default **`equity`** when unsure. Map CEDEAR
+mechanics → `cedear`, fixed income → `bond`. Do **not** create a new playbook
+per PDF; merge into an existing card. See skill `knowledge-ingest`.
+
 **Who decides “important” chunks?** Chunking is mechanical (whole text).
 Ranking keywords/themes are owned by **`/fin`**
 (`knowledge/_prompts/filter-themes.md` + `.json`). Agents must not invent
 ad-hoc keyword lists when those files exist. Extract + human Accept still
-decide what enters playbooks.
+decide what enters playbooks (Accept may skip reading the full PDF).
 
 `<file>` must resolve under `knowledge/sources/` (symlink escapes rejected).
 `meta.json` / `manifest.sources` store **repo-relative** paths only. `--apply`

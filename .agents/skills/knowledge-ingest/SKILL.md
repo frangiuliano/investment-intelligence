@@ -31,6 +31,22 @@ Chunk limits (source of truth): `src/knowledge-ingest/chunk-limits.ts`
 (`filter-themes.*`). Do **not** invent ad-hoc keyword lists in chat when those
 files exist. Change themes via `/fin` + PR updating both md and json.
 
+## Playbook target (`--target`) — Finance Advisor decides
+
+The operator does **not** pick which `.md` receives the extract. **`/fin`
+(or the Agent applying Fin rules)** chooses `--target` and promotes into that
+playbook. Do **not** create a new playbook per PDF/book.
+
+| Source content is mainly… | `--target` |
+|---------------------------|------------|
+| Equity TA / psychology / general equity fundamentals | `equity` (**default** if unsure) |
+| CEDEAR mechanics (ratio, ARS FX, CNV, certificate vs underlying) | `cedear` |
+| Bonds / rates / credit / duration | `bond` |
+| New asset type not in product runtime | Ask `/fin` + `/po` — do not invent a file |
+
+One book → one (or rarely two) existing playbook(s) via merge. Runtime injects
+by holding `assetType`, so the target must match product types in `manifest.json`.
+
 ## Workflow (Agent + LLM)
 
 Copy and track:
@@ -38,13 +54,14 @@ Copy and track:
 ```
 Ingest progress:
 - [ ] 1. Locate source (fixture or local PDF under knowledge/sources/)
-- [ ] 2. npm run knowledge:prepare -- <source> --target <asset>
-- [ ] 3. Pick genre(s) from filter-themes.md; run knowledge:rank-chunks
-- [ ] 4. For each selected chunk (top N): extract with _prompts/extract.md (one chunk only)
-- [ ] 5. Merge extracts with _prompts/merge.md into raw/<docId>/playbook.md
-- [ ] 6. QA with _prompts/qa.md → PASS before apply
-- [ ] 7. Human Accept checklist (~10 min)
-- [ ] 8. Copy draft to knowledge/playbooks/ (or dry-run --apply) + manifest
+- [ ] 2. Decide --target via Fin table above (default equity); do not ask the operator
+- [ ] 3. npm run knowledge:prepare -- <source> --target <asset>
+- [ ] 4. Pick genre(s) from filter-themes.md; run knowledge:rank-chunks
+- [ ] 5. For each selected chunk (top N): extract with _prompts/extract.md (one chunk only)
+- [ ] 6. Merge extracts with _prompts/merge.md into raw/<docId>/playbook.md
+- [ ] 7. QA with _prompts/qa.md → PASS before apply
+- [ ] 8. Human Accept checklist (~10 min) — operator may skip reading the PDF
+- [ ] 9. Copy draft to knowledge/playbooks/ (or dry-run --apply) + manifest
 ```
 
 ### Step details
@@ -56,7 +73,7 @@ Ingest progress:
    - Persist only repo-relative paths in `meta.json` / `manifest.json` (never absolute).
 
 2. **Prepare (no LLM)**
-   - Run `knowledge:prepare`. Note `docId`, `cacheHits` / `cacheMisses`.
+   - Run `knowledge:prepare` with Fin-chosen `--target`. Note `docId`, `cacheHits` / `cacheMisses`.
    - Re-run same input: expect `cacheMisses: 0` for unchanged chunk hashes.
    - Chunking is mechanical (full text → equal slices). It does **not** decide importance.
 

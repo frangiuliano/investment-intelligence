@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "owner": "finance-advisor",
   "updatedAt": "2026-07-23",
   "defaults": {
@@ -122,7 +122,24 @@
         "temporalidad",
         "ohlc",
         "confiabilidad",
-        "reliable"
+        "reliable",
+        "order block",
+        "orderblock",
+        "bloque de orden",
+        "bloque de órdenes",
+        "mitigation",
+        "mitigación",
+        "breaker",
+        "liquidez",
+        "liquidity",
+        "smart money",
+        "institucional",
+        "institutional",
+        "fvg",
+        "imbalance",
+        "fair value gap",
+        "pullback",
+        "retroceso"
       ]
     },
     "fundamental_analysis": {

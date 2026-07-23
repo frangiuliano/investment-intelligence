@@ -20,10 +20,12 @@ extract + human Accept still decide what enters playbooks.
 
 ## How Agents must use this
 
-1. After `knowledge:prepare`, pick a **genre** (or `core` + one specialist).
-2. Run `npm run knowledge:rank-chunks -- <rawDocDir> --genre <id>`.
-3. Extract **only** the top N chunks (default N from JSON `defaults.maxExtractChunks`).
-4. Merge/QA/Accept as usual (`extract.md` / `merge.md` / `qa.md`).
+1. Choose **`--target`** with Fin ownership (operator does not decide):
+   equity (default) | cedear | bond — see skill `knowledge-ingest`.
+2. After `knowledge:prepare`, pick a **genre** (or `core` + one specialist).
+3. Run `npm run knowledge:rank-chunks -- <rawDocDir> --genre <id>`.
+4. Extract **only** the top N chunks (default N from JSON `defaults.maxExtractChunks`).
+5. Merge/QA/Accept as usual (`extract.md` / `merge.md` / `qa.md`).
 
 To change themes: propose via `/fin`, then update this file **and**
 `filter-themes.json` together (same PR). Bump `version` in the JSON.
