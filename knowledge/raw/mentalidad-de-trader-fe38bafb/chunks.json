@@ -1,0 +1,24 @@
+{
+  "docId": "mentalidad-de-trader-fe38bafb",
+  "sourceHash": "fe38bafb3ce7d9c342f06871eb946ea5c80224a1e8b6eb437752571f6c5b97ee",
+  "chunks": [
+    {
+      "id": "chunk-000-a61f67adee6a",
+      "index": 0,
+      "contentHash": "a61f67adee6a8442776dc7ae7d9a8b4535c29157052429c6707dc0903c27d20f",
+      "path": "raw/mentalidad-de-trader-fe38bafb/chunk-000-a61f67adee6a.txt"
+    },
+    {
+      "id": "chunk-001-e80a18fbacb0",
+      "index": 1,
+      "contentHash": "e80a18fbacb0150148860ce33fc9699be4d2447fb373637b4dcca2252aa52136",
+      "path": "raw/mentalidad-de-trader-fe38bafb/chunk-001-e80a18fbacb0.txt"
+    },
+    {
+      "id": "chunk-002-dd1c9520b1cb",
+      "index": 2,
+      "contentHash": "dd1c9520b1cbfe565b79cc37c1b0165e211dfcb8dff2da27392a554a206d8506",
+      "path": "raw/mentalidad-de-trader-fe38bafb/chunk-002-dd1c9520b1cb.txt"
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 {
-  "knowledgeVersion": "0.1.4",
+  "knowledgeVersion": "0.1.5",
   "updatedAt": "2026-07-23",
   "playbooks": [
     {
@@ -64,6 +64,15 @@
       "docId": "order-blocks-bryan-lopez-fcdaecc0",
       "sourceHash": "fcdaecc07e3754a80c9e8692a913685fa4f25e08d78f2062fe369503696f97a0",
       "sourcePath": "sources/Order Blocks Bryan Lopez.pdf",
+      "targets": [
+        "equity"
+      ],
+      "ingestedAt": "2026-07-23"
+    },
+    {
+      "docId": "mentalidad-de-trader-fe38bafb",
+      "sourceHash": "fe38bafb3ce7d9c342f06871eb946ea5c80224a1e8b6eb437752571f6c5b97ee",
+      "sourcePath": "sources/Mentalidad de trader.pdf",
       "targets": [
         "equity"
       ],

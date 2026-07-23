@@ -2,12 +2,12 @@
 
 - id: `equity`
 - assetType: `equity`
-- knowledgeVersion: `0.1.4`
+- knowledgeVersion: `0.1.5`
 
 Equity research method: fundamentals, technical lens, and probabilistic
 process discipline. Method only — do not invent prices, bars, or fundamentals.
 Technical patterns, order-block / SMC labels, and psychology rules are
-educational / process weights, not trade orders.
+educational / process weights for personal recommendations — not broker orders.
 
 ## Always check
 
@@ -22,11 +22,15 @@ educational / process weights, not trade orders.
 - Prefer hunting alleged blocks as **pullbacks in a clear trend** (bullish blocks in uptrends, bearish in downtrends); isolated labels without trend context are weak.
 - Hold competing explanations for the same zone: re-offer of prior interest vs **mitigation** (failed block revisited to flatten losers) vs stop-sweep / breaker structure — do not collapse them into one story.
 - Frame research hypotheses / stance in **probabilities**, not certainty: analysis improves odds; unknown forces can still invalidate the read.
-- Predefine **invalidation** (what would prove the thesis wrong) before leaning on a stance; keep criteria objective (present vs absent), not ad-hoc mid-stream.
-- Judge process quality over a *series* of similar setups — each outcome is independent; one win/loss does not prove or kill the method.
+- Predefine **invalidation** and how much risk you accept before leaning on a stance; keep criteria objective (present vs absent), not ad-hoc mid-stream. Risk only capital you can afford to lose.
+- Weigh whether expected benefit justifies the risk for this review cycle before committing a directional stance.
+- Judge process quality over a *series* of similar setups (expectancy): a low win rate can still be fine if edge holds; audit outcomes honestly — each outcome is independent; one win/loss does not prove or kill the method.
 - Do not let only the last 2–3 outcomes dominate how risky the next read “feels.”
 - Same chart pattern ≠ same participants or path; leave room for uncertainty in technical rationale.
 - Prefer anchoring long-horizon direction on fundamentals / primary news over obsessing block timing when both appear.
+- After the thesis is set: avoid babysitting charts out of discomfort; do not rewrite evidence because watching feels safer.
+- Respect session/context: do not force noise reads in dead conditions; use downtime to study or plan.
+- Accept that seeking research benefit requires accepting risk; fear of loss / fleeing uncertainty can block acting on a prepared thesis (note the bias — do not upgrade alerts from fear alone).
 
 ## Materiality heuristics
 
@@ -49,6 +53,8 @@ educational / process weights, not trade orders.
 | Narrative that “more analysis will remove uncertainty” | low | Process smell; does not upgrade news materiality |
 | Single win/loss treated as proof the whole method is fixed | low | Series thinking; avoid overconfidence or revenge bias |
 | Risk view driven only by recent streak of outcomes | low | Noise for alerts; note bias in brief risks if relevant |
+| Fear / FOMO / chart-babysitting urge with no company event | low | Process smell; note in risks if relevant |
+| Motivational / destiny / promo framing in a source | low | Ignore for alerts |
 
 ## Invalidation
 
@@ -65,27 +71,31 @@ educational / process weights, not trade orders.
 - Rules changed after a few outcomes instead of evaluating a planned sample of similar setups.
 - Contradictory market information was ignored because it threatened an expectation.
 - Overconfidence after a short streak of confirming outcomes without re-checking invalidation.
+- Fear of past failures filtered evidence or blocked acting on a prepared thesis without stating the bias.
+- Micromanaging / rewriting the thesis because chart-watching felt safer than the plan.
 
 ## Do not
 
-- Frame labels as broker orders or regulated investment advice.
+- Frame labels as broker orders or regulated advice for third parties (stances are personal recommendations via the product enum only).
 - Invent revenue, EPS, multiples, or candlestick completions not present in the article or market-data tools.
 - Upgrade materiality solely because the ticker is popular, volatile, or a pattern name appeared.
 - Collapse multiple unrelated tickers into one thesis without stating uncertainty.
-- Treat chart patterns or SMC labels (order block, mitigation, breaker) as `event_type` catalysts or as buy/sell instructions.
-- Map “entrada / R:R / comprar el open del bloque” language into product orders.
+- Treat chart patterns or SMC labels (order block, mitigation, breaker) as `event_type` catalysts or as free-text buy/sell commands.
+- Map “entrada / R:R / lotaje / MetaTrader / comprar el open del bloque” language into product orders.
 - Invent institutional intent, hidden order flow, or pip counts not in tools/sources.
 - Claim certainty from more chart study alone; markets can always surprise.
 - Map trading stop-loss language into product “orders” — use research invalidation and horizon only.
 - Let fear of being wrong, FOMO, or revenge after a miss rewrite what evidence is considered.
-- Substitute “courage / nerves” for predefined invalidation and process rules.
+- Substitute “courage / nerves / fe” for predefined invalidation and process rules.
+- Force noise reads in dead session conditions just to feel active.
 
 ## source_refs
 
 - seed: scaffold #80 minimal equity playbook
 - fixture: `sources/fixtures/sample-equity-earnings.txt`
 - operator: `sources/velas-importantes.txt` (from `sources/velas importantes.pdf`, docId `velas-importantes-c6d2ee47`)
-- operator: `sources/pdfcoffee.com_trading-en-la-zona-pdf-free.pdf` (docId `pdfcoffee-com-trading-en-la-zona-pdf-free-71f96a6b`; Fin-ranked `trading_psychology` chunks via `filter-themes.json` v1.0.0)
-- operator: `sources/Order Blocks Bryan Lopez.pdf` (docId `order-blocks-bryan-lopez-fcdaecc0`; Fin-ranked `technical_analysis` chunks via `filter-themes.json` v1.0.0)
+- operator: `sources/pdfcoffee.com_trading-en-la-zona-pdf-free.pdf` (docId `pdfcoffee-com-trading-en-la-zona-pdf-free-71f96a6b`; Fin-ranked `trading_psychology` via `filter-themes.json`)
+- operator: `sources/Order Blocks Bryan Lopez.pdf` (docId `order-blocks-bryan-lopez-fcdaecc0`; Fin-ranked `technical_analysis` via `filter-themes.json` v1.1.0)
+- operator: `sources/Mentalidad de trader.pdf` (docId `mentalidad-de-trader-fe38bafb`; Fin-ranked `trading_psychology` via `filter-themes.json` v1.1.0)
 - rubric: `rubrics/materiality.md`, `rubrics/event-types.md`, `rubrics/stance-invalidation.md`
-- process: issue #92 formalize ingest filter themes (`/fin` ownership)
+- process: issue #92 formalize ingest filter themes (`/fin` ownership); `/processBook` operator entry

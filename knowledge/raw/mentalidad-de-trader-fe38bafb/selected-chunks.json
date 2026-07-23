@@ -1,0 +1,68 @@
+{
+  "filterThemesVersion": "1.1.0",
+  "genres": [
+    "trading_psychology"
+  ],
+  "minScore": 4,
+  "maxExtractChunks": 16,
+  "selectedCount": 2,
+  "totalChunks": 3,
+  "selected": [
+    {
+      "file": "chunk-000-a61f67adee6a.txt",
+      "score": 7,
+      "matchedKeywords": [
+        "riesgo",
+        "incertidumbre",
+        "expectativa",
+        "miedo",
+        "mentalidad"
+      ],
+      "length": 2992
+    },
+    {
+      "file": "chunk-001-e80a18fbacb0.txt",
+      "score": 6,
+      "matchedKeywords": [
+        "riesgo",
+        "stop",
+        "loss",
+        "actitud"
+      ],
+      "length": 2997
+    }
+  ],
+  "rankedTop30": [
+    {
+      "file": "chunk-000-a61f67adee6a.txt",
+      "score": 7,
+      "matchedKeywords": [
+        "riesgo",
+        "incertidumbre",
+        "expectativa",
+        "miedo",
+        "mentalidad"
+      ],
+      "length": 2992
+    },
+    {
+      "file": "chunk-001-e80a18fbacb0.txt",
+      "score": 6,
+      "matchedKeywords": [
+        "riesgo",
+        "stop",
+        "loss",
+        "actitud"
+      ],
+      "length": 2997
+    },
+    {
+      "file": "chunk-002-dd1c9520b1cb.txt",
+      "score": 1,
+      "matchedKeywords": [
+        "mentalidad"
+      ],
+      "length": 476
+    }
+  ]
+}
