@@ -2,6 +2,7 @@ import { ArrowLeft, TriangleAlert } from "lucide-react"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 
+import { FeedbackButtons } from "@/components/feedback-buttons"
 import { ErrorState } from "@/components/data-states"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -94,6 +95,13 @@ export default async function BriefDetailPage({
             {brief.stanceRationale}
           </p>
         ) : null}
+        <div className="mt-6">
+          <FeedbackButtons
+            targetType="brief"
+            targetId={brief.id}
+            revalidatePath={`/briefs/${brief.id}`}
+          />
+        </div>
       </div>
 
       <div className="space-y-6">
