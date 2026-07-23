@@ -121,11 +121,12 @@ sin fine-tuning ni RAG pesado en v1 de este scope.
 | 40 | #83 | Inyectar Knowledge Pack en news analysis y briefs |
 | 41 | #85 | Crear eval harness de calidad de análisis (gold fixtures) |
 | 42 | #84 | Registrar feedback del operador (útil / ruido) sobre análisis y briefs |
+| 43 | #92 | Formalizar temas/keywords de filtro de ingest (ownership `/fin`) |
 
-Orden vigente (abiertos): **#84**.
+Orden vigente (abiertos): **#84**, **#92**.
 
-`#80`/`#82`/`#81`/`#83`/`#85` cerrados. `#84` depende de `#83` (`#85`
-deseable, cumplido).
+`#80`/`#82`/`#81`/`#83`/`#85` cerrados. `#84` depende de `#83`. `#92` es
+tooling de autoría del Knowledge Pack (ranking de chunks); no bloquea `#84`.
 
 Fuera de este corte (crear después si hace falta): segundo provider real +
 comparación A/B sobre el eval harness; embeddings/vector DB.

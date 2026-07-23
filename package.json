@@ -34,6 +34,7 @@
     "pipeline:once": "ts-node -r tsconfig-paths/register scripts/run-pipeline-once.ts",
     "knowledge:prepare": "ts-node -r tsconfig-paths/register scripts/run-knowledge-prepare.ts",
     "knowledge:dry-run": "ts-node -r tsconfig-paths/register scripts/run-knowledge-dry-run.ts",
+    "knowledge:rank-chunks": "ts-node -r tsconfig-paths/register scripts/run-knowledge-rank-chunks.ts",
     "eval:analysis": "ts-node -r tsconfig-paths/register scripts/run-analysis-eval.ts",
     "verify:lockfile": "bash scripts/verify-lockfile.sh"
   },
