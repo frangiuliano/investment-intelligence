@@ -24,6 +24,7 @@ Optional env:
 | `GEMINI_MODEL` | live | Default `gemini-3.1-flash-lite` |
 | `APP_LOCALE` | both | Prompt locale (`en` \| `es`) |
 | `KNOWLEDGE_ROOT` | both | Knowledge Pack root (default `knowledge`) |
+| `KNOWLEDGE_CONTEXT_MAX_CHARS` | both | Pack injection budget (default `12000`, same as prod) |
 
 CI and `npm run test` only exercise **mock** paths (no paid live calls).
 

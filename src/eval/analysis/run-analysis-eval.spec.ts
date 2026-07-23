@@ -66,21 +66,23 @@ describe('analysis eval fixtures and runner', () => {
     }
   });
 
-  it('should run mock eval without API key and pass the gate', async () => {
+  it('should run full mock eval without API key and pass the gate', async () => {
     const previousKey = process.env.GEMINI_API_KEY_FINANCE;
     delete process.env.GEMINI_API_KEY_FINANCE;
 
     try {
+      const allCases = await loadAnalysisGoldFixtures(FIXTURES_DIR);
       const report = await runAnalysisEval({
         fixturesDir: FIXTURES_DIR,
         mode: 'mock',
-        ids: ['001-aapl-earnings-beat', '007-macro-no-ticker'],
       });
 
       expect(report.mode).toBe('mock');
-      expect(report.total).toBe(2);
-      expect(report.passed).toBe(2);
+      expect(report.total).toBe(allCases.length);
+      expect(report.passed).toBe(allCases.length);
+      expect(report.failed).toBe(0);
       expect(report.gatePassed).toBe(true);
+      expect(report.passRate).toBe(1);
       expect(report.cases.every((result) => result.error == null)).toBe(true);
     } finally {
       if (previousKey !== undefined) {
@@ -89,12 +91,22 @@ describe('analysis eval fixtures and runner', () => {
     }
   });
 
-  it('should allow injecting a custom mock LlmClient', async () => {
+  it('should route mock cases out-of-band without polluting the user prompt', async () => {
     const cases = await loadAnalysisGoldFixtures(FIXTURES_DIR);
     const subset = cases.filter((goldCase) => goldCase.id.startsWith('001-'));
     const client = createMockAnalysisLlmClient(
       new Map(subset.map((goldCase) => [goldCase.id, goldCase])),
     );
+    const seenUsers: string[] = [];
+    const wrappingClient = {
+      routeToCase: (caseId: string) => client.routeToCase(caseId),
+      completeJson: async (
+        request: Parameters<typeof client.completeJson>[0],
+      ) => {
+        seenUsers.push(request.user);
+        return client.completeJson(request);
+      },
+    };
 
     const report = await runAnalysisEval(
       {
@@ -102,9 +114,13 @@ describe('analysis eval fixtures and runner', () => {
         mode: 'mock',
         ids: subset.map((goldCase) => goldCase.id),
       },
-      client,
+      wrappingClient,
     );
 
     expect(report.passed).toBe(subset.length);
+    expect(seenUsers.length).toBe(subset.length);
+    for (const user of seenUsers) {
+      expect(user).not.toMatch(/\[eval-case-id:/);
+    }
   });
 });

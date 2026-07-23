@@ -5,6 +5,7 @@
  * Live: npm run eval:analysis -- --live [--ids id1,id2]
  */
 import path from 'node:path';
+import { DEFAULT_KNOWLEDGE_CONTEXT_MAX_CHARS } from '../src/knowledge/knowledge.constants';
 import {
   DEFAULT_LIVE_PASS_THRESHOLD,
   runAnalysisEval,
@@ -48,12 +49,25 @@ function parseArgs(argv: string[]) {
   return { mode, ids };
 }
 
+function parseMaxContextChars(raw: string | undefined): number | undefined {
+  if (raw === undefined || raw.trim().length === 0) {
+    return undefined;
+  }
+  const parsed = Number(raw);
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    throw new Error(
+      `KNOWLEDGE_CONTEXT_MAX_CHARS must be a positive number (got: ${raw})`,
+    );
+  }
+  return Math.floor(parsed);
+}
+
 async function main() {
   const { mode, ids } = parseArgs(process.argv.slice(2));
-  const fixturesDir = path.resolve(
-    process.cwd(),
-    'eval/analysis/fixtures',
-  );
+  const fixturesDir = path.resolve(process.cwd(), 'eval/analysis/fixtures');
+  const maxContextChars =
+    parseMaxContextChars(process.env.KNOWLEDGE_CONTEXT_MAX_CHARS) ??
+    DEFAULT_KNOWLEDGE_CONTEXT_MAX_CHARS;
 
   const report = await runAnalysisEval({
     fixturesDir,
@@ -61,6 +75,7 @@ async function main() {
     ids,
     locale: (process.env.APP_LOCALE as 'en' | 'es' | undefined) ?? 'en',
     knowledgeRoot: process.env.KNOWLEDGE_ROOT,
+    maxContextChars,
     livePassThreshold: DEFAULT_LIVE_PASS_THRESHOLD,
   });
 

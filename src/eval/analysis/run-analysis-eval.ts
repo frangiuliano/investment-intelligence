@@ -24,17 +24,29 @@ import type {
 export const DEFAULT_LIVE_PASS_THRESHOLD = 0.8;
 export const MOCK_PASS_THRESHOLD = 1;
 
+/**
+ * Mock LLM that replays fixture responses. Case routing is out-of-band
+ * (`routeToCase`) so live prompts stay identical to production.
+ */
+export type CaseRoutedMockLlmClient = LlmClient & {
+  routeToCase(caseId: string): void;
+};
+
 export function createMockAnalysisLlmClient(
   casesById: Map<string, AnalysisGoldCase>,
-): LlmClient {
+): CaseRoutedMockLlmClient {
+  let activeCaseId: string | null = null;
+
   return {
-    completeJson(
-      request: LlmCompleteJsonRequest,
-    ): Promise<LlmCompleteJsonResult> {
-      const caseId = extractCaseIdMarker(request.user);
+    routeToCase(caseId: string) {
+      activeCaseId = caseId;
+    },
+    completeJson(): Promise<LlmCompleteJsonResult> {
+      const caseId = activeCaseId;
+      activeCaseId = null;
       if (!caseId) {
         return Promise.reject(
-          new Error('Mock LLM missing case id marker in user prompt'),
+          new Error('Mock LLM missing active case id (call routeToCase first)'),
         );
       }
       const goldCase = casesById.get(caseId);
@@ -50,6 +62,12 @@ export function createMockAnalysisLlmClient(
       });
     },
   };
+}
+
+export function isCaseRoutedMockLlmClient(
+  client: LlmClient,
+): client is CaseRoutedMockLlmClient {
+  return typeof (client as CaseRoutedMockLlmClient).routeToCase === 'function';
 }
 
 export function createLiveGeminiLlmClient(env: NodeJS.ProcessEnv): LlmClient {
@@ -144,6 +162,9 @@ export async function runAnalysisEval(
   const results: AnalysisCaseResult[] = [];
 
   for (const goldCase of cases) {
+    if (isCaseRoutedMockLlmClient(client)) {
+      client.routeToCase(goldCase.id);
+    }
     results.push(
       await evaluateOneCase({
         goldCase,
@@ -196,11 +217,8 @@ async function evaluateOneCase(params: {
       buildAnalysisSystemPrompt(locale),
       knowledge,
     );
-    const user = [
-      buildAnalysisUserPrompt(goldCase.input),
-      '',
-      caseIdMarker(goldCase.id),
-    ].join('\n');
+    // Same user prompt shape as GeminiClient.analyzeArticle (no eval markers).
+    const user = buildAnalysisUserPrompt(goldCase.input);
 
     const completion = await client.completeJson({
       system,
@@ -246,13 +264,4 @@ function filterCases(
     throw new Error(`Unknown gold case id(s): ${missing.join(', ')}`);
   }
   return selected;
-}
-
-function caseIdMarker(id: string): string {
-  return `[eval-case-id:${id}]`;
-}
-
-function extractCaseIdMarker(userPrompt: string): string | null {
-  const match = userPrompt.match(/\[eval-case-id:([^\]]+)\]/);
-  return match?.[1] ?? null;
 }
