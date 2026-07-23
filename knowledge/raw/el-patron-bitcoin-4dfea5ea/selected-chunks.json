@@ -1,0 +1,466 @@
+{
+  "filterThemesVersion": "1.1.0",
+  "genres": [
+    "fundamental_analysis"
+  ],
+  "minScore": 4,
+  "maxExtractChunks": 16,
+  "selectedCount": 16,
+  "totalChunks": 270,
+  "selected": [
+    {
+      "file": "chunk-074-ee0b02932b66.txt",
+      "score": 5,
+      "matchedKeywords": [
+        "resultados",
+        "probabilidad",
+        "ingresos",
+        "per",
+        "deuda"
+      ],
+      "length": 2994
+    },
+    {
+      "file": "chunk-121-b4a7a7fba728.txt",
+      "score": 5,
+      "matchedKeywords": [
+        "ingresos",
+        "margen",
+        "per",
+        "deuda",
+        "valoración"
+      ],
+      "length": 2996
+    },
+    {
+      "file": "chunk-007-a894514fc47f.txt",
+      "score": 4,
+      "matchedKeywords": [
+        "riesgo",
+        "ingresos",
+        "margin",
+        "per"
+      ],
+      "length": 2993
+    },
+    {
+      "file": "chunk-009-e489fa9ceec9.txt",
+      "score": 4,
+      "matchedKeywords": [
+        "probabilidad",
+        "per"
+      ],
+      "length": 2996
+    },
+    {
+      "file": "chunk-075-4f44bd2207fc.txt",
+      "score": 4,
+      "matchedKeywords": [
+        "probabilidad",
+        "ingresos",
+        "margen",
+        "per"
+      ],
+      "length": 2993
+    },
+    {
+      "file": "chunk-078-6e1a0c9ca617.txt",
+      "score": 4,
+      "matchedKeywords": [
+        "ingresos",
+        "margin",
+        "per",
+        "valoración"
+      ],
+      "length": 2995
+    },
+    {
+      "file": "chunk-079-cbda7ea190d5.txt",
+      "score": 4,
+      "matchedKeywords": [
+        "riesgo",
+        "per"
+      ],
+      "length": 2998
+    },
+    {
+      "file": "chunk-083-93ab2ade94e9.txt",
+      "score": 4,
+      "matchedKeywords": [
+        "riesgo",
+        "ingresos",
+        "per",
+        "deuda"
+      ],
+      "length": 2996
+    },
+    {
+      "file": "chunk-084-544802540248.txt",
+      "score": 4,
+      "matchedKeywords": [
+        "resultados",
+        "margen",
+        "per",
+        "deuda"
+      ],
+      "length": 2996
+    },
+    {
+      "file": "chunk-090-ba3b94b9e471.txt",
+      "score": 4,
+      "matchedKeywords": [
+        "per",
+        "comparables"
+      ],
+      "length": 2994
+    },
+    {
+      "file": "chunk-114-52245179f8fe.txt",
+      "score": 4,
+      "matchedKeywords": [
+        "guía",
+        "per"
+      ],
+      "length": 2990
+    },
+    {
+      "file": "chunk-151-ce1e31aa2be8.txt",
+      "score": 4,
+      "matchedKeywords": [
+        "riesgo",
+        "per"
+      ],
+      "length": 2989
+    },
+    {
+      "file": "chunk-185-a8a4ef552218.txt",
+      "score": 4,
+      "matchedKeywords": [
+        "riesgo",
+        "per"
+      ],
+      "length": 2993
+    },
+    {
+      "file": "chunk-192-d6285da61f4f.txt",
+      "score": 4,
+      "matchedKeywords": [
+        "resultados",
+        "sesgo",
+        "múltiplo",
+        "per"
+      ],
+      "length": 2999
+    },
+    {
+      "file": "chunk-252-8ed9e445a094.txt",
+      "score": 4,
+      "matchedKeywords": [
+        "risk",
+        "per"
+      ],
+      "length": 2999
+    },
+    {
+      "file": "chunk-254-2c104c526de8.txt",
+      "score": 4,
+      "matchedKeywords": [
+        "múltiplo",
+        "per"
+      ],
+      "length": 2997
+    }
+  ],
+  "rankedTop30": [
+    {
+      "file": "chunk-074-ee0b02932b66.txt",
+      "score": 5,
+      "matchedKeywords": [
+        "resultados",
+        "probabilidad",
+        "ingresos",
+        "per",
+        "deuda"
+      ],
+      "length": 2994
+    },
+    {
+      "file": "chunk-121-b4a7a7fba728.txt",
+      "score": 5,
+      "matchedKeywords": [
+        "ingresos",
+        "margen",
+        "per",
+        "deuda",
+        "valoración"
+      ],
+      "length": 2996
+    },
+    {
+      "file": "chunk-007-a894514fc47f.txt",
+      "score": 4,
+      "matchedKeywords": [
+        "riesgo",
+        "ingresos",
+        "margin",
+        "per"
+      ],
+      "length": 2993
+    },
+    {
+      "file": "chunk-009-e489fa9ceec9.txt",
+      "score": 4,
+      "matchedKeywords": [
+        "probabilidad",
+        "per"
+      ],
+      "length": 2996
+    },
+    {
+      "file": "chunk-075-4f44bd2207fc.txt",
+      "score": 4,
+      "matchedKeywords": [
+        "probabilidad",
+        "ingresos",
+        "margen",
+        "per"
+      ],
+      "length": 2993
+    },
+    {
+      "file": "chunk-078-6e1a0c9ca617.txt",
+      "score": 4,
+      "matchedKeywords": [
+        "ingresos",
+        "margin",
+        "per",
+        "valoración"
+      ],
+      "length": 2995
+    },
+    {
+      "file": "chunk-079-cbda7ea190d5.txt",
+      "score": 4,
+      "matchedKeywords": [
+        "riesgo",
+        "per"
+      ],
+      "length": 2998
+    },
+    {
+      "file": "chunk-083-93ab2ade94e9.txt",
+      "score": 4,
+      "matchedKeywords": [
+        "riesgo",
+        "ingresos",
+        "per",
+        "deuda"
+      ],
+      "length": 2996
+    },
+    {
+      "file": "chunk-084-544802540248.txt",
+      "score": 4,
+      "matchedKeywords": [
+        "resultados",
+        "margen",
+        "per",
+        "deuda"
+      ],
+      "length": 2996
+    },
+    {
+      "file": "chunk-090-ba3b94b9e471.txt",
+      "score": 4,
+      "matchedKeywords": [
+        "per",
+        "comparables"
+      ],
+      "length": 2994
+    },
+    {
+      "file": "chunk-114-52245179f8fe.txt",
+      "score": 4,
+      "matchedKeywords": [
+        "guía",
+        "per"
+      ],
+      "length": 2990
+    },
+    {
+      "file": "chunk-151-ce1e31aa2be8.txt",
+      "score": 4,
+      "matchedKeywords": [
+        "riesgo",
+        "per"
+      ],
+      "length": 2989
+    },
+    {
+      "file": "chunk-185-a8a4ef552218.txt",
+      "score": 4,
+      "matchedKeywords": [
+        "riesgo",
+        "per"
+      ],
+      "length": 2993
+    },
+    {
+      "file": "chunk-192-d6285da61f4f.txt",
+      "score": 4,
+      "matchedKeywords": [
+        "resultados",
+        "sesgo",
+        "múltiplo",
+        "per"
+      ],
+      "length": 2999
+    },
+    {
+      "file": "chunk-252-8ed9e445a094.txt",
+      "score": 4,
+      "matchedKeywords": [
+        "risk",
+        "per"
+      ],
+      "length": 2999
+    },
+    {
+      "file": "chunk-254-2c104c526de8.txt",
+      "score": 4,
+      "matchedKeywords": [
+        "múltiplo",
+        "per"
+      ],
+      "length": 2997
+    },
+    {
+      "file": "chunk-255-d45c021dcb1a.txt",
+      "score": 4,
+      "matchedKeywords": [
+        "ingresos",
+        "per"
+      ],
+      "length": 2998
+    },
+    {
+      "file": "chunk-258-1d55727d5829.txt",
+      "score": 4,
+      "matchedKeywords": [
+        "ingresos",
+        "per"
+      ],
+      "length": 2994
+    },
+    {
+      "file": "chunk-264-5abd3d7a7dcc.txt",
+      "score": 4,
+      "matchedKeywords": [
+        "ingresos",
+        "per"
+      ],
+      "length": 2997
+    },
+    {
+      "file": "chunk-267-526d1111e2c4.txt",
+      "score": 4,
+      "matchedKeywords": [
+        "risk",
+        "per"
+      ],
+      "length": 2994
+    },
+    {
+      "file": "chunk-002-b3d82527ede5.txt",
+      "score": 3,
+      "matchedKeywords": [
+        "per"
+      ],
+      "length": 2990
+    },
+    {
+      "file": "chunk-003-bb74e6056e75.txt",
+      "score": 3,
+      "matchedKeywords": [
+        "margin",
+        "per",
+        "valoración"
+      ],
+      "length": 2994
+    },
+    {
+      "file": "chunk-005-51c93fcd43f1.txt",
+      "score": 3,
+      "matchedKeywords": [
+        "riesgo",
+        "margen",
+        "per"
+      ],
+      "length": 2996
+    },
+    {
+      "file": "chunk-040-86a49e2f8833.txt",
+      "score": 3,
+      "matchedKeywords": [
+        "riesgo",
+        "per",
+        "deuda"
+      ],
+      "length": 2997
+    },
+    {
+      "file": "chunk-045-28bae1a7fec2.txt",
+      "score": 3,
+      "matchedKeywords": [
+        "resultados",
+        "per",
+        "valoración"
+      ],
+      "length": 2997
+    },
+    {
+      "file": "chunk-047-8eddc9b0e07f.txt",
+      "score": 3,
+      "matchedKeywords": [
+        "per"
+      ],
+      "length": 2993
+    },
+    {
+      "file": "chunk-061-125fe7ffa806.txt",
+      "score": 3,
+      "matchedKeywords": [
+        "per"
+      ],
+      "length": 2995
+    },
+    {
+      "file": "chunk-064-f67b9136af8a.txt",
+      "score": 3,
+      "matchedKeywords": [
+        "riesgo",
+        "per",
+        "deuda"
+      ],
+      "length": 2992
+    },
+    {
+      "file": "chunk-080-7a8f15540106.txt",
+      "score": 3,
+      "matchedKeywords": [
+        "per"
+      ],
+      "length": 2997
+    },
+    {
+      "file": "chunk-081-cf59f153089a.txt",
+      "score": 3,
+      "matchedKeywords": [
+        "resultados",
+        "múltiplo",
+        "per"
+      ],
+      "length": 2993
+    }
+  ]
+}

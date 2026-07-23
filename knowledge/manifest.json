@@ -1,5 +1,5 @@
 {
-  "knowledgeVersion": "0.1.6",
+  "knowledgeVersion": "0.1.7",
   "updatedAt": "2026-07-23",
   "playbooks": [
     {
@@ -82,6 +82,15 @@
       "docId": "market-makers-method-order-blocks-pdfdrive-6c6cb069",
       "sourceHash": "6c6cb0699993e8a284787665aba5b7eae04cf208912a19b1f89ce1b73e2255aa",
       "sourcePath": "sources/Market Makers Method (Order Blocks) ( PDFDrive ).pdf",
+      "targets": [
+        "equity"
+      ],
+      "ingestedAt": "2026-07-23"
+    },
+    {
+      "docId": "el-patron-bitcoin-4dfea5ea",
+      "sourceHash": "4dfea5ea30ec3194f7666c39dd1dd7c1949be84d5c6a2a256e3a03ac98f8249c",
+      "sourcePath": "sources/El patron Bitcoin.pdf",
       "targets": [
         "equity"
       ],

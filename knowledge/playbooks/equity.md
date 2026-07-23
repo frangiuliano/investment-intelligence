@@ -2,7 +2,7 @@
 
 - id: `equity`
 - assetType: `equity`
-- knowledgeVersion: `0.1.6`
+- knowledgeVersion: `0.1.7`
 
 Equity research method: fundamentals, technical lens, and probabilistic
 process discipline. Method only — do not invent prices, bars, or fundamentals.
@@ -33,6 +33,8 @@ educational / process weights for personal recommendations — not broker orders
 - Do not let only the last 2–3 outcomes dominate how risky the next read “feels.”
 - Same chart pattern ≠ same participants or path; leave room for uncertainty in technical rationale.
 - Prefer anchoring long-horizon direction on fundamentals / primary news over obsessing block timing when both appear.
+- When a story is about **money / Bitcoin / hard-vs-easy money**: separate store-of-value framing from risk-asset investment framing; scarcity claims need a stated stock-vs-flow / issuance mechanism — do not invent ratios.
+- Treat CB liquidity / time-preference / hard-money essays as macro color unless tied to a concrete company or policy catalyst.
 - After the thesis is set: avoid babysitting charts out of discomfort; do not rewrite evidence because watching feels safer.
 - Respect session/context: do not force noise reads in dead conditions; use downtime to study or plan.
 - Accept that seeking research benefit requires accepting risk; fear of loss / fleeing uncertainty can block acting on a prepared thesis (note the bias — do not upgrade alerts from fear alone).
@@ -60,6 +62,8 @@ educational / process weights for personal recommendations — not broker orders
 | Risk view driven only by recent streak of outcomes | low | Noise for alerts; note bias in brief risks if relevant |
 | Fear / FOMO / chart-babysitting urge with no company event | low | Process smell; note in risks if relevant |
 | Motivational / destiny / promo framing in a source | low | Ignore for alerts |
+| Pure monetary philosophy / hard-money essay with no ticker or event | low | Prefer digest |
+| Certainty that a monetary asset “must” appreciate as store of value | low | Process smell; SoV ≠ guaranteed return |
 
 ## Invalidation
 
@@ -80,6 +84,7 @@ educational / process weights for personal recommendations — not broker orders
 - Overconfidence after a short streak of confirming outcomes without re-checking invalidation.
 - Fear of past failures filtered evidence or blocked acting on a prepared thesis without stating the bias.
 - Micromanaging / rewriting the thesis because chart-watching felt safer than the plan.
+- Hard-money / Austrian / Bitcoin-Standard ideology treated as verified microstructure or as a numeric forecast without sources.
 
 ## Do not
 
@@ -95,6 +100,8 @@ educational / process weights for personal recommendations — not broker orders
 - Let fear of being wrong, FOMO, or revenge after a miss rewrite what evidence is considered.
 - Substitute “courage / nerves / fe” for predefined invalidation and process rules.
 - Force noise reads in dead session conditions just to feel active.
+- Invent stock-to-flow ratios, on-chain volumes, or issuance stats not present in tools/sources.
+- Collapse “money / store of value” essays into free-text buy-crypto product orders.
 
 ## source_refs
 
@@ -105,5 +112,6 @@ educational / process weights for personal recommendations — not broker orders
 - operator: `sources/Order Blocks Bryan Lopez.pdf` (docId `order-blocks-bryan-lopez-fcdaecc0`; Fin-ranked `technical_analysis` via `filter-themes.json` v1.1.0)
 - operator: `sources/Mentalidad de trader.pdf` (docId `mentalidad-de-trader-fe38bafb`; Fin-ranked `trading_psychology` via `filter-themes.json` v1.1.0)
 - operator: `sources/Market Makers Method (Order Blocks) ( PDFDrive ).pdf` (docId `market-makers-method-order-blocks-pdfdrive-6c6cb069`; Fin-ranked `technical_analysis` via `filter-themes.json` v1.1.0)
+- operator: `sources/El patron Bitcoin.pdf` (docId `el-patron-bitcoin-4dfea5ea`; Fin-ranked `fundamental_analysis` via `filter-themes.json` v1.1.0 — monetary theory, not chart TA)
 - rubric: `rubrics/materiality.md`, `rubrics/event-types.md`, `rubrics/stance-invalidation.md`
 - process: issue #92 formalize ingest filter themes (`/fin` ownership); `/processBook` operator entry
