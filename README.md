@@ -80,7 +80,7 @@ falta una variable obligatoria de runtime (mensaje explícito vía Joi).
 | `DIGEST_LOOKBACK_HOURS` | No (default `24`) | Ventana de candidatos al digesto (1–168) |
 | `STORY_CLUSTER_WINDOW_HOURS` | No (default `24`) | Ventana para colapsar historias duplicadas en un solo push |
 | `WATCHLIST_TICKERS` | No | Filtro opcional de tickers para relevancia |
-| `DASHBOARD_API_KEY` | No (default vacío) | Secret BFF → Nest (`x-dashboard-api-key`); vacío = `/reviews`, `/news/*`, `/notifications`, `/briefs` y `/feedback` en 401 |
+| `DASHBOARD_API_KEY` | No (default vacío) | Secret BFF → Nest (`x-dashboard-api-key`); vacío = `/reviews`, `/news/*`, `/notifications`, `/briefs`, `/feedback` y `/assets/*` en 401 |
 | `REVIEW_CRON_SCHEDULE` | No (default `0 12 1 * *`) | Cron mensual: día 1 UTC revisa el **mes UTC anterior** |
 | `TECHNICAL_CHART_ENABLED` | No (default `true`) | Enviar chart técnico en imagen tras un brief con market data |
 | `TECHNICAL_CHART_SMA_PERIODS` | No (default `20`) | Ventanas SMA del overlay, separadas por coma (ej. `20,50`) |
@@ -894,6 +894,55 @@ curl -s -X POST http://localhost:3000/feedback \
   -H "Content-Type: application/json" \
   -H "x-dashboard-api-key: $DASHBOARD_API_KEY" \
   -d '{"targetType":"brief","targetId":"<brief-uuid>","label":"useful"}' | jq
+```
+
+## API de sugerencias de activos (dashboard)
+
+Búsqueda de tickers por prefijo de símbolo o nombre de empresa para el desk
+(autocomplete de Informes). Usa el mismo provider que market data (`yahoo` en
+v1) vía puerto `AssetSuggestPort` (Dependency Inversion). Requiere
+`x-dashboard-api-key` (`DASHBOARD_API_KEY`); vacío → `401`.
+
+| Endpoint | Descripción |
+|----------|-------------|
+| `GET /assets/suggest?q=` | Lista acotada de candidatos (`symbol`, `name`, `assetType`, `exchange`, `prioritized`) |
+
+Contrato:
+
+- `q` vacío o solo espacios → `400`
+- Sin resultados → `200` con `items: []` (no inventa símbolos)
+- Provider caído / timeout → `503` (no inventa símbolos)
+- Holdings y watchlist activos que matchean la query se **priorizan**
+  (`prioritized: true`) y pueden aparecer aunque el provider los omita
+  (símbolos ya conocidos del operador; no son inventados)
+- Máx. 10 items; v1 filtra a `equity` y `etf`
+- `source` fija el provenance (p. ej. `yahoo-finance-search`)
+
+```bash
+export DASHBOARD_API_KEY=pick_a_long_random_string
+
+curl -s -H "x-dashboard-api-key: $DASHBOARD_API_KEY" \
+  "http://localhost:3000/assets/suggest?q=AAP" | jq
+
+curl -s -H "x-dashboard-api-key: $DASHBOARD_API_KEY" \
+  "http://localhost:3000/assets/suggest?q=Apple" | jq
+```
+
+Ejemplo de respuesta:
+
+```json
+{
+  "items": [
+    {
+      "symbol": "AAPL",
+      "name": "Apple Inc.",
+      "assetType": "equity",
+      "exchange": "NASDAQ",
+      "prioritized": true
+    }
+  ],
+  "source": "yahoo-finance-search"
+}
 ```
 
 ## Brief on-demand (`/brief`)
