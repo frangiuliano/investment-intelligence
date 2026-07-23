@@ -59,6 +59,10 @@ tables in every playbook.
 - Put copyrighted books/PDFs under `sources/` for local ingest only.
 - `sources/**/*.pdf` is gitignored — do **not** force-add them.
 - Version short fixtures under `sources/fixtures/` (plain `.txt`).
+- Full-text `raw/*/source.txt` and `raw/*/chunk-*.txt` from large books are
+  gitignored (copyright/size). Commit ranking metadata (`selected-chunks.json`,
+  `meta.json`), extracts, and playbook drafts; keep regenerable chunk text local.
+  Small caches may be allowlisted (e.g. fixture / tiny sheets).
 - PDF text extraction uses `pdftotext` (poppler). Install via
   `brew install poppler` (macOS) or your distro package. Empty text → stop;
   OCR is out of scope.

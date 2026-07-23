@@ -29,3 +29,11 @@ coverage/
 knowledge/sources/**/*.pdf
 knowledge/sources/**/*.PDF
 !knowledge/sources/fixtures/
+
+# Full-text chunk cache from large/copyrighted books (regenerable via prepare)
+knowledge/raw/*/source.txt
+knowledge/raw/*/chunk-*.txt
+!knowledge/raw/sample-equity-earnings-*/source.txt
+!knowledge/raw/sample-equity-earnings-*/chunk-*.txt
+!knowledge/raw/velas-importantes-*/source.txt
+!knowledge/raw/velas-importantes-*/chunk-*.txt
