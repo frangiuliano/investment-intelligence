@@ -1,0 +1,32 @@
+{
+  "id": "008-multi-ticker-deal",
+  "input": {
+    "title": "Amazon and Google deepen cloud partnership for retail AI",
+    "source": "TechPress",
+    "url": "https://example.com/news/amzn-goog",
+    "content": "Amazon.com Inc (AMZN) and Alphabet Inc's Google Cloud (GOOGL) announced a multi-year collaboration to integrate retail AI tooling. Financial terms were not disclosed. Analysts called it strategically notable but not a transformational earnings event this quarter."
+  },
+  "expected": {
+    "tickers": [
+      "AMZN",
+      "GOOGL"
+    ],
+    "materiality": "medium",
+    "event_type": "other",
+    "sentiment": "positive"
+  },
+  "mockModelResponse": {
+    "headline": "Amazon and Google expand retail AI cloud tie-up",
+    "summary": "AMZN and GOOGL announced a multi-year cloud collaboration for retail AI. Terms were undisclosed; impact looks notable but not an immediate earnings catalyst.",
+    "sentiment": "positive",
+    "tickers": [
+      "AMZN",
+      "GOOGL"
+    ],
+    "materiality": "medium",
+    "event_type": "other"
+  },
+  "meta": {
+    "notes": "Multi-ticker partnership; medium materiality."
+  }
+}

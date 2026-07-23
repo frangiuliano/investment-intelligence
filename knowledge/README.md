@@ -111,8 +111,15 @@ Current playbooks/rubrics start as **minimal seeds**. Enrich via `/fin`
 review and this ingest pipeline. Prefer dry-run for demos; use the Agent
 skill + LLM extract/merge/QA for real books (local PDFs only).
 
+## Analysis eval (#85)
+
+Gold fixtures and runner live under `eval/analysis/` (not inside this pack).
+Default `npm run eval:analysis` is **mock** (deterministic, no API key). Live
+opt-in uses the LLM port / Gemini key — see `eval/analysis/README.md` for
+pass-rate gates when changing prompts, models, or playbooks.
+
 ## Out of scope here
 
-- Eval harness (#85) and operator feedback (#84)
+- Operator feedback UI/API (#84)
 - NestJS ingest API, cron, or mandatory production Finance API key for ingest
 - Vector DB / semantic RAG (runtime injection is metadata/keyword only; ADR 006)

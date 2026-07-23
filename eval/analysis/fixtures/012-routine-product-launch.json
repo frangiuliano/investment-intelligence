@@ -1,0 +1,30 @@
+{
+  "id": "012-routine-product-launch",
+  "input": {
+    "title": "Nike unveils limited colorway of existing sneaker line",
+    "source": "RetailWire",
+    "url": "https://example.com/news/nke-colorway",
+    "content": "Nike (NKE) released a new colorway of an existing lifestyle sneaker through its app. The drop is limited and follows a regular seasonal cadence. Management did not change guidance."
+  },
+  "expected": {
+    "tickers": [
+      "NKE"
+    ],
+    "materiality": "low",
+    "event_type": "none",
+    "sentiment": "neutral"
+  },
+  "mockModelResponse": {
+    "headline": "Nike drops limited sneaker colorway",
+    "summary": "Nike launched a limited colorway in an existing line without changing financial guidance. Impact looks routine.",
+    "sentiment": "neutral",
+    "tickers": [
+      "NKE"
+    ],
+    "materiality": "low",
+    "event_type": "none"
+  },
+  "meta": {
+    "notes": "Routine product noise should not alert."
+  }
+}

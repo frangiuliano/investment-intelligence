@@ -1,0 +1,30 @@
+{
+  "id": "003-xyz-ipo-debut",
+  "input": {
+    "title": "Fintech startup LedgerPay prices IPO at $22, to trade as LDGR",
+    "source": "CNBC",
+    "url": "https://example.com/news/ldgr-ipo",
+    "content": "LedgerPay priced its initial public offering at $22 per share and will begin trading on the Nasdaq under the ticker LDGR. The company raised $480 million. Proceeds will fund product expansion. No prior public financials were restated in the article."
+  },
+  "expected": {
+    "tickers": [
+      "LDGR"
+    ],
+    "materiality": "high",
+    "event_type": "ipo",
+    "sentiment": "positive"
+  },
+  "mockModelResponse": {
+    "headline": "LedgerPay prices IPO, ticker LDGR",
+    "summary": "LedgerPay completed its IPO at $22 a share and will list as LDGR, raising about $480 million for expansion.",
+    "sentiment": "positive",
+    "tickers": [
+      "LDGR"
+    ],
+    "materiality": "high",
+    "event_type": "ipo"
+  },
+  "meta": {
+    "notes": "IPO listing debut with new ticker."
+  }
+}

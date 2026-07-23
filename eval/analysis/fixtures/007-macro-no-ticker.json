@@ -1,0 +1,26 @@
+{
+  "id": "007-macro-no-ticker",
+  "input": {
+    "title": "Global oil demand outlook revised slightly higher by agency",
+    "source": "IEA Wire",
+    "url": "https://example.com/news/oil-outlook",
+    "content": "An energy agency nudged its global oil demand forecast higher by 0.1 million barrels per day for next year, citing mild winter weather assumptions. The note did not name individual listed oil producers or recommend securities."
+  },
+  "expected": {
+    "tickers": [],
+    "materiality": "low",
+    "event_type": "none",
+    "sentiment": "neutral"
+  },
+  "mockModelResponse": {
+    "headline": "Agency slightly raises oil demand outlook",
+    "summary": "A small upward revision to global oil demand forecasts was published without naming specific equities. Market impact appears limited and nonspecific.",
+    "sentiment": "neutral",
+    "tickers": [],
+    "materiality": "low",
+    "event_type": "none"
+  },
+  "meta": {
+    "notes": "Macro blurb without investable tickers."
+  }
+}

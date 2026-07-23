@@ -1,0 +1,30 @@
+{
+  "id": "009-jpm-guidance-medium",
+  "input": {
+    "title": "JPMorgan tweaks full-year NII guidance within prior range",
+    "source": "MarketWatch",
+    "url": "https://example.com/news/jpm-guidance",
+    "content": "JPMorgan Chase (JPM) slightly adjusted full-year net interest income guidance toward the middle of its previously stated range during a conference appearance. No new quarterly earnings print was released. Management reiterated the existing capital return framework."
+  },
+  "expected": {
+    "tickers": [
+      "JPM"
+    ],
+    "materiality": "medium",
+    "event_type": "earnings",
+    "sentiment": "neutral"
+  },
+  "mockModelResponse": {
+    "headline": "JPMorgan fine-tunes NII guidance",
+    "summary": "JPM nudged full-year NII guidance within its prior range without a new earnings release. Tone was steady rather than a major surprise.",
+    "sentiment": "neutral",
+    "tickers": [
+      "JPM"
+    ],
+    "materiality": "medium",
+    "event_type": "earnings"
+  },
+  "meta": {
+    "notes": "Guidance tweak related to earnings outlook, not a full print."
+  }
+}

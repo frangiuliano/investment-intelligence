@@ -1,0 +1,26 @@
+{
+  "id": "010-bond-auction-other",
+  "input": {
+    "title": "Treasury 10-year auction sees soft demand; yields tick higher",
+    "source": "BondDesk",
+    "url": "https://example.com/news/ust-auction",
+    "content": "The latest US 10-year Treasury auction cleared with a higher-than-expected yield and a softer bid-to-cover ratio. Rates desks described demand as lukewarm. No single equity issuer was highlighted."
+  },
+  "expected": {
+    "tickers": [],
+    "materiality": "medium",
+    "event_type": "other",
+    "sentiment": "negative"
+  },
+  "mockModelResponse": {
+    "headline": "Soft 10-year Treasury auction lifts yields",
+    "summary": "A weak bid-to-cover in the 10-year auction pushed yields higher. The piece is rates-focused without naming equity tickers.",
+    "sentiment": "negative",
+    "tickers": [],
+    "materiality": "medium",
+    "event_type": "other"
+  },
+  "meta": {
+    "notes": "Rates/bond market event without equity tickers."
+  }
+}

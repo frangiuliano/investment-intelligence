@@ -1,0 +1,30 @@
+{
+  "id": "011-ggal-cedear-context",
+  "input": {
+    "title": "Grupo Galicia ADR jumps after Argentina policy headline",
+    "source": "BA Markets",
+    "url": "https://example.com/news/ggal",
+    "content": "Shares of Grupo Financiero Galicia (GGAL) ADRs rose after local reports of a market-friendly policy signal in Argentina. Liquidity in the CEDEAR/ADR complex increased intraday. Analysts urged caution until an official decree is published."
+  },
+  "expected": {
+    "tickers": [
+      "GGAL"
+    ],
+    "materiality": "medium",
+    "event_type": "other",
+    "sentiment": "positive"
+  },
+  "mockModelResponse": {
+    "headline": "GGAL ADRs rally on Argentina policy chatter",
+    "summary": "GGAL ADRs advanced on reports of a market-friendly Argentine policy signal, though confirmation is still pending.",
+    "sentiment": "positive",
+    "tickers": [
+      "GGAL"
+    ],
+    "materiality": "medium",
+    "event_type": "other"
+  },
+  "meta": {
+    "notes": "LatAm ADR/CEDEAR-style name; policy chatter, not regulation filing."
+  }
+}
