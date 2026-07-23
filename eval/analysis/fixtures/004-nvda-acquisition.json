@@ -1,0 +1,30 @@
+{
+  "id": "004-nvda-acquisition",
+  "input": {
+    "title": "NVIDIA to acquire chip-design firm Helix Semi for $4.2 billion",
+    "source": "WSJ",
+    "url": "https://example.com/news/nvda-mna",
+    "content": "NVIDIA Corporation (NVDA) agreed to buy Helix Semi in an all-cash deal valued at $4.2 billion. The acquisition targets custom AI accelerator design talent. Closing is subject to regulatory review in the US and EU."
+  },
+  "expected": {
+    "tickers": [
+      "NVDA"
+    ],
+    "materiality": "high",
+    "event_type": "m_and_a",
+    "sentiment": "positive"
+  },
+  "mockModelResponse": {
+    "headline": "NVIDIA agrees to buy Helix Semi",
+    "summary": "NVIDIA announced a $4.2 billion cash acquisition of Helix Semi to bolster AI chip design, pending regulatory approvals.",
+    "sentiment": "positive",
+    "tickers": [
+      "NVDA"
+    ],
+    "materiality": "high",
+    "event_type": "m_and_a"
+  },
+  "meta": {
+    "notes": "Material M&A announcement."
+  }
+}

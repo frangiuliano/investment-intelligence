@@ -1,0 +1,30 @@
+{
+  "id": "006-rumor-low-materiality",
+  "input": {
+    "title": "Unverified blog claims Tesla robotaxi launch next week",
+    "source": "TechRumorDaily",
+    "url": "https://example.com/news/tsla-rumor",
+    "content": "An anonymous post on a low-traffic blog alleged Tesla (TSLA) will unveil robotaxi pricing next week. The company did not comment. No regulatory filing or named executive confirmed the claim. Similar rumors circulated last year without follow-through."
+  },
+  "expected": {
+    "tickers": [
+      "TSLA"
+    ],
+    "materiality": "low",
+    "event_type": "other",
+    "sentiment": "neutral"
+  },
+  "mockModelResponse": {
+    "headline": "Unverified Tesla robotaxi rumor circulates",
+    "summary": "A low-credibility blog claimed Tesla would announce robotaxi pricing soon, without company confirmation or filings. Treat as unverified rumor.",
+    "sentiment": "neutral",
+    "tickers": [
+      "TSLA"
+    ],
+    "materiality": "low",
+    "event_type": "other"
+  },
+  "meta": {
+    "notes": "Rumor/noise should stay low materiality."
+  }
+}

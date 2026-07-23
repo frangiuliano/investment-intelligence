@@ -1,0 +1,30 @@
+{
+  "id": "005-meta-ftc-regulation",
+  "input": {
+    "title": "US regulators open antitrust probe into Meta ad practices",
+    "source": "FT",
+    "url": "https://example.com/news/meta-ftc",
+    "content": "The Federal Trade Commission opened a formal investigation into Meta Platforms (META) advertising data practices. Officials said the probe could lead to fines or product restrictions. Meta said it would cooperate and disputed the premises of the inquiry."
+  },
+  "expected": {
+    "tickers": [
+      "META"
+    ],
+    "materiality": "high",
+    "event_type": "regulation",
+    "sentiment": "negative"
+  },
+  "mockModelResponse": {
+    "headline": "FTC opens Meta advertising probe",
+    "summary": "US regulators launched an antitrust-style probe into Meta ad practices that could bring fines or product limits. Meta said it will cooperate while disputing the claims.",
+    "sentiment": "negative",
+    "tickers": [
+      "META"
+    ],
+    "materiality": "high",
+    "event_type": "regulation"
+  },
+  "meta": {
+    "notes": "Regulatory/policy catalyst."
+  }
+}

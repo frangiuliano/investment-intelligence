@@ -1,0 +1,30 @@
+{
+  "id": "002-msft-earnings-miss",
+  "input": {
+    "title": "Microsoft misses cloud revenue targets; Azure growth slows",
+    "source": "Bloomberg",
+    "url": "https://example.com/news/msft-miss",
+    "content": "Microsoft Corp (MSFT) reported fiscal quarter results that missed consensus on Azure growth. Executives cited delayed enterprise deals and higher AI infrastructure costs. The company cut near-term cloud margin expectations."
+  },
+  "expected": {
+    "tickers": [
+      "MSFT"
+    ],
+    "materiality": "high",
+    "event_type": "earnings",
+    "sentiment": "negative"
+  },
+  "mockModelResponse": {
+    "headline": "Microsoft cloud growth misses estimates",
+    "summary": "Microsoft missed Azure growth expectations and trimmed near-term cloud margin outlook, pointing to delayed deals and AI costs.",
+    "sentiment": "negative",
+    "tickers": [
+      "MSFT"
+    ],
+    "materiality": "high",
+    "event_type": "earnings"
+  },
+  "meta": {
+    "notes": "Earnings miss with negative investor impact."
+  }
+}

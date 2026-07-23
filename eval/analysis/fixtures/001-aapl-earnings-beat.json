@@ -1,0 +1,30 @@
+{
+  "id": "001-aapl-earnings-beat",
+  "input": {
+    "title": "Apple reports record Q2 earnings, raises full-year guidance",
+    "source": "Reuters",
+    "url": "https://example.com/news/aapl-earnings-beat",
+    "content": "Apple Inc (AAPL) posted quarterly earnings that topped Wall Street estimates, driven by Services and iPhone demand in emerging markets. Management raised full-year revenue guidance and announced a larger share repurchase authorization. Shares rose in after-hours trading."
+  },
+  "expected": {
+    "tickers": [
+      "AAPL"
+    ],
+    "materiality": "high",
+    "event_type": "earnings",
+    "sentiment": "positive"
+  },
+  "mockModelResponse": {
+    "headline": "Apple beats estimates and raises guidance",
+    "summary": "Apple reported better-than-expected quarterly results and raised full-year guidance, citing Services and iPhone strength. The company also expanded its buyback program.",
+    "sentiment": "positive",
+    "tickers": [
+      "AAPL"
+    ],
+    "materiality": "high",
+    "event_type": "earnings"
+  },
+  "meta": {
+    "notes": "Clear named ticker + earnings catalyst with guidance raise."
+  }
+}
