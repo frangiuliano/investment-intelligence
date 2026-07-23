@@ -26,8 +26,12 @@ knowledge/
   or files; **major** for breaking template/schema changes.
 - Ingest `--apply` bumps **patch** and records a `sources[]` entry
   (`docId`, `sourceHash`, `targets`, `ingestedAt`).
-- Runtime persistence of which version was used lands in #83
-  (`knowledgeVersion` on analyses/briefs).
+- Runtime (`src/knowledge/`, issue #83) injects selected playbooks/rubrics into
+  news analysis and brief **system** prompts (metadata/keyword first; character
+  budget via `KNOWLEDGE_CONTEXT_MAX_CHARS`, default 12_000). Persists
+  `knowledgeVersion` (+ `promptVersion` on analyses) on each run. Missing pack
+  → degrade to the previous prompt shape without crashing. Restart the process
+  to pick up pack file edits (in-memory cache). See ADR 006.
 
 ## Playbook template (required sections)
 
@@ -109,6 +113,6 @@ skill + LLM extract/merge/QA for real books (local PDFs only).
 
 ## Out of scope here
 
-- Prompt injection at runtime (#83)
 - Eval harness (#85) and operator feedback (#84)
 - NestJS ingest API, cron, or mandatory production Finance API key for ingest
+- Vector DB / semantic RAG (runtime injection is metadata/keyword only; ADR 006)
