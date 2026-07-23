@@ -17,15 +17,16 @@ Mapa de módulos del backend NestJS y su relación con el backlog del MVP.
 | `database/` | Implementado | TypeORM connection, health, migraciones | #2 |
 | `health/` | Implementado | `GET /health` (app + DB) | #8 |
 | `news/` | Implementado | Recolección RSS (cron), dedupe y persistencia | #1 |
-| `analysis/` | Implementado | Análisis con Gemini Flash (cola + delay) | #3 |
+| `analysis/` | Implementado | Análisis vía puerto LLM (adapter Gemini) | #3, #81 |
 | `relevance/` | Implementado | Criterios de relevancia para alertas | #6 |
 | `notifications/` | Implementado | Alertas Telegram | #4 |
 | `pipeline/` | Implementado | Cron end-to-end + `GET /status` | #7 |
 | `portfolio/` | Implementado | Holdings + watchlist (`/holdings`, `/watchlist`) | #27, #28 |
-| `brief/` | Implementado | Briefs educativos on-demand (Gemini, persistencia) | #32 |
+| `brief/` | Implementado | Briefs educativos on-demand (LLM port + persistencia) | #32, #81 |
 | `telegram-bot/` | Implementado | Inbound Telegram (`/brief`, `/review`, webhook/poll) | #32, #34 |
 | `research/` | Implementado | Journal de hipótesis + reviews de período | #33, #34 |
 | `market-data/` | Implementado | Port + adapter Yahoo para OHLCV histórico | #55 |
+| `llm/` | Implementado | Port `LlmClient` + adapter Gemini (`completeJson`) | #81 |
 | `charts/` | Implementado | Render determinista de chart técnico PNG desde OHLCV; persistido en `research_briefs.chart_png` (ADR 004 addendum) | #57, #76 |
 | `web/` | Implementado | Dashboard Next.js (research desk): Holdings, Hypotheses, Alerts, Briefs, Reviews vía BFF → Nest | #64, #35 |
 
@@ -39,10 +40,11 @@ pipeline
   └── notifications
 
 portfolio  ← holdings + watchlist (REST CRUD; base para briefs/journal)
-brief      ← Gemini on-demand + research_briefs (holdings + market-data + Telegram outbound)
+brief      ← LLM on-demand + research_briefs (holdings + market-data + Telegram outbound)
 telegram-bot ← inbound webhook/commands → brief
 research   ← hypotheses + reviews (REST + /review Telegram; market-data para returns)
 market-data ← MarketDataService → MarketDataPort → Yahoo adapter
+llm        ← LlmClient port → Gemini adapter (analysis + brief)
 charts     ← TechnicalChartService → ChartRendererPort → canvas PNG (brief lo consume)
 telegram-bot ← inbound webhook/commands → brief + review
 

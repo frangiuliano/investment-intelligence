@@ -1,20 +1,18 @@
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppLocale } from '../config/env.validation';
-import {
-  GEMINI_FLASH_MODEL,
-  GEMINI_REQUEST_TIMEOUT_MS,
-} from './gemini.constants';
+import { LlmApiError } from '../llm/llm.errors';
+import { LLM_CLIENT } from '../llm/llm.port';
+import { GEMINI_REQUEST_TIMEOUT_MS } from './gemini.constants';
 import { GeminiApiError, GeminiClient } from './gemini.client';
 
 describe('GeminiClient', () => {
   let client: GeminiClient;
-  let fetchMock: jest.Mock;
+  let completeJson: jest.Mock;
   let locale: AppLocale;
 
   beforeEach(async () => {
-    fetchMock = jest.fn();
-    global.fetch = fetchMock;
+    completeJson = jest.fn();
     locale = 'en';
 
     const module: TestingModule = await Test.createTestingModule({
@@ -24,18 +22,16 @@ describe('GeminiClient', () => {
           provide: ConfigService,
           useValue: {
             getOrThrow: jest.fn((key: string) => {
-              if (key === 'gemini.apiKeyFinance') {
-                return 'test-finance-key';
-              }
-              if (key === 'gemini.model') {
-                return GEMINI_FLASH_MODEL;
-              }
               if (key === 'locale') {
                 return locale;
               }
               throw new Error(`Unexpected config key: ${key}`);
             }),
           },
+        },
+        {
+          provide: LLM_CLIENT,
+          useValue: { completeJson },
         },
       ],
     }).compile();
@@ -44,34 +40,21 @@ describe('GeminiClient', () => {
   });
 
   afterEach(() => {
-    jest.useRealTimers();
     jest.restoreAllMocks();
   });
 
-  it('should call Gemini Flash with finance API key and parse JSON', async () => {
-    fetchMock.mockResolvedValue({
-      ok: true,
-      json: () =>
-        Promise.resolve({
-          candidates: [
-            {
-              content: {
-                parts: [
-                  {
-                    text: JSON.stringify({
-                      headline: 'Oil prices fall on inventories',
-                      summary: 'Oil prices fell.',
-                      sentiment: 'negative',
-                      tickers: ['XOM'],
-                      materiality: 'medium',
-                      event_type: 'none',
-                    }),
-                  },
-                ],
-              },
-            },
-          ],
-        }),
+  it('should call the LLM port and parse JSON analysis', async () => {
+    completeJson.mockResolvedValue({
+      text: JSON.stringify({
+        headline: 'Oil prices fall on inventories',
+        summary: 'Oil prices fell.',
+        sentiment: 'negative',
+        tickers: ['XOM'],
+        materiality: 'medium',
+        event_type: 'none',
+      }),
+      provider: 'gemini',
+      model: 'gemini-test',
     });
 
     const result = await client.analyzeArticle({
@@ -90,48 +73,40 @@ describe('GeminiClient', () => {
       eventType: 'none',
     });
 
-    expect(fetchMock).toHaveBeenCalledTimes(1);
-    const [url, options] = fetchMock.mock.calls[0] as [string, RequestInit];
-    expect(url).toContain(`models/${GEMINI_FLASH_MODEL}:generateContent`);
-    expect(options.headers).toMatchObject({
-      'x-goog-api-key': 'test-finance-key',
-    });
-    expect(typeof options.body).toBe('string');
-    const body = JSON.parse(options.body as string) as {
-      systemInstruction: { parts: Array<{ text: string }> };
-      generationConfig: { responseMimeType: string };
-    };
-    expect(body.generationConfig.responseMimeType).toBe('application/json');
-    expect(body.systemInstruction.parts[0]?.text).toContain(
+    expect(completeJson).toHaveBeenCalledTimes(1);
+    const [request] = completeJson.mock.calls[0] as [
+      {
+        system: string;
+        user: string;
+        temperature: number;
+        maxOutputTokens: number;
+        timeoutMs: number;
+        schemaVersion: string;
+      },
+    ];
+    expect(request.system).toContain(
       'Write the summary and headline in English.',
     );
+    expect(request.user).toContain('Oil slides');
+    expect(request.temperature).toBe(0.2);
+    expect(request.maxOutputTokens).toBe(1024);
+    expect(request.timeoutMs).toBe(GEMINI_REQUEST_TIMEOUT_MS);
+    expect(request.schemaVersion).toBe('news-analysis-v1');
   });
 
   it('should instruct Spanish summary and headline when APP_LOCALE is es', async () => {
     locale = 'es';
-    fetchMock.mockResolvedValue({
-      ok: true,
-      json: () =>
-        Promise.resolve({
-          candidates: [
-            {
-              content: {
-                parts: [
-                  {
-                    text: JSON.stringify({
-                      headline: 'El petróleo baja por inventarios',
-                      summary: 'El petróleo bajó.',
-                      sentiment: 'negative',
-                      tickers: ['XOM'],
-                      materiality: 'high',
-                      event_type: 'none',
-                    }),
-                  },
-                ],
-              },
-            },
-          ],
-        }),
+    completeJson.mockResolvedValue({
+      text: JSON.stringify({
+        headline: 'El petróleo baja por inventarios',
+        summary: 'El petróleo bajó.',
+        sentiment: 'negative',
+        tickers: ['XOM'],
+        materiality: 'high',
+        event_type: 'none',
+      }),
+      provider: 'gemini',
+      model: 'gemini-test',
     });
 
     await client.analyzeArticle({
@@ -141,25 +116,16 @@ describe('GeminiClient', () => {
       content: 'Crude fell on inventory data.',
     });
 
-    const [, options] = fetchMock.mock.calls[0] as [string, RequestInit];
-    const body = JSON.parse(options.body as string) as {
-      systemInstruction: { parts: Array<{ text: string }> };
-    };
-    expect(body.systemInstruction.parts[0]?.text).toContain(
+    const [request] = completeJson.mock.calls[0] as [{ system: string }];
+    expect(request.system).toContain(
       'Write the summary and headline in Spanish.',
     );
   });
 
-  it('should throw a retryable GeminiApiError on HTTP 429', async () => {
-    fetchMock.mockResolvedValue({
-      ok: false,
-      status: 429,
-      headers: {
-        get: (name: string) => (name === 'retry-after' ? '5' : null),
-      },
-      text: () =>
-        Promise.resolve('Please retry in 5.2s. Quota exceeded for free tier'),
-    });
+  it('should map a retryable LlmApiError to GeminiApiError on HTTP 429', async () => {
+    completeJson.mockRejectedValue(
+      new LlmApiError('Gemini API 429: quota', 429, true, 5000),
+    );
 
     await expect(
       client.analyzeArticle({
@@ -179,18 +145,10 @@ describe('GeminiClient', () => {
   });
 
   it('should throw a non-retryable GeminiApiError on invalid JSON schema', async () => {
-    fetchMock.mockResolvedValue({
-      ok: true,
-      json: () =>
-        Promise.resolve({
-          candidates: [
-            {
-              content: {
-                parts: [{ text: JSON.stringify({ summary: 'only' }) }],
-              },
-            },
-          ],
-        }),
+    completeJson.mockResolvedValue({
+      text: JSON.stringify({ summary: 'only' }),
+      provider: 'gemini',
+      model: 'gemini-test',
     });
 
     try {
@@ -207,26 +165,5 @@ describe('GeminiClient', () => {
       expect(geminiError.retryable).toBe(false);
       expect(geminiError.message).toContain('Gemini response parse failed');
     }
-  });
-
-  it('should time out when response body never resolves', async () => {
-    jest.useFakeTimers();
-    fetchMock.mockResolvedValue({
-      ok: true,
-      json: () => new Promise(() => undefined),
-    });
-
-    const pending = client.analyzeArticle({
-      title: 'hang',
-      source: 'Example',
-      url: 'https://news.example.com/hang',
-      content: 'body',
-    });
-    const expectation = expect(pending).rejects.toThrow(
-      /Gemini request timed out after/,
-    );
-
-    await jest.advanceTimersByTimeAsync(GEMINI_REQUEST_TIMEOUT_MS);
-    await expectation;
   });
 });

@@ -52,10 +52,11 @@ falta una variable obligatoria de runtime (mensaje explícito vía Joi).
 | `APP_LOCALE` | No (default `en`) | Idioma de salida (`en` \| `es`) |
 | `DATABASE_URL` | Sí | Conexión PostgreSQL (app) |
 | `TEST_DATABASE_URL` | No (solo tests) | DB de integración; nombre debe terminar en `_test` |
-| `GEMINI_API_KEY_FINANCE` | Sí | Análisis de noticias (Proyecto B) |
+| `GEMINI_API_KEY_FINANCE` | Sí | Análisis / briefs (Proyecto B) vía adapter Gemini |
 | `GEMINI_API_KEY_REVIEWER` | No | Solo GitHub Actions / Reviewer (Proyecto A) |
-| `GEMINI_MODEL` | No (default `gemini-3.1-flash-lite`) | Modelo Gemini para análisis |
-| `GEMINI_REQUEST_DELAY_MS` | No (default `12000`) | Delay entre requests a Gemini |
+| `LLM_PROVIDER` | No (default `gemini`) | Provider del puerto LLM (`gemini` único soportado hoy) |
+| `GEMINI_MODEL` | No (default `gemini-3.1-flash-lite`) | Modelo cuando `LLM_PROVIDER=gemini` |
+| `GEMINI_REQUEST_DELAY_MS` | No (default `12000`) | Delay entre requests de análisis |
 | `GEMINI_ANALYSIS_BATCH_SIZE` | No (default `5`) | Máx. artículos por corrida de análisis |
 | `MARKET_DATA_PROVIDER` | No (default `yahoo`) | Provider de OHLCV histórico; solo `yahoo` en v1 |
 | `MARKET_DATA_TIMEOUT_MS` | No (default `10000`) | Timeout del provider (1000–30000 ms) |
@@ -357,12 +358,14 @@ En ambos casos:
 Para depurar una etapa aislada (también sin cron activo en paralelo):
 `news:collect-once`, `analysis:once`, `telegram:test`, `telegram:notify-once`.
 
-## News Analysis (Gemini Flash)
+## News Analysis (LLM port → Gemini)
 
 El módulo `analysis/` toma artículos de `news_articles` **sin** fila en
-`news_analysis` y los procesa en cola secuencial (concurrencia 1):
+`news_analysis` y los procesa en cola secuencial (concurrencia 1). Las
+llamadas al modelo pasan por el puerto `LlmClient` (`src/llm/`, ADR 005) con
+adapter Gemini (`LLM_PROVIDER=gemini`):
 
-1. Prompt estructurado a Gemini Flash (`GEMINI_MODEL`, default
+1. Prompt estructurado vía `completeJson` (`GEMINI_MODEL`, default
    `gemini-3.1-flash-lite`) pidiendo JSON:
    `headline`, `summary`, `sentiment` (`positive` | `negative` | `neutral`),
    `tickers`, `materiality` (`low` | `medium` | `high`),
@@ -383,7 +386,7 @@ El módulo `analysis/` toma artículos de `news_articles` **sin** fila en
    artículo se omite en el proceso actual para no bloquear la cola.
 5. Persiste en `news_analysis` (`article_id` unique → no re-analiza). Si
    Gemini respondió bien y falla el `save`, se reutiliza el resultado en
-   memoria (sin otra llamada a Gemini) en la siguiente corrida.
+   memoria (sin otra llamada al LLM) en la siguiente corrida.
 
 Invocación local (one-shot, sin esperar al cron del pipeline):
 
@@ -846,12 +849,14 @@ canal Telegram.
 
 Brief educativo TA/FA a pedido (modo research). Con market data disponible
 incluye una **postura etiquetada** (`stance`) relativa a holdings; sin market
-data **no** inventa precios ni postura. Usa `GEMINI_API_KEY_FINANCE` +
+data **no** inventa precios ni postura. Usa el puerto `LlmClient` (adapter
+Gemini: `LLM_PROVIDER` + `GEMINI_API_KEY_FINANCE` + `GEMINI_MODEL`) +
 `APP_LOCALE` + `MarketDataService` (#55).
 
 | Pieza | Rol |
 |-------|-----|
-| `brief/` | Prompt Gemini, persistencia en `research_briefs` (sections + stance), formato Telegram |
+| `llm/` | Puerto `LlmClient.completeJson` + adapter Gemini (ADR 005) |
+| `brief/` | Prompt + parseo, persistencia en `research_briefs` (sections + stance), formato Telegram |
 | `market-data/` | OHLCV verificado → facts block del prompt; fallo → stance `null` |
 | `telegram-bot/` | Inbound: `POST /telegram/webhook` + router `/brief` `/help` |
 | Holdings | Sin posición: `enter` \| `avoid` \| `watch`. Con posición: `hold` \| `add` \| `reduce` \| `exit` |

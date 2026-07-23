@@ -19,6 +19,10 @@ export const DEFAULT_DIGEST_CRON_SCHEDULE = '0 12 * * *';
 export const DEFAULT_DIGEST_LOOKBACK_HOURS = 24;
 export const DEFAULT_MARKET_DATA_PROVIDER = 'yahoo' as const;
 export const DEFAULT_MARKET_DATA_TIMEOUT_MS = 10_000;
+/** LLM provider for news analysis and briefs (vendor-agnostic port). */
+export const DEFAULT_LLM_PROVIDER = 'gemini' as const;
+export const ALLOWED_LLM_PROVIDERS = [DEFAULT_LLM_PROVIDER] as const;
+export type LlmProvider = (typeof ALLOWED_LLM_PROVIDERS)[number];
 /** First day of each month at 12:00 UTC — period review of hypotheses. */
 export const DEFAULT_REVIEW_CRON_SCHEDULE = '0 12 1 * *';
 /** Technical chart follow-up for briefs (ADR 004). */
@@ -197,6 +201,18 @@ export const envValidationSchema = Joi.object({
     .min(1_000)
     .max(30_000)
     .default(DEFAULT_MARKET_DATA_TIMEOUT_MS),
+  /**
+   * Vendor-agnostic LLM provider selected by LlmModule.
+   * Only `gemini` is wired today; other values fail validation at boot.
+   */
+  LLM_PROVIDER: Joi.string()
+    .trim()
+    .lowercase()
+    .valid(...ALLOWED_LLM_PROVIDERS)
+    .default(DEFAULT_LLM_PROVIDER)
+    .messages({
+      'any.only': `LLM_PROVIDER must be one of: ${ALLOWED_LLM_PROVIDERS.join(', ')}`,
+    }),
   /**
    * Shared secret for dashboard-facing Nest routes (BFF header
    * x-dashboard-api-key). Empty disables those routes (401).
