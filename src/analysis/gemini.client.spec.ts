@@ -74,15 +74,19 @@ describe('GeminiClient', () => {
     });
 
     expect(completeJson).toHaveBeenCalledTimes(1);
-    const request = completeJson.mock.calls[0][0] as {
-      system: string;
-      user: string;
-      temperature: number;
-      maxOutputTokens: number;
-      timeoutMs: number;
-      schemaVersion: string;
-    };
-    expect(request.system).toContain('Write the summary and headline in English.');
+    const [request] = completeJson.mock.calls[0] as [
+      {
+        system: string;
+        user: string;
+        temperature: number;
+        maxOutputTokens: number;
+        timeoutMs: number;
+        schemaVersion: string;
+      },
+    ];
+    expect(request.system).toContain(
+      'Write the summary and headline in English.',
+    );
     expect(request.user).toContain('Oil slides');
     expect(request.temperature).toBe(0.2);
     expect(request.maxOutputTokens).toBe(1024);
@@ -112,7 +116,7 @@ describe('GeminiClient', () => {
       content: 'Crude fell on inventory data.',
     });
 
-    const request = completeJson.mock.calls[0][0] as { system: string };
+    const [request] = completeJson.mock.calls[0] as [{ system: string }];
     expect(request.system).toContain(
       'Write the summary and headline in Spanish.',
     );

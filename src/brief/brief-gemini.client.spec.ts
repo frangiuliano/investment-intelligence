@@ -1,6 +1,6 @@
 import { ConfigService } from '@nestjs/config';
 import { LlmApiError } from '../llm/llm.errors';
-import { LlmClient } from '../llm/llm.port';
+import type { LlmClient } from '../llm/llm.port';
 import { BriefGeminiClient } from './brief-gemini.client';
 import {
   BRIEF_GEMINI_TIMEOUT_MS,
@@ -51,13 +51,15 @@ describe('BriefGeminiClient', () => {
     expect(result.stance).toBe('watch');
     expect(result.stanceRationale).toBe('Range-bound');
     expect(completeJson).toHaveBeenCalledTimes(1);
-    const request = completeJson.mock.calls[0][0] as {
-      system: string;
-      temperature: number;
-      maxOutputTokens: number;
-      timeoutMs: number;
-      schemaVersion: string;
-    };
+    const [request] = completeJson.mock.calls[0] as [
+      {
+        system: string;
+        temperature: number;
+        maxOutputTokens: number;
+        timeoutMs: number;
+        schemaVersion: string;
+      },
+    ];
     expect(request.system).toContain('stance');
     expect(request.temperature).toBe(0.3);
     expect(request.maxOutputTokens).toBe(BRIEF_MAX_OUTPUT_TOKENS);
