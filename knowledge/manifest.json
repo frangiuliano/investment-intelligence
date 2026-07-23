@@ -1,5 +1,5 @@
 {
-  "knowledgeVersion": "0.1.9",
+  "knowledgeVersion": "0.1.10",
   "updatedAt": "2026-07-23",
   "playbooks": [
     {
@@ -109,6 +109,15 @@
       "docId": "babypips-tus-primeros-pasos-en-forex-6d5491fb",
       "sourceHash": "6d5491fb3cfd23a1a0dd1bc4456d86b5c10623d9133642ba9df90d3d101d889d",
       "sourcePath": "sources/babypips- Tus primeros pasos en Forex.pdf",
+      "targets": [
+        "equity"
+      ],
+      "ingestedAt": "2026-07-23"
+    },
+    {
+      "docId": "accion-del-precio-f0995645",
+      "sourceHash": "f0995645505ac9f6cc49be5e69b770426083e84d3a576dab648c5b23e7fa619a",
+      "sourcePath": "sources/ACCION DEL PRECIO.pdf",
       "targets": [
         "equity"
       ],

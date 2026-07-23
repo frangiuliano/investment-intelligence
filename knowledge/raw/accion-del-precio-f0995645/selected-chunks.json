@@ -1,0 +1,166 @@
+{
+  "filterThemesVersion": "1.1.0",
+  "genres": [
+    "technical_analysis"
+  ],
+  "minScore": 4,
+  "maxExtractChunks": 16,
+  "selectedCount": 6,
+  "totalChunks": 7,
+  "selected": [
+    {
+      "file": "chunk-003-6e7a25b1fe98.txt",
+      "score": 10,
+      "matchedKeywords": [
+        "vela",
+        "soporte",
+        "resistencia",
+        "tendencia",
+        "volumen",
+        "volume",
+        "media móvil",
+        "retroceso"
+      ],
+      "length": 2937
+    },
+    {
+      "file": "chunk-000-68b7a25f0d23.txt",
+      "score": 7,
+      "matchedKeywords": [
+        "vela",
+        "soporte",
+        "resistencia",
+        "tendencia",
+        "retroceso"
+      ],
+      "length": 2993
+    },
+    {
+      "file": "chunk-004-c1f5fd792170.txt",
+      "score": 7,
+      "matchedKeywords": [
+        "vela",
+        "soporte",
+        "resistencia",
+        "tendencia",
+        "media móvil"
+      ],
+      "length": 2968
+    },
+    {
+      "file": "chunk-005-1f11609bab8f.txt",
+      "score": 7,
+      "matchedKeywords": [
+        "resultados",
+        "riesgo",
+        "volumen",
+        "volume",
+        "sma"
+      ],
+      "length": 2934
+    },
+    {
+      "file": "chunk-001-2938d1f102e5.txt",
+      "score": 6,
+      "matchedKeywords": [
+        "vela",
+        "soporte",
+        "resistencia",
+        "tendencia"
+      ],
+      "length": 2999
+    },
+    {
+      "file": "chunk-002-276843eae011.txt",
+      "score": 6,
+      "matchedKeywords": [
+        "vela",
+        "soporte",
+        "resistencia",
+        "tendencia"
+      ],
+      "length": 2997
+    }
+  ],
+  "rankedTop30": [
+    {
+      "file": "chunk-003-6e7a25b1fe98.txt",
+      "score": 10,
+      "matchedKeywords": [
+        "vela",
+        "soporte",
+        "resistencia",
+        "tendencia",
+        "volumen",
+        "volume",
+        "media móvil",
+        "retroceso"
+      ],
+      "length": 2937
+    },
+    {
+      "file": "chunk-000-68b7a25f0d23.txt",
+      "score": 7,
+      "matchedKeywords": [
+        "vela",
+        "soporte",
+        "resistencia",
+        "tendencia",
+        "retroceso"
+      ],
+      "length": 2993
+    },
+    {
+      "file": "chunk-004-c1f5fd792170.txt",
+      "score": 7,
+      "matchedKeywords": [
+        "vela",
+        "soporte",
+        "resistencia",
+        "tendencia",
+        "media móvil"
+      ],
+      "length": 2968
+    },
+    {
+      "file": "chunk-005-1f11609bab8f.txt",
+      "score": 7,
+      "matchedKeywords": [
+        "resultados",
+        "riesgo",
+        "volumen",
+        "volume",
+        "sma"
+      ],
+      "length": 2934
+    },
+    {
+      "file": "chunk-001-2938d1f102e5.txt",
+      "score": 6,
+      "matchedKeywords": [
+        "vela",
+        "soporte",
+        "resistencia",
+        "tendencia"
+      ],
+      "length": 2999
+    },
+    {
+      "file": "chunk-002-276843eae011.txt",
+      "score": 6,
+      "matchedKeywords": [
+        "vela",
+        "soporte",
+        "resistencia",
+        "tendencia"
+      ],
+      "length": 2997
+    },
+    {
+      "file": "chunk-006-3596e8a877d4.txt",
+      "score": 2,
+      "matchedKeywords": [],
+      "length": 326
+    }
+  ]
+}

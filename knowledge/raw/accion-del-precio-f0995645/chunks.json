@@ -1,0 +1,48 @@
+{
+  "docId": "accion-del-precio-f0995645",
+  "sourceHash": "f0995645505ac9f6cc49be5e69b770426083e84d3a576dab648c5b23e7fa619a",
+  "chunks": [
+    {
+      "id": "chunk-000-68b7a25f0d23",
+      "index": 0,
+      "contentHash": "68b7a25f0d23bf3d372c0b522766aaacb1a00aae81684694ed7a966f0ea7f30e",
+      "path": "raw/accion-del-precio-f0995645/chunk-000-68b7a25f0d23.txt"
+    },
+    {
+      "id": "chunk-001-2938d1f102e5",
+      "index": 1,
+      "contentHash": "2938d1f102e58b19412b818e1d678f243cbca431fa535cc5b86600286c8f2b5f",
+      "path": "raw/accion-del-precio-f0995645/chunk-001-2938d1f102e5.txt"
+    },
+    {
+      "id": "chunk-002-276843eae011",
+      "index": 2,
+      "contentHash": "276843eae011661097277200b331b2a537d59e67c6266f6e4661a90fb51c3f8a",
+      "path": "raw/accion-del-precio-f0995645/chunk-002-276843eae011.txt"
+    },
+    {
+      "id": "chunk-003-6e7a25b1fe98",
+      "index": 3,
+      "contentHash": "6e7a25b1fe984f2a0678ef8a316b287470160c6d964dd878e55e4c2f1ef8b40e",
+      "path": "raw/accion-del-precio-f0995645/chunk-003-6e7a25b1fe98.txt"
+    },
+    {
+      "id": "chunk-004-c1f5fd792170",
+      "index": 4,
+      "contentHash": "c1f5fd79217062d3734fa7896aabea3d0b89f2045abfadd486c7c4268863d9c1",
+      "path": "raw/accion-del-precio-f0995645/chunk-004-c1f5fd792170.txt"
+    },
+    {
+      "id": "chunk-005-1f11609bab8f",
+      "index": 5,
+      "contentHash": "1f11609bab8f6cf91bbedfda115678fe9ed581c520404263e8b3f3df3d93e5d3",
+      "path": "raw/accion-del-precio-f0995645/chunk-005-1f11609bab8f.txt"
+    },
+    {
+      "id": "chunk-006-3596e8a877d4",
+      "index": 6,
+      "contentHash": "3596e8a877d401281b83a42b706886d58011fa5589199b9cfc365bd732f789f9",
+      "path": "raw/accion-del-precio-f0995645/chunk-006-3596e8a877d4.txt"
+    }
+  ]
+}
