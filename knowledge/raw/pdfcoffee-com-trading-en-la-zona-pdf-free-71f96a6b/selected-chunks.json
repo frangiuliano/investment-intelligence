@@ -1,0 +1,690 @@
+{
+  "filterThemesVersion": "1.0.0",
+  "genres": [
+    "trading_psychology"
+  ],
+  "minScore": 4,
+  "maxExtractChunks": 16,
+  "selectedCount": 16,
+  "totalChunks": 162,
+  "selected": [
+    {
+      "file": "chunk-003-933eea4bed43.txt",
+      "score": 11,
+      "matchedKeywords": [
+        "resultados",
+        "riesgo",
+        "sesgo",
+        "probabilidad",
+        "creencia",
+        "pérdida",
+        "zona",
+        "mentalidad",
+        "actitud"
+      ],
+      "length": 2994
+    },
+    {
+      "file": "chunk-016-de27c388f771.txt",
+      "score": 10,
+      "matchedKeywords": [
+        "resultados",
+        "riesgo",
+        "incertidumbre",
+        "disciplina",
+        "creencia",
+        "miedo",
+        "consistencia",
+        "actitud"
+      ],
+      "length": 2991
+    },
+    {
+      "file": "chunk-074-c7db1e709f7f.txt",
+      "score": 10,
+      "matchedKeywords": [
+        "resultados",
+        "riesgo",
+        "incertidumbre",
+        "creencia",
+        "ventaja",
+        "consistencia",
+        "zona",
+        "cualquier cosa puede"
+      ],
+      "length": 2986
+    },
+    {
+      "file": "chunk-091-f0e7a177c386.txt",
+      "score": 10,
+      "matchedKeywords": [
+        "resultados",
+        "riesgo",
+        "probabilidad",
+        "creencia",
+        "serie",
+        "muestra",
+        "stop",
+        "pérdida",
+        "actitud",
+        "casino"
+      ],
+      "length": 2993
+    },
+    {
+      "file": "chunk-107-901d4e0a86b0.txt",
+      "score": 10,
+      "matchedKeywords": [
+        "resultados",
+        "riesgo",
+        "probabilidad",
+        "creencia",
+        "miedo",
+        "objetividad",
+        "pérdida",
+        "cualquier cosa puede"
+      ],
+      "length": 2999
+    },
+    {
+      "file": "chunk-013-198c1f84da35.txt",
+      "score": 9,
+      "matchedKeywords": [
+        "riesgo",
+        "incertidumbre",
+        "aceptar el riesgo",
+        "disciplina",
+        "miedo",
+        "stop",
+        "pérdida",
+        "loss",
+        "actitud"
+      ],
+      "length": 2997
+    },
+    {
+      "file": "chunk-055-df1dd49694e9.txt",
+      "score": 9,
+      "matchedKeywords": [
+        "resultados",
+        "riesgo",
+        "probabilidad",
+        "aceptar el riesgo",
+        "creencia",
+        "expectativa",
+        "miedo",
+        "pérdida",
+        "actitud"
+      ],
+      "length": 2998
+    },
+    {
+      "file": "chunk-085-51b27cdc7175.txt",
+      "score": 9,
+      "matchedKeywords": [
+        "resultados",
+        "probabilidad",
+        "incertidumbre",
+        "aleatorio",
+        "ventaja",
+        "consistencia",
+        "serie",
+        "muestra",
+        "casino"
+      ],
+      "length": 2999
+    },
+    {
+      "file": "chunk-109-a4950604f541.txt",
+      "score": 9,
+      "matchedKeywords": [
+        "resultados",
+        "probabilidad",
+        "creencia",
+        "miedo",
+        "consistencia",
+        "pérdida",
+        "zona"
+      ],
+      "length": 2982
+    },
+    {
+      "file": "chunk-160-dbd8dcede91e.txt",
+      "score": 9,
+      "matchedKeywords": [
+        "probabilidad",
+        "aleatorio",
+        "disciplina",
+        "creencia",
+        "miedo",
+        "consistencia",
+        "serie",
+        "muestra",
+        "casino"
+      ],
+      "length": 2998
+    },
+    {
+      "file": "chunk-002-8cb11c7a6bff.txt",
+      "score": 8,
+      "matchedKeywords": [
+        "resultados",
+        "disciplina",
+        "creencia",
+        "zona",
+        "mentalidad",
+        "actitud"
+      ],
+      "length": 2997
+    },
+    {
+      "file": "chunk-031-05b4009be16a.txt",
+      "score": 8,
+      "matchedKeywords": [
+        "resultados",
+        "creencia",
+        "miedo",
+        "consistencia",
+        "serie",
+        "pérdida",
+        "mentalidad",
+        "actitud"
+      ],
+      "length": 2997
+    },
+    {
+      "file": "chunk-075-c009f4a6ba9d.txt",
+      "score": 8,
+      "matchedKeywords": [
+        "probabilidad",
+        "incertidumbre",
+        "creencia",
+        "expectativa",
+        "miedo",
+        "ventaja",
+        "serie",
+        "cualquier cosa puede"
+      ],
+      "length": 2997
+    },
+    {
+      "file": "chunk-083-530d9e6488b7.txt",
+      "score": 8,
+      "matchedKeywords": [
+        "resultados",
+        "riesgo",
+        "creencia",
+        "expectativa",
+        "predefinir",
+        "pérdida",
+        "actitud",
+        "cualquier cosa puede"
+      ],
+      "length": 2999
+    },
+    {
+      "file": "chunk-086-d53b8d0a292f.txt",
+      "score": 8,
+      "matchedKeywords": [
+        "resultados",
+        "probabilidad",
+        "creencia",
+        "expectativa",
+        "ventaja",
+        "muestra",
+        "pérdida",
+        "casino"
+      ],
+      "length": 2996
+    },
+    {
+      "file": "chunk-088-6994a8a79ae8.txt",
+      "score": 8,
+      "matchedKeywords": [
+        "resultados",
+        "probabilidad",
+        "ventaja",
+        "consistencia",
+        "serie",
+        "muestra",
+        "pérdida",
+        "casino"
+      ],
+      "length": 2997
+    }
+  ],
+  "rankedTop30": [
+    {
+      "file": "chunk-003-933eea4bed43.txt",
+      "score": 11,
+      "matchedKeywords": [
+        "resultados",
+        "riesgo",
+        "sesgo",
+        "probabilidad",
+        "creencia",
+        "pérdida",
+        "zona",
+        "mentalidad",
+        "actitud"
+      ],
+      "length": 2994
+    },
+    {
+      "file": "chunk-016-de27c388f771.txt",
+      "score": 10,
+      "matchedKeywords": [
+        "resultados",
+        "riesgo",
+        "incertidumbre",
+        "disciplina",
+        "creencia",
+        "miedo",
+        "consistencia",
+        "actitud"
+      ],
+      "length": 2991
+    },
+    {
+      "file": "chunk-074-c7db1e709f7f.txt",
+      "score": 10,
+      "matchedKeywords": [
+        "resultados",
+        "riesgo",
+        "incertidumbre",
+        "creencia",
+        "ventaja",
+        "consistencia",
+        "zona",
+        "cualquier cosa puede"
+      ],
+      "length": 2986
+    },
+    {
+      "file": "chunk-091-f0e7a177c386.txt",
+      "score": 10,
+      "matchedKeywords": [
+        "resultados",
+        "riesgo",
+        "probabilidad",
+        "creencia",
+        "serie",
+        "muestra",
+        "stop",
+        "pérdida",
+        "actitud",
+        "casino"
+      ],
+      "length": 2993
+    },
+    {
+      "file": "chunk-107-901d4e0a86b0.txt",
+      "score": 10,
+      "matchedKeywords": [
+        "resultados",
+        "riesgo",
+        "probabilidad",
+        "creencia",
+        "miedo",
+        "objetividad",
+        "pérdida",
+        "cualquier cosa puede"
+      ],
+      "length": 2999
+    },
+    {
+      "file": "chunk-013-198c1f84da35.txt",
+      "score": 9,
+      "matchedKeywords": [
+        "riesgo",
+        "incertidumbre",
+        "aceptar el riesgo",
+        "disciplina",
+        "miedo",
+        "stop",
+        "pérdida",
+        "loss",
+        "actitud"
+      ],
+      "length": 2997
+    },
+    {
+      "file": "chunk-055-df1dd49694e9.txt",
+      "score": 9,
+      "matchedKeywords": [
+        "resultados",
+        "riesgo",
+        "probabilidad",
+        "aceptar el riesgo",
+        "creencia",
+        "expectativa",
+        "miedo",
+        "pérdida",
+        "actitud"
+      ],
+      "length": 2998
+    },
+    {
+      "file": "chunk-085-51b27cdc7175.txt",
+      "score": 9,
+      "matchedKeywords": [
+        "resultados",
+        "probabilidad",
+        "incertidumbre",
+        "aleatorio",
+        "ventaja",
+        "consistencia",
+        "serie",
+        "muestra",
+        "casino"
+      ],
+      "length": 2999
+    },
+    {
+      "file": "chunk-109-a4950604f541.txt",
+      "score": 9,
+      "matchedKeywords": [
+        "resultados",
+        "probabilidad",
+        "creencia",
+        "miedo",
+        "consistencia",
+        "pérdida",
+        "zona"
+      ],
+      "length": 2982
+    },
+    {
+      "file": "chunk-160-dbd8dcede91e.txt",
+      "score": 9,
+      "matchedKeywords": [
+        "probabilidad",
+        "aleatorio",
+        "disciplina",
+        "creencia",
+        "miedo",
+        "consistencia",
+        "serie",
+        "muestra",
+        "casino"
+      ],
+      "length": 2998
+    },
+    {
+      "file": "chunk-002-8cb11c7a6bff.txt",
+      "score": 8,
+      "matchedKeywords": [
+        "resultados",
+        "disciplina",
+        "creencia",
+        "zona",
+        "mentalidad",
+        "actitud"
+      ],
+      "length": 2997
+    },
+    {
+      "file": "chunk-031-05b4009be16a.txt",
+      "score": 8,
+      "matchedKeywords": [
+        "resultados",
+        "creencia",
+        "miedo",
+        "consistencia",
+        "serie",
+        "pérdida",
+        "mentalidad",
+        "actitud"
+      ],
+      "length": 2997
+    },
+    {
+      "file": "chunk-075-c009f4a6ba9d.txt",
+      "score": 8,
+      "matchedKeywords": [
+        "probabilidad",
+        "incertidumbre",
+        "creencia",
+        "expectativa",
+        "miedo",
+        "ventaja",
+        "serie",
+        "cualquier cosa puede"
+      ],
+      "length": 2997
+    },
+    {
+      "file": "chunk-083-530d9e6488b7.txt",
+      "score": 8,
+      "matchedKeywords": [
+        "resultados",
+        "riesgo",
+        "creencia",
+        "expectativa",
+        "predefinir",
+        "pérdida",
+        "actitud",
+        "cualquier cosa puede"
+      ],
+      "length": 2999
+    },
+    {
+      "file": "chunk-086-d53b8d0a292f.txt",
+      "score": 8,
+      "matchedKeywords": [
+        "resultados",
+        "probabilidad",
+        "creencia",
+        "expectativa",
+        "ventaja",
+        "muestra",
+        "pérdida",
+        "casino"
+      ],
+      "length": 2996
+    },
+    {
+      "file": "chunk-088-6994a8a79ae8.txt",
+      "score": 8,
+      "matchedKeywords": [
+        "resultados",
+        "probabilidad",
+        "ventaja",
+        "consistencia",
+        "serie",
+        "muestra",
+        "pérdida",
+        "casino"
+      ],
+      "length": 2997
+    },
+    {
+      "file": "chunk-108-2d87f993bdb9.txt",
+      "score": 8,
+      "matchedKeywords": [
+        "probabilidad",
+        "expectativa",
+        "miedo",
+        "serie",
+        "pérdida",
+        "cualquier cosa puede"
+      ],
+      "length": 2993
+    },
+    {
+      "file": "chunk-030-10f1e682a023.txt",
+      "score": 7,
+      "matchedKeywords": [
+        "resultados",
+        "creencia",
+        "miedo",
+        "consistencia",
+        "serie",
+        "mentalidad",
+        "actitud"
+      ],
+      "length": 2998
+    },
+    {
+      "file": "chunk-053-78d825b2ebc7.txt",
+      "score": 7,
+      "matchedKeywords": [
+        "riesgo",
+        "aceptar el riesgo",
+        "creencia",
+        "expectativa",
+        "miedo",
+        "ventaja",
+        "actitud"
+      ],
+      "length": 2994
+    },
+    {
+      "file": "chunk-084-aa5259c3a073.txt",
+      "score": 7,
+      "matchedKeywords": [
+        "resultados",
+        "probabilidad",
+        "aleatorio",
+        "creencia",
+        "consistencia",
+        "muestra",
+        "casino"
+      ],
+      "length": 2998
+    },
+    {
+      "file": "chunk-087-2b8487ceb11b.txt",
+      "score": 7,
+      "matchedKeywords": [
+        "resultados",
+        "probabilidad",
+        "creencia",
+        "ventaja",
+        "muestra",
+        "pérdida",
+        "casino"
+      ],
+      "length": 2991
+    },
+    {
+      "file": "chunk-100-fd2a8a2a4b42.txt",
+      "score": 7,
+      "matchedKeywords": [
+        "riesgo",
+        "probabilidad",
+        "expectativa",
+        "objetividad",
+        "cualquier cosa puede"
+      ],
+      "length": 2998
+    },
+    {
+      "file": "chunk-104-5ce591680825.txt",
+      "score": 7,
+      "matchedKeywords": [
+        "probabilidad",
+        "aleatorio",
+        "creencia",
+        "objetividad",
+        "consistencia",
+        "serie",
+        "pérdida"
+      ],
+      "length": 2999
+    },
+    {
+      "file": "chunk-106-7ef451027a15.txt",
+      "score": 7,
+      "matchedKeywords": [
+        "resultados",
+        "creencia",
+        "miedo",
+        "consistencia",
+        "serie",
+        "muestra",
+        "actitud"
+      ],
+      "length": 2998
+    },
+    {
+      "file": "chunk-148-09710ddadcfb.txt",
+      "score": 7,
+      "matchedKeywords": [
+        "riesgo",
+        "disciplina",
+        "creencia",
+        "consistencia",
+        "predefinir"
+      ],
+      "length": 2998
+    },
+    {
+      "file": "chunk-150-a8070c2369c9.txt",
+      "score": 7,
+      "matchedKeywords": [
+        "riesgo",
+        "disciplina",
+        "creencia",
+        "expectativa",
+        "predefinir",
+        "stop",
+        "pérdida"
+      ],
+      "length": 2987
+    },
+    {
+      "file": "chunk-151-595076e6d7a4.txt",
+      "score": 7,
+      "matchedKeywords": [
+        "probabilidad",
+        "disciplina",
+        "creencia",
+        "objetividad",
+        "consistencia",
+        "zone",
+        "casino"
+      ],
+      "length": 2999
+    },
+    {
+      "file": "chunk-152-f351efbddb31.txt",
+      "score": 7,
+      "matchedKeywords": [
+        "resultados",
+        "probabilidad",
+        "serie",
+        "zone",
+        "casino"
+      ],
+      "length": 2997
+    },
+    {
+      "file": "chunk-153-8ffc5a2a4a8b.txt",
+      "score": 7,
+      "matchedKeywords": [
+        "riesgo",
+        "probabilidad",
+        "aleatorio",
+        "serie",
+        "stop",
+        "pérdida",
+        "loss"
+      ],
+      "length": 2991
+    },
+    {
+      "file": "chunk-001-b0ea9b6a8448.txt",
+      "score": 6,
+      "matchedKeywords": [
+        "probabilidad",
+        "disciplina",
+        "pérdida",
+        "zona",
+        "mentalidad",
+        "actitud"
+      ],
+      "length": 2995
+    }
+  ]
+}
