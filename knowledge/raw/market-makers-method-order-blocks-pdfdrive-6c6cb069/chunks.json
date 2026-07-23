@@ -1,0 +1,492 @@
+{
+  "docId": "market-makers-method-order-blocks-pdfdrive-6c6cb069",
+  "sourceHash": "6c6cb0699993e8a284787665aba5b7eae04cf208912a19b1f89ce1b73e2255aa",
+  "chunks": [
+    {
+      "id": "chunk-000-cac8901de251",
+      "index": 0,
+      "contentHash": "cac8901de25151c11ea8b5fea7b4c4f33926b64709d1c1caf95cc7c8c53fbb2f",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-000-cac8901de251.txt"
+    },
+    {
+      "id": "chunk-001-17b2d609fb68",
+      "index": 1,
+      "contentHash": "17b2d609fb68277d8b7d49f7a3170c420a1fe2906d76eb687ea7d29bb753c71d",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-001-17b2d609fb68.txt"
+    },
+    {
+      "id": "chunk-002-3301d95e6066",
+      "index": 2,
+      "contentHash": "3301d95e606640aadedfc8b6383f5e04233023a33efc267f665b9c0419e5e7eb",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-002-3301d95e6066.txt"
+    },
+    {
+      "id": "chunk-003-79258cbdb03f",
+      "index": 3,
+      "contentHash": "79258cbdb03f91e9028d3ceab9f2c54efc6639cd260c558c0ad4f5e8e8efc5b0",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-003-79258cbdb03f.txt"
+    },
+    {
+      "id": "chunk-004-b5544ae42313",
+      "index": 4,
+      "contentHash": "b5544ae42313b7af6515eb10b69e3d1f37ed61240868d68709955107dc753b1c",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-004-b5544ae42313.txt"
+    },
+    {
+      "id": "chunk-005-b9213a1b0c7d",
+      "index": 5,
+      "contentHash": "b9213a1b0c7de29fe205f71936a31f2bd19e0e7b54a07ab40626eb5ce0d4e900",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-005-b9213a1b0c7d.txt"
+    },
+    {
+      "id": "chunk-006-2a02ebc542d8",
+      "index": 6,
+      "contentHash": "2a02ebc542d803f4af9add4e2af4538a452883ef9376fdf37aca0c049b972d63",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-006-2a02ebc542d8.txt"
+    },
+    {
+      "id": "chunk-007-e3d9f340fd41",
+      "index": 7,
+      "contentHash": "e3d9f340fd411c745f25a68c0b98b369e6904fca9d52b8ec5fa33e3189507600",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-007-e3d9f340fd41.txt"
+    },
+    {
+      "id": "chunk-008-1f54b6f4172e",
+      "index": 8,
+      "contentHash": "1f54b6f4172ebfbc42680733d1e25b1b4dbc4e58aed9453629893929abbafa8e",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-008-1f54b6f4172e.txt"
+    },
+    {
+      "id": "chunk-009-26943a693594",
+      "index": 9,
+      "contentHash": "26943a69359477f3293300644760249aad0408e97dfbae80342af0f00a724a97",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-009-26943a693594.txt"
+    },
+    {
+      "id": "chunk-010-2ed3ba6f1d6d",
+      "index": 10,
+      "contentHash": "2ed3ba6f1d6db8a00f57552886c304ede4cc06e062a0a95c59cb416848c52048",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-010-2ed3ba6f1d6d.txt"
+    },
+    {
+      "id": "chunk-011-f9d0ace575b6",
+      "index": 11,
+      "contentHash": "f9d0ace575b6394646cd0876d458d3e22a472c544d54a8967d85386036b5dfef",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-011-f9d0ace575b6.txt"
+    },
+    {
+      "id": "chunk-012-44dfde71b8ad",
+      "index": 12,
+      "contentHash": "44dfde71b8ad50ac21fc661991e5f2b4107a5a95ad3f41127a063dc6551f1745",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-012-44dfde71b8ad.txt"
+    },
+    {
+      "id": "chunk-013-884f8e5f5554",
+      "index": 13,
+      "contentHash": "884f8e5f555480307fb2d645c614b1cdd508c703aefe5295554e1bbd4652c091",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-013-884f8e5f5554.txt"
+    },
+    {
+      "id": "chunk-014-4d36ac0d5964",
+      "index": 14,
+      "contentHash": "4d36ac0d5964209a11da967b2110fb891292e71580401b4ceef0d00b813169cf",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-014-4d36ac0d5964.txt"
+    },
+    {
+      "id": "chunk-015-8e43869f5282",
+      "index": 15,
+      "contentHash": "8e43869f5282b0712b85d06ff37048297b5c8945468d554b3be5ec32eae73638",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-015-8e43869f5282.txt"
+    },
+    {
+      "id": "chunk-016-6ea7d71f277d",
+      "index": 16,
+      "contentHash": "6ea7d71f277d6cbf032f31d9d56978edb84d7ad768a3c791092fec094583c536",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-016-6ea7d71f277d.txt"
+    },
+    {
+      "id": "chunk-017-e12e071c850f",
+      "index": 17,
+      "contentHash": "e12e071c850f0775c98a290969fd586adfb99fa1c7b01eb7630ae89b1b351ad2",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-017-e12e071c850f.txt"
+    },
+    {
+      "id": "chunk-018-84f403af99be",
+      "index": 18,
+      "contentHash": "84f403af99be4f595af8d66a9e22816da1ad14aa118397bdcb429ac7e80f4c07",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-018-84f403af99be.txt"
+    },
+    {
+      "id": "chunk-019-a4d108874c31",
+      "index": 19,
+      "contentHash": "a4d108874c311ce30fc69facdf7d40a46638df672f7f0e432b2fe052f0afbee9",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-019-a4d108874c31.txt"
+    },
+    {
+      "id": "chunk-020-a3c4c1229e43",
+      "index": 20,
+      "contentHash": "a3c4c1229e43c60f5c35f4626ec6a596f868604f798b5196d0833cdabb3e8919",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-020-a3c4c1229e43.txt"
+    },
+    {
+      "id": "chunk-021-13aec1fa1edd",
+      "index": 21,
+      "contentHash": "13aec1fa1edd03a77623cecbdb8650b771a3c56f2ad3a644bfaa33bbc992fe21",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-021-13aec1fa1edd.txt"
+    },
+    {
+      "id": "chunk-022-b0f48b814b4f",
+      "index": 22,
+      "contentHash": "b0f48b814b4fb787ac1541adaf1f7be6cc7abe3661e11520e52dcf13f817214f",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-022-b0f48b814b4f.txt"
+    },
+    {
+      "id": "chunk-023-250030401a2b",
+      "index": 23,
+      "contentHash": "250030401a2bb3aee44d42cfde4d2992d280ea23decb3698afe3a02573343ca4",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-023-250030401a2b.txt"
+    },
+    {
+      "id": "chunk-024-d479bf81ae12",
+      "index": 24,
+      "contentHash": "d479bf81ae1296fe85f0277744b911fc94eb75f20e9f887b4fdfc7bb922e29f2",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-024-d479bf81ae12.txt"
+    },
+    {
+      "id": "chunk-025-a02db014e0fd",
+      "index": 25,
+      "contentHash": "a02db014e0fdc0a568a0aa8d5967a077f936c5dac46d05a760aa4fa2f1716b87",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-025-a02db014e0fd.txt"
+    },
+    {
+      "id": "chunk-026-d3d6ffc1adf2",
+      "index": 26,
+      "contentHash": "d3d6ffc1adf2f88d4052c044cb92c1ecd20b59ab2b0aed556110fb568e711b94",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-026-d3d6ffc1adf2.txt"
+    },
+    {
+      "id": "chunk-027-95ec898e850d",
+      "index": 27,
+      "contentHash": "95ec898e850d3f077c4f9d8e1555f4fd946cef23336f2bacf96ca8a17f38d852",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-027-95ec898e850d.txt"
+    },
+    {
+      "id": "chunk-028-d66f2a3773de",
+      "index": 28,
+      "contentHash": "d66f2a3773dec5e3db9eaef34ae61fcc5c608a31507d44f7b981e5cf4cf5e161",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-028-d66f2a3773de.txt"
+    },
+    {
+      "id": "chunk-029-a3badcf713dd",
+      "index": 29,
+      "contentHash": "a3badcf713dd8ea86f4ca64ab2374a195181e3cd4ad2f280fbb49fd4e86280ec",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-029-a3badcf713dd.txt"
+    },
+    {
+      "id": "chunk-030-1b85a4bb64c8",
+      "index": 30,
+      "contentHash": "1b85a4bb64c869e8d58603dcac2430d631c4385fec636cb84588a99b58d0c6b7",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-030-1b85a4bb64c8.txt"
+    },
+    {
+      "id": "chunk-031-4817fc299458",
+      "index": 31,
+      "contentHash": "4817fc299458b015b47c604dc2859465f011f078172f413bb26ec932791fc9e6",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-031-4817fc299458.txt"
+    },
+    {
+      "id": "chunk-032-d61a505aa2ba",
+      "index": 32,
+      "contentHash": "d61a505aa2baf7ffb590b70552f5ae33c5cadbaeef98d8cfd80637c31c6afb13",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-032-d61a505aa2ba.txt"
+    },
+    {
+      "id": "chunk-033-4498c6724c5f",
+      "index": 33,
+      "contentHash": "4498c6724c5f8c760c4767cc8edcb9fd5cb074092c85ac202c20dad6bc150223",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-033-4498c6724c5f.txt"
+    },
+    {
+      "id": "chunk-034-1a625603a4c0",
+      "index": 34,
+      "contentHash": "1a625603a4c00d46819eb6b3e9449eb20250e8d02936bb5c0ecd2ce0160de4e6",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-034-1a625603a4c0.txt"
+    },
+    {
+      "id": "chunk-035-6433d432ff00",
+      "index": 35,
+      "contentHash": "6433d432ff00a0f0873c7bac124c3090a94751da0de0f6657977c60b75c0da02",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-035-6433d432ff00.txt"
+    },
+    {
+      "id": "chunk-036-c3c2f9b2fb58",
+      "index": 36,
+      "contentHash": "c3c2f9b2fb58af9ad205bfbc9e37f69929efa584367a74233e0d87b608506b48",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-036-c3c2f9b2fb58.txt"
+    },
+    {
+      "id": "chunk-037-cbe381367fba",
+      "index": 37,
+      "contentHash": "cbe381367fba1d301546b3dfed80e2deadc54b7201dc9d703c56c80c5cb908c9",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-037-cbe381367fba.txt"
+    },
+    {
+      "id": "chunk-038-a51e236ac636",
+      "index": 38,
+      "contentHash": "a51e236ac6360d21d58de8fa94c2b13c6c4de3f4ba9119fbaaf7307497a60521",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-038-a51e236ac636.txt"
+    },
+    {
+      "id": "chunk-039-a1bbc11d99c9",
+      "index": 39,
+      "contentHash": "a1bbc11d99c90b375a792e71787d742ac7bbe86b7077301e1b9ef81fc6de0b3b",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-039-a1bbc11d99c9.txt"
+    },
+    {
+      "id": "chunk-040-9d5cb6d53575",
+      "index": 40,
+      "contentHash": "9d5cb6d53575032ad6ab1f7c96d7a59c37f7de4cf3795ed2ba5b8da2ca868390",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-040-9d5cb6d53575.txt"
+    },
+    {
+      "id": "chunk-041-c53b28c90df5",
+      "index": 41,
+      "contentHash": "c53b28c90df5efea27b2342b8c93e76212dc3c88a0c41dc5e17d2c1f6843c3d5",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-041-c53b28c90df5.txt"
+    },
+    {
+      "id": "chunk-042-3d72b562f4cf",
+      "index": 42,
+      "contentHash": "3d72b562f4cf9f47696f8ed823a877cab0e5ac715ab5d3cd30bcf88d7e00e202",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-042-3d72b562f4cf.txt"
+    },
+    {
+      "id": "chunk-043-15541caea01d",
+      "index": 43,
+      "contentHash": "15541caea01d1a22d9a4a4a793b6d6c4e9728ce22ef9488c31ebe345a5a0c5e8",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-043-15541caea01d.txt"
+    },
+    {
+      "id": "chunk-044-594b54591e4d",
+      "index": 44,
+      "contentHash": "594b54591e4d289400ac5a23f9bc6ef9c501e6a835c24e0651c886c9c1504d15",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-044-594b54591e4d.txt"
+    },
+    {
+      "id": "chunk-045-e20382d04ed1",
+      "index": 45,
+      "contentHash": "e20382d04ed1df2745d4b2cf383898bf63ad0c481d8e212812098afdad4295fe",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-045-e20382d04ed1.txt"
+    },
+    {
+      "id": "chunk-046-3d2664a5ae7a",
+      "index": 46,
+      "contentHash": "3d2664a5ae7a86dfe91b1ca1eb6849f011a0141ca21ff31a67f4458aea9f2a21",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-046-3d2664a5ae7a.txt"
+    },
+    {
+      "id": "chunk-047-00c47cc1c360",
+      "index": 47,
+      "contentHash": "00c47cc1c360d01857e4e6cd014ad9521164649f37a58566afdbc73c6ee8806d",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-047-00c47cc1c360.txt"
+    },
+    {
+      "id": "chunk-048-043fafa01fbb",
+      "index": 48,
+      "contentHash": "043fafa01fbb3fdeb7a21e67a1a216c266e1403942da2527c6c5b47aaf0fdd36",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-048-043fafa01fbb.txt"
+    },
+    {
+      "id": "chunk-049-71617e7a8c20",
+      "index": 49,
+      "contentHash": "71617e7a8c20b4b556806f5075bea4b268083762e5dd9e7c822470ff776d8a0a",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-049-71617e7a8c20.txt"
+    },
+    {
+      "id": "chunk-050-889431d3e29a",
+      "index": 50,
+      "contentHash": "889431d3e29a2eea92b7e342fe2e12e0518a15defaf821dc7a163f36eb75d01e",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-050-889431d3e29a.txt"
+    },
+    {
+      "id": "chunk-051-50d4ac6a1dc1",
+      "index": 51,
+      "contentHash": "50d4ac6a1dc1ae091a3663c119daaa1815b98aa6d1f7ca18942d539050a6969d",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-051-50d4ac6a1dc1.txt"
+    },
+    {
+      "id": "chunk-052-f7d19322169b",
+      "index": 52,
+      "contentHash": "f7d19322169bf229aed573b2e407538850cba7789f5154082ed78d6fcc968e47",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-052-f7d19322169b.txt"
+    },
+    {
+      "id": "chunk-053-e9e95e6ab1af",
+      "index": 53,
+      "contentHash": "e9e95e6ab1af29f44cd8b92bd2cde76a862ed30551a239f9f7b7b799aa1f3ad4",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-053-e9e95e6ab1af.txt"
+    },
+    {
+      "id": "chunk-054-9fc9d74511a0",
+      "index": 54,
+      "contentHash": "9fc9d74511a0cef0da3a78a810ebd68781ef37cad68ad8d2d01f4441668aa449",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-054-9fc9d74511a0.txt"
+    },
+    {
+      "id": "chunk-055-5420d813ff7d",
+      "index": 55,
+      "contentHash": "5420d813ff7de360e416823e85f61d9a6c6321c2b7e3188b064420f0363c3b2c",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-055-5420d813ff7d.txt"
+    },
+    {
+      "id": "chunk-056-4c1a0f0dfd78",
+      "index": 56,
+      "contentHash": "4c1a0f0dfd78542ca8cfaf12a0ad86e360f2544e23d1e5b1cabe8f0f4be54793",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-056-4c1a0f0dfd78.txt"
+    },
+    {
+      "id": "chunk-057-e87bc5188797",
+      "index": 57,
+      "contentHash": "e87bc51887976110a9da8a6296004b3c3fc4dbff5dbdcd697356d89d74e6c08e",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-057-e87bc5188797.txt"
+    },
+    {
+      "id": "chunk-058-d34db4720ba2",
+      "index": 58,
+      "contentHash": "d34db4720ba2ac719943e3244db31fd4bd6a77a708bbbfc58a5f624df6018df2",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-058-d34db4720ba2.txt"
+    },
+    {
+      "id": "chunk-059-08e1e8999dab",
+      "index": 59,
+      "contentHash": "08e1e8999dab0f9168a6ef07e346976337f0204b5c1bc7f18a80a356d99d96e4",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-059-08e1e8999dab.txt"
+    },
+    {
+      "id": "chunk-060-6d7e5dd3cd51",
+      "index": 60,
+      "contentHash": "6d7e5dd3cd516b7d70276ef7bb3a5f447989f2a4e75e35aabc4daaf7b4fff70c",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-060-6d7e5dd3cd51.txt"
+    },
+    {
+      "id": "chunk-061-55b3c91a97d0",
+      "index": 61,
+      "contentHash": "55b3c91a97d060a3ba674a7c4b9753f81a6b044f9c6a2546a5b6790de356ce12",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-061-55b3c91a97d0.txt"
+    },
+    {
+      "id": "chunk-062-d6a925a2c329",
+      "index": 62,
+      "contentHash": "d6a925a2c3290c07212c8ce5e4c600dc2d8006630cd2542b087cf52b327c9dbe",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-062-d6a925a2c329.txt"
+    },
+    {
+      "id": "chunk-063-5d18caf0abd3",
+      "index": 63,
+      "contentHash": "5d18caf0abd357727f276f313d60ae98f942cc058f483369fd0cc3b717e015ba",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-063-5d18caf0abd3.txt"
+    },
+    {
+      "id": "chunk-064-21d4c0db12a3",
+      "index": 64,
+      "contentHash": "21d4c0db12a3ca86d890d515f1cf91224222590b14bf09da80c4b36c7553efb9",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-064-21d4c0db12a3.txt"
+    },
+    {
+      "id": "chunk-065-a4439c065435",
+      "index": 65,
+      "contentHash": "a4439c065435cb339709d12cee540aeb9e45640c090edc6c24bc337eb866da1d",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-065-a4439c065435.txt"
+    },
+    {
+      "id": "chunk-066-fb25efb113f6",
+      "index": 66,
+      "contentHash": "fb25efb113f65c0e0c9140b2773e022c3a9b86de2749872972faae9bdbba891d",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-066-fb25efb113f6.txt"
+    },
+    {
+      "id": "chunk-067-fc745fe5798b",
+      "index": 67,
+      "contentHash": "fc745fe5798b2c76a20ec44e8a0fbc8365cd95dd1661a51c657c9b6798894538",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-067-fc745fe5798b.txt"
+    },
+    {
+      "id": "chunk-068-96a07dcf16d9",
+      "index": 68,
+      "contentHash": "96a07dcf16d9a8c8198df059501159002ecab10011e07327192d5cc2501e7a28",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-068-96a07dcf16d9.txt"
+    },
+    {
+      "id": "chunk-069-672d1175722a",
+      "index": 69,
+      "contentHash": "672d1175722adb1efe1b6a569b2c1d5afbf3b7fe815e7d87992b2055cb3bf14a",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-069-672d1175722a.txt"
+    },
+    {
+      "id": "chunk-070-e7307eb274ee",
+      "index": 70,
+      "contentHash": "e7307eb274eee8d78db40eb47e761cea0542d458321ace2b1b695f974845829e",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-070-e7307eb274ee.txt"
+    },
+    {
+      "id": "chunk-071-920555e1fcfc",
+      "index": 71,
+      "contentHash": "920555e1fcfc25fe22b1c393f20486adf01127689f8b09ccbb4c50ee7d801c09",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-071-920555e1fcfc.txt"
+    },
+    {
+      "id": "chunk-072-25c71bf0ad1c",
+      "index": 72,
+      "contentHash": "25c71bf0ad1c1b6db2744dc9627bb0bad27c9ae85f1add29255a78913d50e93e",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-072-25c71bf0ad1c.txt"
+    },
+    {
+      "id": "chunk-073-fe2b4a7e3150",
+      "index": 73,
+      "contentHash": "fe2b4a7e3150075ff2d8c064ff47caebb59edcdfca3319487f0a8e72a8edc48d",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-073-fe2b4a7e3150.txt"
+    },
+    {
+      "id": "chunk-074-c28f6f03a75a",
+      "index": 74,
+      "contentHash": "c28f6f03a75a0aad19cbf766895045b4453140bd5fc81705ceb4f1d346c2e6ea",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-074-c28f6f03a75a.txt"
+    },
+    {
+      "id": "chunk-075-bacb18607a0e",
+      "index": 75,
+      "contentHash": "bacb18607a0ee83551f2de9cbacf4657444ce91e36f2763f8f3e7364324f450b",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-075-bacb18607a0e.txt"
+    },
+    {
+      "id": "chunk-076-1ca45e238a04",
+      "index": 76,
+      "contentHash": "1ca45e238a04546f3f1bf1387700bf0ec14479296d5e9911b366eac58c9d937d",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-076-1ca45e238a04.txt"
+    },
+    {
+      "id": "chunk-077-af58eb172203",
+      "index": 77,
+      "contentHash": "af58eb1722030a4f0abd9f9f5d1491c53686d127ae34f47fa8fdf0e3713da334",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-077-af58eb172203.txt"
+    },
+    {
+      "id": "chunk-078-a12ca2c6417a",
+      "index": 78,
+      "contentHash": "a12ca2c6417ad4fe165ac93ac7832f80f750daad3eb08415658c55475c668da5",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-078-a12ca2c6417a.txt"
+    },
+    {
+      "id": "chunk-079-cbc63a4dd119",
+      "index": 79,
+      "contentHash": "cbc63a4dd119f28b01b7eb725d4729f544f3e1043f6100fb1b0acd246f8324a8",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-079-cbc63a4dd119.txt"
+    },
+    {
+      "id": "chunk-080-ba25d65904e9",
+      "index": 80,
+      "contentHash": "ba25d65904e9d6f99db823f9d1438afc97333aeabbc640bb41864c2574f6a90b",
+      "path": "raw/market-makers-method-order-blocks-pdfdrive-6c6cb069/chunk-080-ba25d65904e9.txt"
+    }
+  ]
+}

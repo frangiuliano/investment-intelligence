@@ -1,0 +1,771 @@
+{
+  "filterThemesVersion": "1.1.0",
+  "genres": [
+    "technical_analysis"
+  ],
+  "minScore": 4,
+  "maxExtractChunks": 16,
+  "selectedCount": 16,
+  "totalChunks": 81,
+  "selected": [
+    {
+      "file": "chunk-064-21d4c0db12a3.txt",
+      "score": 17,
+      "matchedKeywords": [
+        "probabilidad",
+        "patrón",
+        "soporte",
+        "resistencia",
+        "tendencia",
+        "reversal",
+        "sma",
+        "timeframe",
+        "order block",
+        "liquidity",
+        "smart money",
+        "institucional",
+        "institutional",
+        "pullback",
+        "retroceso"
+      ],
+      "length": 2999
+    },
+    {
+      "file": "chunk-062-d6a925a2c329.txt",
+      "score": 15,
+      "matchedKeywords": [
+        "probabilidad",
+        "patrón",
+        "soporte",
+        "resistencia",
+        "tendencia",
+        "reversal",
+        "sma",
+        "timeframe",
+        "liquidez",
+        "liquidity",
+        "smart money",
+        "institucional",
+        "retroceso"
+      ],
+      "length": 2990
+    },
+    {
+      "file": "chunk-061-55b3c91a97d0.txt",
+      "score": 13,
+      "matchedKeywords": [
+        "probabilidad",
+        "patrón",
+        "resistencia",
+        "tendencia",
+        "reversal",
+        "sma",
+        "order block",
+        "liquidity",
+        "smart money",
+        "institucional",
+        "retroceso"
+      ],
+      "length": 2993
+    },
+    {
+      "file": "chunk-063-5d18caf0abd3.txt",
+      "score": 13,
+      "matchedKeywords": [
+        "patrón",
+        "soporte",
+        "resistencia",
+        "tendencia",
+        "reversal",
+        "sma",
+        "liquidez",
+        "smart money",
+        "institucional",
+        "institutional",
+        "pullback"
+      ],
+      "length": 2999
+    },
+    {
+      "file": "chunk-078-a12ca2c6417a.txt",
+      "score": 13,
+      "matchedKeywords": [
+        "probabilidad",
+        "vela",
+        "patrón",
+        "soporte",
+        "resistencia",
+        "tendencia",
+        "martillo",
+        "timeframe",
+        "order block",
+        "pullback",
+        "retroceso"
+      ],
+      "length": 2995
+    },
+    {
+      "file": "chunk-001-17b2d609fb68.txt",
+      "score": 12,
+      "matchedKeywords": [
+        "probabilidad",
+        "vela",
+        "patrón",
+        "resistencia",
+        "tendencia",
+        "temporalidad",
+        "order block",
+        "liquidez",
+        "pullback",
+        "retroceso"
+      ],
+      "length": 2999
+    },
+    {
+      "file": "chunk-032-d61a505aa2ba.txt",
+      "score": 12,
+      "matchedKeywords": [
+        "probabilidad",
+        "vela",
+        "tendencia",
+        "sma",
+        "order block",
+        "liquidity",
+        "smart money",
+        "institucional",
+        "institutional",
+        "pullback"
+      ],
+      "length": 2996
+    },
+    {
+      "file": "chunk-038-a51e236ac636.txt",
+      "score": 12,
+      "matchedKeywords": [
+        "risk",
+        "probabilidad",
+        "vela",
+        "tendencia",
+        "timeframe",
+        "order block",
+        "bloque de órdenes",
+        "institucional",
+        "pullback",
+        "retroceso"
+      ],
+      "length": 2998
+    },
+    {
+      "file": "chunk-042-3d72b562f4cf.txt",
+      "score": 12,
+      "matchedKeywords": [
+        "vela",
+        "patrón",
+        "volumen",
+        "volume",
+        "sma",
+        "timeframe",
+        "order block",
+        "liquidez",
+        "smart money",
+        "institucional"
+      ],
+      "length": 2994
+    },
+    {
+      "file": "chunk-065-a4439c065435.txt",
+      "score": 12,
+      "matchedKeywords": [
+        "probabilidad",
+        "vela",
+        "soporte",
+        "resistencia",
+        "tendencia",
+        "sma",
+        "order block",
+        "smart money",
+        "institucional",
+        "institutional"
+      ],
+      "length": 2991
+    },
+    {
+      "file": "chunk-066-fb25efb113f6.txt",
+      "score": 12,
+      "matchedKeywords": [
+        "soporte",
+        "resistencia",
+        "volumen",
+        "volume",
+        "sma",
+        "timeframe",
+        "order block",
+        "smart money",
+        "institucional",
+        "institutional"
+      ],
+      "length": 2994
+    },
+    {
+      "file": "chunk-068-96a07dcf16d9.txt",
+      "score": 12,
+      "matchedKeywords": [
+        "probabilidad",
+        "patrón",
+        "soporte",
+        "resistencia",
+        "tendencia",
+        "order block",
+        "liquidez",
+        "institucional",
+        "pullback",
+        "retroceso"
+      ],
+      "length": 2995
+    },
+    {
+      "file": "chunk-033-4498c6724c5f.txt",
+      "score": 11,
+      "matchedKeywords": [
+        "riesgo",
+        "probabilidad",
+        "vela",
+        "tendencia",
+        "order block",
+        "bloque de órdenes",
+        "institucional",
+        "pullback",
+        "retroceso"
+      ],
+      "length": 2991
+    },
+    {
+      "file": "chunk-035-6433d432ff00.txt",
+      "score": 11,
+      "matchedKeywords": [
+        "probabilidad",
+        "vela",
+        "tendencia",
+        "timeframe",
+        "order block",
+        "liquidez",
+        "institucional",
+        "pullback",
+        "retroceso"
+      ],
+      "length": 2998
+    },
+    {
+      "file": "chunk-041-c53b28c90df5.txt",
+      "score": 11,
+      "matchedKeywords": [
+        "probabilidad",
+        "vela",
+        "tendencia",
+        "timeframe",
+        "order block",
+        "institucional",
+        "institutional",
+        "pullback",
+        "retroceso"
+      ],
+      "length": 2952
+    },
+    {
+      "file": "chunk-044-594b54591e4d.txt",
+      "score": 11,
+      "matchedKeywords": [
+        "pattern",
+        "tendencia",
+        "order block",
+        "mitigation",
+        "breaker",
+        "liquidez",
+        "liquidity",
+        "institucional",
+        "institutional"
+      ],
+      "length": 2996
+    }
+  ],
+  "rankedTop30": [
+    {
+      "file": "chunk-064-21d4c0db12a3.txt",
+      "score": 17,
+      "matchedKeywords": [
+        "probabilidad",
+        "patrón",
+        "soporte",
+        "resistencia",
+        "tendencia",
+        "reversal",
+        "sma",
+        "timeframe",
+        "order block",
+        "liquidity",
+        "smart money",
+        "institucional",
+        "institutional",
+        "pullback",
+        "retroceso"
+      ],
+      "length": 2999
+    },
+    {
+      "file": "chunk-062-d6a925a2c329.txt",
+      "score": 15,
+      "matchedKeywords": [
+        "probabilidad",
+        "patrón",
+        "soporte",
+        "resistencia",
+        "tendencia",
+        "reversal",
+        "sma",
+        "timeframe",
+        "liquidez",
+        "liquidity",
+        "smart money",
+        "institucional",
+        "retroceso"
+      ],
+      "length": 2990
+    },
+    {
+      "file": "chunk-061-55b3c91a97d0.txt",
+      "score": 13,
+      "matchedKeywords": [
+        "probabilidad",
+        "patrón",
+        "resistencia",
+        "tendencia",
+        "reversal",
+        "sma",
+        "order block",
+        "liquidity",
+        "smart money",
+        "institucional",
+        "retroceso"
+      ],
+      "length": 2993
+    },
+    {
+      "file": "chunk-063-5d18caf0abd3.txt",
+      "score": 13,
+      "matchedKeywords": [
+        "patrón",
+        "soporte",
+        "resistencia",
+        "tendencia",
+        "reversal",
+        "sma",
+        "liquidez",
+        "smart money",
+        "institucional",
+        "institutional",
+        "pullback"
+      ],
+      "length": 2999
+    },
+    {
+      "file": "chunk-078-a12ca2c6417a.txt",
+      "score": 13,
+      "matchedKeywords": [
+        "probabilidad",
+        "vela",
+        "patrón",
+        "soporte",
+        "resistencia",
+        "tendencia",
+        "martillo",
+        "timeframe",
+        "order block",
+        "pullback",
+        "retroceso"
+      ],
+      "length": 2995
+    },
+    {
+      "file": "chunk-001-17b2d609fb68.txt",
+      "score": 12,
+      "matchedKeywords": [
+        "probabilidad",
+        "vela",
+        "patrón",
+        "resistencia",
+        "tendencia",
+        "temporalidad",
+        "order block",
+        "liquidez",
+        "pullback",
+        "retroceso"
+      ],
+      "length": 2999
+    },
+    {
+      "file": "chunk-032-d61a505aa2ba.txt",
+      "score": 12,
+      "matchedKeywords": [
+        "probabilidad",
+        "vela",
+        "tendencia",
+        "sma",
+        "order block",
+        "liquidity",
+        "smart money",
+        "institucional",
+        "institutional",
+        "pullback"
+      ],
+      "length": 2996
+    },
+    {
+      "file": "chunk-038-a51e236ac636.txt",
+      "score": 12,
+      "matchedKeywords": [
+        "risk",
+        "probabilidad",
+        "vela",
+        "tendencia",
+        "timeframe",
+        "order block",
+        "bloque de órdenes",
+        "institucional",
+        "pullback",
+        "retroceso"
+      ],
+      "length": 2998
+    },
+    {
+      "file": "chunk-042-3d72b562f4cf.txt",
+      "score": 12,
+      "matchedKeywords": [
+        "vela",
+        "patrón",
+        "volumen",
+        "volume",
+        "sma",
+        "timeframe",
+        "order block",
+        "liquidez",
+        "smart money",
+        "institucional"
+      ],
+      "length": 2994
+    },
+    {
+      "file": "chunk-065-a4439c065435.txt",
+      "score": 12,
+      "matchedKeywords": [
+        "probabilidad",
+        "vela",
+        "soporte",
+        "resistencia",
+        "tendencia",
+        "sma",
+        "order block",
+        "smart money",
+        "institucional",
+        "institutional"
+      ],
+      "length": 2991
+    },
+    {
+      "file": "chunk-066-fb25efb113f6.txt",
+      "score": 12,
+      "matchedKeywords": [
+        "soporte",
+        "resistencia",
+        "volumen",
+        "volume",
+        "sma",
+        "timeframe",
+        "order block",
+        "smart money",
+        "institucional",
+        "institutional"
+      ],
+      "length": 2994
+    },
+    {
+      "file": "chunk-068-96a07dcf16d9.txt",
+      "score": 12,
+      "matchedKeywords": [
+        "probabilidad",
+        "patrón",
+        "soporte",
+        "resistencia",
+        "tendencia",
+        "order block",
+        "liquidez",
+        "institucional",
+        "pullback",
+        "retroceso"
+      ],
+      "length": 2995
+    },
+    {
+      "file": "chunk-033-4498c6724c5f.txt",
+      "score": 11,
+      "matchedKeywords": [
+        "riesgo",
+        "probabilidad",
+        "vela",
+        "tendencia",
+        "order block",
+        "bloque de órdenes",
+        "institucional",
+        "pullback",
+        "retroceso"
+      ],
+      "length": 2991
+    },
+    {
+      "file": "chunk-035-6433d432ff00.txt",
+      "score": 11,
+      "matchedKeywords": [
+        "probabilidad",
+        "vela",
+        "tendencia",
+        "timeframe",
+        "order block",
+        "liquidez",
+        "institucional",
+        "pullback",
+        "retroceso"
+      ],
+      "length": 2998
+    },
+    {
+      "file": "chunk-041-c53b28c90df5.txt",
+      "score": 11,
+      "matchedKeywords": [
+        "probabilidad",
+        "vela",
+        "tendencia",
+        "timeframe",
+        "order block",
+        "institucional",
+        "institutional",
+        "pullback",
+        "retroceso"
+      ],
+      "length": 2952
+    },
+    {
+      "file": "chunk-044-594b54591e4d.txt",
+      "score": 11,
+      "matchedKeywords": [
+        "pattern",
+        "tendencia",
+        "order block",
+        "mitigation",
+        "breaker",
+        "liquidez",
+        "liquidity",
+        "institucional",
+        "institutional"
+      ],
+      "length": 2996
+    },
+    {
+      "file": "chunk-017-e12e071c850f.txt",
+      "score": 10,
+      "matchedKeywords": [
+        "probabilidad",
+        "patrón",
+        "soporte",
+        "resistencia",
+        "tendencia",
+        "sma",
+        "liquidez",
+        "institucional"
+      ],
+      "length": 2995
+    },
+    {
+      "file": "chunk-031-4817fc299458.txt",
+      "score": 10,
+      "matchedKeywords": [
+        "probabilidad",
+        "vela",
+        "patrón",
+        "soporte",
+        "tendencia",
+        "institucional",
+        "pullback",
+        "retroceso"
+      ],
+      "length": 2995
+    },
+    {
+      "file": "chunk-070-e7307eb274ee.txt",
+      "score": 10,
+      "matchedKeywords": [
+        "probabilidad",
+        "patrón",
+        "soporte",
+        "tendencia",
+        "timeframe",
+        "order block",
+        "pullback",
+        "retroceso"
+      ],
+      "length": 2998
+    },
+    {
+      "file": "chunk-006-2a02ebc542d8.txt",
+      "score": 9,
+      "matchedKeywords": [
+        "probabilidad",
+        "tendencia",
+        "liquidez",
+        "liquidity",
+        "institucional",
+        "pullback",
+        "retroceso"
+      ],
+      "length": 2998
+    },
+    {
+      "file": "chunk-034-1a625603a4c0.txt",
+      "score": 9,
+      "matchedKeywords": [
+        "bias",
+        "probabilidad",
+        "vela",
+        "timeframe",
+        "order block",
+        "institucional",
+        "institutional"
+      ],
+      "length": 2998
+    },
+    {
+      "file": "chunk-039-a1bbc11d99c9.txt",
+      "score": 9,
+      "matchedKeywords": [
+        "vela",
+        "patrón",
+        "tendencia",
+        "order block",
+        "mitigación",
+        "liquidez",
+        "institucional"
+      ],
+      "length": 2992
+    },
+    {
+      "file": "chunk-045-e20382d04ed1.txt",
+      "score": 9,
+      "matchedKeywords": [
+        "resistencia",
+        "timeframe",
+        "order block",
+        "liquidez",
+        "liquidity",
+        "institucional",
+        "retroceso"
+      ],
+      "length": 2999
+    },
+    {
+      "file": "chunk-049-71617e7a8c20.txt",
+      "score": 9,
+      "matchedKeywords": [
+        "probabilidad",
+        "vela",
+        "patrón",
+        "order block",
+        "liquidez",
+        "institucional",
+        "institutional"
+      ],
+      "length": 2993
+    },
+    {
+      "file": "chunk-053-e9e95e6ab1af.txt",
+      "score": 9,
+      "matchedKeywords": [
+        "vela",
+        "resistencia",
+        "sma",
+        "order block",
+        "mitigation",
+        "breaker",
+        "institucional"
+      ],
+      "length": 2984
+    },
+    {
+      "file": "chunk-060-6d7e5dd3cd51.txt",
+      "score": 9,
+      "matchedKeywords": [
+        "patrón",
+        "tendencia",
+        "reversal",
+        "sma",
+        "order block",
+        "smart money",
+        "institucional"
+      ],
+      "length": 2989
+    },
+    {
+      "file": "chunk-067-fc745fe5798b.txt",
+      "score": 9,
+      "matchedKeywords": [
+        "riesgo",
+        "patrón",
+        "soporte",
+        "resistencia",
+        "timeframe",
+        "order block",
+        "institutional"
+      ],
+      "length": 2958
+    },
+    {
+      "file": "chunk-069-672d1175722a.txt",
+      "score": 9,
+      "matchedKeywords": [
+        "probabilidad",
+        "patrón",
+        "soporte",
+        "resistencia",
+        "tendencia",
+        "liquidez",
+        "institucional"
+      ],
+      "length": 2996
+    },
+    {
+      "file": "chunk-071-920555e1fcfc.txt",
+      "score": 9,
+      "matchedKeywords": [
+        "probabilidad",
+        "vela",
+        "patrón",
+        "tendencia",
+        "order block",
+        "pullback",
+        "retroceso"
+      ],
+      "length": 2996
+    },
+    {
+      "file": "chunk-073-fe2b4a7e3150.txt",
+      "score": 9,
+      "matchedKeywords": [
+        "patrón",
+        "soporte",
+        "resistencia",
+        "tendencia",
+        "timeframe",
+        "order block",
+        "institutional"
+      ],
+      "length": 2951
+    }
+  ]
+}
