@@ -5,7 +5,7 @@ playbook correcto. El operador **no** elige el `.md` destino.
 
 ## Setup
 
-1. Repo de producto: `investment-intelligence` (cwd del workspace).
+1. Repo de producto: `investment-intelligence` (sibling bajo el workspace `Projects/`, o cwd si abrís solo ese repo).
 2. Leé y seguí **exactamente** el skill
    `.agents/skills/knowledge-ingest/SKILL.md` (o `.cursor/skills/knowledge-ingest`).
 3. Aplicá reglas Fin de `--target` y géneros en
