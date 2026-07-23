@@ -1,5 +1,5 @@
 {
-  "knowledgeVersion": "0.1.8",
+  "knowledgeVersion": "0.1.9",
   "updatedAt": "2026-07-23",
   "playbooks": [
     {
@@ -100,6 +100,15 @@
       "docId": "curso5-stoch-y-bollinger-8c32f910",
       "sourceHash": "8c32f91071cad0f69bda1134fb52f3111622cb679cf8c7c1a1afdff42b42fcea",
       "sourcePath": "sources/Curso5-Stoch y Bollinger.pdf",
+      "targets": [
+        "equity"
+      ],
+      "ingestedAt": "2026-07-23"
+    },
+    {
+      "docId": "babypips-tus-primeros-pasos-en-forex-6d5491fb",
+      "sourceHash": "6d5491fb3cfd23a1a0dd1bc4456d86b5c10623d9133642ba9df90d3d101d889d",
+      "sourcePath": "sources/babypips- Tus primeros pasos en Forex.pdf",
       "targets": [
         "equity"
       ],

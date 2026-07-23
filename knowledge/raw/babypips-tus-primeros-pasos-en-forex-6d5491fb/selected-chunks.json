@@ -1,0 +1,580 @@
+{
+  "filterThemesVersion": "1.1.0",
+  "genres": [
+    "technical_analysis"
+  ],
+  "minScore": 4,
+  "maxExtractChunks": 16,
+  "selectedCount": 16,
+  "totalChunks": 138,
+  "selected": [
+    {
+      "file": "chunk-043-94366946e2aa.txt",
+      "score": 9,
+      "matchedKeywords": [
+        "vela",
+        "patrón",
+        "soporte",
+        "resistencia",
+        "tendencia",
+        "doji",
+        "martillo"
+      ],
+      "length": 2995
+    },
+    {
+      "file": "chunk-049-3dd98084c195.txt",
+      "score": 9,
+      "matchedKeywords": [
+        "riesgo",
+        "risk",
+        "soporte",
+        "resistencia",
+        "tendencia",
+        "sma",
+        "retroceso"
+      ],
+      "length": 2997
+    },
+    {
+      "file": "chunk-051-c53e4aedcad4.txt",
+      "score": 9,
+      "matchedKeywords": [
+        "vela",
+        "soporte",
+        "resistencia",
+        "tendencia",
+        "sma",
+        "media móvil",
+        "retroceso"
+      ],
+      "length": 2996
+    },
+    {
+      "file": "chunk-002-d341e19af5ed.txt",
+      "score": 8,
+      "matchedKeywords": [
+        "soporte",
+        "resistencia",
+        "tendencia",
+        "sma",
+        "media móvil",
+        "retroceso"
+      ],
+      "length": 2989
+    },
+    {
+      "file": "chunk-037-ed74e0373d22.txt",
+      "score": 8,
+      "matchedKeywords": [
+        "vela",
+        "patrón",
+        "tendencia",
+        "reversión",
+        "sma",
+        "ohlc"
+      ],
+      "length": 2995
+    },
+    {
+      "file": "chunk-041-62be56fd2555.txt",
+      "score": 8,
+      "matchedKeywords": [
+        "vela",
+        "patrón",
+        "tendencia",
+        "reversión",
+        "doji",
+        "martillo"
+      ],
+      "length": 2994
+    },
+    {
+      "file": "chunk-044-0843582e9f04.txt",
+      "score": 8,
+      "matchedKeywords": [
+        "vela",
+        "patrón",
+        "soporte",
+        "resistencia",
+        "tendencia",
+        "ruptura"
+      ],
+      "length": 2999
+    },
+    {
+      "file": "chunk-056-4089f59afd33.txt",
+      "score": 8,
+      "matchedKeywords": [
+        "vela",
+        "soporte",
+        "resistencia",
+        "tendencia",
+        "ruptura",
+        "media móvil"
+      ],
+      "length": 2999
+    },
+    {
+      "file": "chunk-073-021eb4031975.txt",
+      "score": 8,
+      "matchedKeywords": [
+        "probabilidad",
+        "vela",
+        "soporte",
+        "resistencia",
+        "tendencia",
+        "ruptura"
+      ],
+      "length": 2997
+    },
+    {
+      "file": "chunk-077-9910c249d35d.txt",
+      "score": 8,
+      "matchedKeywords": [
+        "vela",
+        "soporte",
+        "resistencia",
+        "tendencia",
+        "sma",
+        "media móvil"
+      ],
+      "length": 2995
+    },
+    {
+      "file": "chunk-098-d2d2d547a4b1.txt",
+      "score": 8,
+      "matchedKeywords": [
+        "riesgo",
+        "probabilidad",
+        "soporte",
+        "resistencia",
+        "tendencia",
+        "retroceso"
+      ],
+      "length": 2992
+    },
+    {
+      "file": "chunk-001-46c61dd74124.txt",
+      "score": 7,
+      "matchedKeywords": [
+        "vela",
+        "soporte",
+        "resistencia",
+        "tendencia",
+        "reversión"
+      ],
+      "length": 2929
+    },
+    {
+      "file": "chunk-040-938ff9e0d404.txt",
+      "score": 7,
+      "matchedKeywords": [
+        "vela",
+        "patrón",
+        "tendencia",
+        "reversión",
+        "doji"
+      ],
+      "length": 2998
+    },
+    {
+      "file": "chunk-042-447a54f1882a.txt",
+      "score": 7,
+      "matchedKeywords": [
+        "vela",
+        "patrón",
+        "resistencia",
+        "tendencia",
+        "martillo"
+      ],
+      "length": 2992
+    },
+    {
+      "file": "chunk-047-7bb9c15378a3.txt",
+      "score": 7,
+      "matchedKeywords": [
+        "vela",
+        "soporte",
+        "resistencia",
+        "tendencia",
+        "retroceso"
+      ],
+      "length": 2998
+    },
+    {
+      "file": "chunk-060-811a0b00307e.txt",
+      "score": 7,
+      "matchedKeywords": [
+        "soporte",
+        "resistencia",
+        "tendencia",
+        "ruptura",
+        "media móvil"
+      ],
+      "length": 2994
+    }
+  ],
+  "rankedTop30": [
+    {
+      "file": "chunk-043-94366946e2aa.txt",
+      "score": 9,
+      "matchedKeywords": [
+        "vela",
+        "patrón",
+        "soporte",
+        "resistencia",
+        "tendencia",
+        "doji",
+        "martillo"
+      ],
+      "length": 2995
+    },
+    {
+      "file": "chunk-049-3dd98084c195.txt",
+      "score": 9,
+      "matchedKeywords": [
+        "riesgo",
+        "risk",
+        "soporte",
+        "resistencia",
+        "tendencia",
+        "sma",
+        "retroceso"
+      ],
+      "length": 2997
+    },
+    {
+      "file": "chunk-051-c53e4aedcad4.txt",
+      "score": 9,
+      "matchedKeywords": [
+        "vela",
+        "soporte",
+        "resistencia",
+        "tendencia",
+        "sma",
+        "media móvil",
+        "retroceso"
+      ],
+      "length": 2996
+    },
+    {
+      "file": "chunk-002-d341e19af5ed.txt",
+      "score": 8,
+      "matchedKeywords": [
+        "soporte",
+        "resistencia",
+        "tendencia",
+        "sma",
+        "media móvil",
+        "retroceso"
+      ],
+      "length": 2989
+    },
+    {
+      "file": "chunk-037-ed74e0373d22.txt",
+      "score": 8,
+      "matchedKeywords": [
+        "vela",
+        "patrón",
+        "tendencia",
+        "reversión",
+        "sma",
+        "ohlc"
+      ],
+      "length": 2995
+    },
+    {
+      "file": "chunk-041-62be56fd2555.txt",
+      "score": 8,
+      "matchedKeywords": [
+        "vela",
+        "patrón",
+        "tendencia",
+        "reversión",
+        "doji",
+        "martillo"
+      ],
+      "length": 2994
+    },
+    {
+      "file": "chunk-044-0843582e9f04.txt",
+      "score": 8,
+      "matchedKeywords": [
+        "vela",
+        "patrón",
+        "soporte",
+        "resistencia",
+        "tendencia",
+        "ruptura"
+      ],
+      "length": 2999
+    },
+    {
+      "file": "chunk-056-4089f59afd33.txt",
+      "score": 8,
+      "matchedKeywords": [
+        "vela",
+        "soporte",
+        "resistencia",
+        "tendencia",
+        "ruptura",
+        "media móvil"
+      ],
+      "length": 2999
+    },
+    {
+      "file": "chunk-073-021eb4031975.txt",
+      "score": 8,
+      "matchedKeywords": [
+        "probabilidad",
+        "vela",
+        "soporte",
+        "resistencia",
+        "tendencia",
+        "ruptura"
+      ],
+      "length": 2997
+    },
+    {
+      "file": "chunk-077-9910c249d35d.txt",
+      "score": 8,
+      "matchedKeywords": [
+        "vela",
+        "soporte",
+        "resistencia",
+        "tendencia",
+        "sma",
+        "media móvil"
+      ],
+      "length": 2995
+    },
+    {
+      "file": "chunk-098-d2d2d547a4b1.txt",
+      "score": 8,
+      "matchedKeywords": [
+        "riesgo",
+        "probabilidad",
+        "soporte",
+        "resistencia",
+        "tendencia",
+        "retroceso"
+      ],
+      "length": 2992
+    },
+    {
+      "file": "chunk-001-46c61dd74124.txt",
+      "score": 7,
+      "matchedKeywords": [
+        "vela",
+        "soporte",
+        "resistencia",
+        "tendencia",
+        "reversión"
+      ],
+      "length": 2929
+    },
+    {
+      "file": "chunk-040-938ff9e0d404.txt",
+      "score": 7,
+      "matchedKeywords": [
+        "vela",
+        "patrón",
+        "tendencia",
+        "reversión",
+        "doji"
+      ],
+      "length": 2998
+    },
+    {
+      "file": "chunk-042-447a54f1882a.txt",
+      "score": 7,
+      "matchedKeywords": [
+        "vela",
+        "patrón",
+        "resistencia",
+        "tendencia",
+        "martillo"
+      ],
+      "length": 2992
+    },
+    {
+      "file": "chunk-047-7bb9c15378a3.txt",
+      "score": 7,
+      "matchedKeywords": [
+        "vela",
+        "soporte",
+        "resistencia",
+        "tendencia",
+        "retroceso"
+      ],
+      "length": 2998
+    },
+    {
+      "file": "chunk-060-811a0b00307e.txt",
+      "score": 7,
+      "matchedKeywords": [
+        "soporte",
+        "resistencia",
+        "tendencia",
+        "ruptura",
+        "media móvil"
+      ],
+      "length": 2994
+    },
+    {
+      "file": "chunk-000-32e6fa2fa7ba.txt",
+      "score": 6,
+      "matchedKeywords": [
+        "vela",
+        "soporte",
+        "resistencia",
+        "tendencia"
+      ],
+      "length": 2999
+    },
+    {
+      "file": "chunk-028-aa36581f2056.txt",
+      "score": 6,
+      "matchedKeywords": [
+        "riesgo",
+        "volumen",
+        "volume",
+        "liquidez"
+      ],
+      "length": 2997
+    },
+    {
+      "file": "chunk-045-4866a209ec2a.txt",
+      "score": 6,
+      "matchedKeywords": [
+        "vela",
+        "soporte",
+        "resistencia",
+        "tendencia"
+      ],
+      "length": 2988
+    },
+    {
+      "file": "chunk-046-555becf28761.txt",
+      "score": 6,
+      "matchedKeywords": [
+        "soporte",
+        "resistencia",
+        "tendencia",
+        "retroceso"
+      ],
+      "length": 2997
+    },
+    {
+      "file": "chunk-048-6d0ab3097a07.txt",
+      "score": 6,
+      "matchedKeywords": [
+        "soporte",
+        "resistencia",
+        "tendencia",
+        "retroceso"
+      ],
+      "length": 2996
+    },
+    {
+      "file": "chunk-050-e24b3fb8e4e5.txt",
+      "score": 6,
+      "matchedKeywords": [
+        "soporte",
+        "resistencia",
+        "tendencia",
+        "retroceso"
+      ],
+      "length": 2995
+    },
+    {
+      "file": "chunk-054-576fe448c2a6.txt",
+      "score": 6,
+      "matchedKeywords": [
+        "probabilidad",
+        "tendencia",
+        "sma",
+        "media móvil"
+      ],
+      "length": 2996
+    },
+    {
+      "file": "chunk-058-ad1f0d268a60.txt",
+      "score": 6,
+      "matchedKeywords": [
+        "vela",
+        "tendencia",
+        "reversal",
+        "media móvil"
+      ],
+      "length": 2994
+    },
+    {
+      "file": "chunk-061-5dc5bb064d68.txt",
+      "score": 6,
+      "matchedKeywords": [
+        "vela",
+        "tendencia",
+        "reversal",
+        "media móvil"
+      ],
+      "length": 2994
+    },
+    {
+      "file": "chunk-064-8fdb6589ecac.txt",
+      "score": 6,
+      "matchedKeywords": [
+        "vela",
+        "patrón",
+        "tendencia",
+        "sma"
+      ],
+      "length": 2998
+    },
+    {
+      "file": "chunk-067-bb2789c7ac97.txt",
+      "score": 6,
+      "matchedKeywords": [
+        "patrón",
+        "soporte",
+        "tendencia",
+        "ruptura"
+      ],
+      "length": 2992
+    },
+    {
+      "file": "chunk-069-ef84852bdf7d.txt",
+      "score": 6,
+      "matchedKeywords": [
+        "patrón",
+        "soporte",
+        "resistencia",
+        "tendencia"
+      ],
+      "length": 2999
+    },
+    {
+      "file": "chunk-070-1025637f05ad.txt",
+      "score": 6,
+      "matchedKeywords": [
+        "soporte",
+        "resistencia",
+        "tendencia",
+        "ruptura"
+      ],
+      "length": 2995
+    },
+    {
+      "file": "chunk-071-8cde00e0b776.txt",
+      "score": 6,
+      "matchedKeywords": [
+        "soporte",
+        "resistencia",
+        "tendencia",
+        "ruptura"
+      ],
+      "length": 2998
+    }
+  ]
+}

@@ -1,0 +1,834 @@
+{
+  "docId": "babypips-tus-primeros-pasos-en-forex-6d5491fb",
+  "sourceHash": "6d5491fb3cfd23a1a0dd1bc4456d86b5c10623d9133642ba9df90d3d101d889d",
+  "chunks": [
+    {
+      "id": "chunk-000-32e6fa2fa7ba",
+      "index": 0,
+      "contentHash": "32e6fa2fa7babd42706342362640ee65a9e4ebb8a16965cd87177b4a47b3cab3",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-000-32e6fa2fa7ba.txt"
+    },
+    {
+      "id": "chunk-001-46c61dd74124",
+      "index": 1,
+      "contentHash": "46c61dd7412417b9c87afd1d7c37812271d326925b9ddea9c76cf343652462f2",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-001-46c61dd74124.txt"
+    },
+    {
+      "id": "chunk-002-d341e19af5ed",
+      "index": 2,
+      "contentHash": "d341e19af5edffe923aa79a33d347363c799f2111f8a7a83ef5340fe598e1284",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-002-d341e19af5ed.txt"
+    },
+    {
+      "id": "chunk-003-f18d8874ac75",
+      "index": 3,
+      "contentHash": "f18d8874ac75bc818fa4734fa32064103cf553c2f56da371870b192ce183cb61",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-003-f18d8874ac75.txt"
+    },
+    {
+      "id": "chunk-004-853df12666d4",
+      "index": 4,
+      "contentHash": "853df12666d49f86322d1183966e655f6fd6c617c2aed1682cb36de0a2daec39",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-004-853df12666d4.txt"
+    },
+    {
+      "id": "chunk-005-0b33ff7cabe5",
+      "index": 5,
+      "contentHash": "0b33ff7cabe5b9503d8ffad5911be1f8628bc3ee55549f271bffad2d5faca65d",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-005-0b33ff7cabe5.txt"
+    },
+    {
+      "id": "chunk-006-2c0f49dbbf53",
+      "index": 6,
+      "contentHash": "2c0f49dbbf53637f40807f873327e4f852324ec362e413adede8ee8c930f03c2",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-006-2c0f49dbbf53.txt"
+    },
+    {
+      "id": "chunk-007-f03271a75894",
+      "index": 7,
+      "contentHash": "f03271a75894fb84590e6bda86a5998b67a175565159ecbb7613e795021f56be",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-007-f03271a75894.txt"
+    },
+    {
+      "id": "chunk-008-16b477614a19",
+      "index": 8,
+      "contentHash": "16b477614a19fbca4e3d5b35ec5b32756e29531a81add5ae9a920eada22c73a2",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-008-16b477614a19.txt"
+    },
+    {
+      "id": "chunk-009-fd1ac977cae3",
+      "index": 9,
+      "contentHash": "fd1ac977cae3ebc5186afc3a1dad2c24afc031138ccdcddeb085328673840931",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-009-fd1ac977cae3.txt"
+    },
+    {
+      "id": "chunk-010-5c684578baf2",
+      "index": 10,
+      "contentHash": "5c684578baf29d910573b7b5ac912ae4523cc258fe2d5f5e963c23df037a1106",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-010-5c684578baf2.txt"
+    },
+    {
+      "id": "chunk-011-394c75020cbe",
+      "index": 11,
+      "contentHash": "394c75020cbec1a8edb8554a634c04a935a3d6fdef9cabfce05413aa05f542fd",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-011-394c75020cbe.txt"
+    },
+    {
+      "id": "chunk-012-e51a129daef0",
+      "index": 12,
+      "contentHash": "e51a129daef0a9108229008f2a61a21de4c4183ce8f51fa7e270fe956c87ea94",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-012-e51a129daef0.txt"
+    },
+    {
+      "id": "chunk-013-48265dfaa6c1",
+      "index": 13,
+      "contentHash": "48265dfaa6c12616d52da998cb78ecdaab647151c9e1069374b46b88d33b53d8",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-013-48265dfaa6c1.txt"
+    },
+    {
+      "id": "chunk-014-8882ac07b0e3",
+      "index": 14,
+      "contentHash": "8882ac07b0e38a790be876be24b7420bf1bfdab2d607450332f168b8ff4268d2",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-014-8882ac07b0e3.txt"
+    },
+    {
+      "id": "chunk-015-2241280b2d22",
+      "index": 15,
+      "contentHash": "2241280b2d223e8497dcf91d69ee2d66f32989cd4469a93184929e386642de3d",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-015-2241280b2d22.txt"
+    },
+    {
+      "id": "chunk-016-34d58451fa83",
+      "index": 16,
+      "contentHash": "34d58451fa839e363814ce9ae3c01c89cabab81ecdc9aeeaecc96e1676984bdc",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-016-34d58451fa83.txt"
+    },
+    {
+      "id": "chunk-017-59491328f470",
+      "index": 17,
+      "contentHash": "59491328f470c8a07021253fddcd1e4644b13116d87ee426d6f04d708c290ce1",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-017-59491328f470.txt"
+    },
+    {
+      "id": "chunk-018-b1e6c611b1ee",
+      "index": 18,
+      "contentHash": "b1e6c611b1ee8f11439510a35f092415473324042dc962f2d7efccb23e5c1684",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-018-b1e6c611b1ee.txt"
+    },
+    {
+      "id": "chunk-019-f1d5906b97c1",
+      "index": 19,
+      "contentHash": "f1d5906b97c1f048ee049c390bf32b706caf30a583b25de494ce7266858d859c",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-019-f1d5906b97c1.txt"
+    },
+    {
+      "id": "chunk-020-a103cbcef87f",
+      "index": 20,
+      "contentHash": "a103cbcef87f472ed3318c9c1c44989e0db6949e52c5f95133a7449bd6014368",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-020-a103cbcef87f.txt"
+    },
+    {
+      "id": "chunk-021-8839387d1365",
+      "index": 21,
+      "contentHash": "8839387d1365d8cdd33bbacac920ae56b4b3b1ad4c9cd16f89bf9f854bbe2412",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-021-8839387d1365.txt"
+    },
+    {
+      "id": "chunk-022-4089ef4264b4",
+      "index": 22,
+      "contentHash": "4089ef4264b4f61da4e99b22b60a4e236f4644052ad7c78de1f294b98fe75892",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-022-4089ef4264b4.txt"
+    },
+    {
+      "id": "chunk-023-9fefde6dd7e3",
+      "index": 23,
+      "contentHash": "9fefde6dd7e312ec9330db22791fa0e1bc9a3a3b2cacde86aecd6d461a9668f1",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-023-9fefde6dd7e3.txt"
+    },
+    {
+      "id": "chunk-024-0a94d193a1a7",
+      "index": 24,
+      "contentHash": "0a94d193a1a71c236a626444f5da37a602ccb9d5227bcb989c2539af21e57691",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-024-0a94d193a1a7.txt"
+    },
+    {
+      "id": "chunk-025-721a52040e7f",
+      "index": 25,
+      "contentHash": "721a52040e7f068eb348734d479d3e8a96e9c92d8889fe8e51cee77a8ec91de3",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-025-721a52040e7f.txt"
+    },
+    {
+      "id": "chunk-026-dfdf3f0d4f66",
+      "index": 26,
+      "contentHash": "dfdf3f0d4f663db8a1b3bc873f9be41d5e3bec6315a58a59cd39628d478e8194",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-026-dfdf3f0d4f66.txt"
+    },
+    {
+      "id": "chunk-027-cc45c3ab80aa",
+      "index": 27,
+      "contentHash": "cc45c3ab80aa648aee885e567be6b7521dba7977be8bf74e642dba4aea46aa10",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-027-cc45c3ab80aa.txt"
+    },
+    {
+      "id": "chunk-028-aa36581f2056",
+      "index": 28,
+      "contentHash": "aa36581f20562d99d74fab2feb4e5d0d747499849172c3bc3fe2f3cfa0632014",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-028-aa36581f2056.txt"
+    },
+    {
+      "id": "chunk-029-ef013e949140",
+      "index": 29,
+      "contentHash": "ef013e9491400ef653f1fedcc139edcd786ab77670b46026a2f013678cba211c",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-029-ef013e949140.txt"
+    },
+    {
+      "id": "chunk-030-44f79bdd5e52",
+      "index": 30,
+      "contentHash": "44f79bdd5e52f3afa0217230c10d03b11fd0622fc688ce61448560d8406cc587",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-030-44f79bdd5e52.txt"
+    },
+    {
+      "id": "chunk-031-110c9e651627",
+      "index": 31,
+      "contentHash": "110c9e6516278976d0fd24bc28a59e0cf872aa0e0b48d48e6204cc71f87f97e2",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-031-110c9e651627.txt"
+    },
+    {
+      "id": "chunk-032-3c89b1476fc5",
+      "index": 32,
+      "contentHash": "3c89b1476fc52de3668b6a0db74ad88c1024e3e08bc390715e86ee74a7dd1476",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-032-3c89b1476fc5.txt"
+    },
+    {
+      "id": "chunk-033-3e3467268558",
+      "index": 33,
+      "contentHash": "3e346726855897138c19baa3f9b22c282edae9c3c5c1422ab64a752740165c75",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-033-3e3467268558.txt"
+    },
+    {
+      "id": "chunk-034-2ebd872a0954",
+      "index": 34,
+      "contentHash": "2ebd872a0954afd8c9e29c80d0fbd12d2597d9c13d305144d3e2765222165202",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-034-2ebd872a0954.txt"
+    },
+    {
+      "id": "chunk-035-d66d49b5b7c4",
+      "index": 35,
+      "contentHash": "d66d49b5b7c461f0521104bd81175f1558ec01e2f26faee0ba175fd62841dc87",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-035-d66d49b5b7c4.txt"
+    },
+    {
+      "id": "chunk-036-5a922c0b4c5e",
+      "index": 36,
+      "contentHash": "5a922c0b4c5ecd316c44ba92e5d58ab53e18bb7ba987f31eb7122a5dc28d910e",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-036-5a922c0b4c5e.txt"
+    },
+    {
+      "id": "chunk-037-ed74e0373d22",
+      "index": 37,
+      "contentHash": "ed74e0373d22fb83665bd7dc1c40d8c21f394192716afaa80f7f7a6c69ea5881",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-037-ed74e0373d22.txt"
+    },
+    {
+      "id": "chunk-038-daaeb6aa1098",
+      "index": 38,
+      "contentHash": "daaeb6aa1098bc1bc832d8a16219034e34ee8627492bb8886779ef8a8124ad43",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-038-daaeb6aa1098.txt"
+    },
+    {
+      "id": "chunk-039-06e16f0881ee",
+      "index": 39,
+      "contentHash": "06e16f0881eedc3c7b7f6bebfe4f92b7552187404f956fe209504f17fb74a9ed",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-039-06e16f0881ee.txt"
+    },
+    {
+      "id": "chunk-040-938ff9e0d404",
+      "index": 40,
+      "contentHash": "938ff9e0d404fbc7fa3c15bb4bfc1392673b363b9fc58f5fff3dcabeb136190c",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-040-938ff9e0d404.txt"
+    },
+    {
+      "id": "chunk-041-62be56fd2555",
+      "index": 41,
+      "contentHash": "62be56fd255577bb386f13dc93aa32a2801ba43c593ab7f04defe04b4d27d345",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-041-62be56fd2555.txt"
+    },
+    {
+      "id": "chunk-042-447a54f1882a",
+      "index": 42,
+      "contentHash": "447a54f1882ad0e21fbb66eb265cbb762ab9a4e710f2a2d175727c8ec6a795ca",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-042-447a54f1882a.txt"
+    },
+    {
+      "id": "chunk-043-94366946e2aa",
+      "index": 43,
+      "contentHash": "94366946e2aab8dac14c9b06243ddd0ae8de6f74449d219173d51ae5ddc28919",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-043-94366946e2aa.txt"
+    },
+    {
+      "id": "chunk-044-0843582e9f04",
+      "index": 44,
+      "contentHash": "0843582e9f04cc05a22449db8aedfb921aa2effe4293caf18163d01cc9d675ae",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-044-0843582e9f04.txt"
+    },
+    {
+      "id": "chunk-045-4866a209ec2a",
+      "index": 45,
+      "contentHash": "4866a209ec2a9f948446b8c0d231deb5b9a83ff9ff57bbd9b240536cc7e16195",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-045-4866a209ec2a.txt"
+    },
+    {
+      "id": "chunk-046-555becf28761",
+      "index": 46,
+      "contentHash": "555becf287617e9970dd8ad827ae0d6d83f5a9a6266604b5d93681ef79a54cc2",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-046-555becf28761.txt"
+    },
+    {
+      "id": "chunk-047-7bb9c15378a3",
+      "index": 47,
+      "contentHash": "7bb9c15378a3121c73e26ab66c2e950f06bcea08d9182750be9f8a2286910e0b",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-047-7bb9c15378a3.txt"
+    },
+    {
+      "id": "chunk-048-6d0ab3097a07",
+      "index": 48,
+      "contentHash": "6d0ab3097a078679b1787ac3fcf6efe73ff2f9c80022fd5c36ea7dfad7bab80f",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-048-6d0ab3097a07.txt"
+    },
+    {
+      "id": "chunk-049-3dd98084c195",
+      "index": 49,
+      "contentHash": "3dd98084c195d38fcc116a89d8582ee8dc6b81d51361e07e6733a992bcb548d5",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-049-3dd98084c195.txt"
+    },
+    {
+      "id": "chunk-050-e24b3fb8e4e5",
+      "index": 50,
+      "contentHash": "e24b3fb8e4e5d0f011e00bc96daac10f061fc12711f59117e3506dffa1cb8386",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-050-e24b3fb8e4e5.txt"
+    },
+    {
+      "id": "chunk-051-c53e4aedcad4",
+      "index": 51,
+      "contentHash": "c53e4aedcad48766343985db7bc5ed7d7d66004bad060d55c203f4c69a8840f6",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-051-c53e4aedcad4.txt"
+    },
+    {
+      "id": "chunk-052-fd4f6b1266f5",
+      "index": 52,
+      "contentHash": "fd4f6b1266f5c226535d927928fbc33f61636df6c42e63412496937d39e98cb9",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-052-fd4f6b1266f5.txt"
+    },
+    {
+      "id": "chunk-053-f1c4e77ee4ef",
+      "index": 53,
+      "contentHash": "f1c4e77ee4ef3cc7a14f380f0fcd165968dd9a89f0ee2bafb97d8998b97827a6",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-053-f1c4e77ee4ef.txt"
+    },
+    {
+      "id": "chunk-054-576fe448c2a6",
+      "index": 54,
+      "contentHash": "576fe448c2a6c0396e0413781b02816d7c8320d35443cf520a1faf35c2bb3b92",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-054-576fe448c2a6.txt"
+    },
+    {
+      "id": "chunk-055-fdad275a2352",
+      "index": 55,
+      "contentHash": "fdad275a235292c58646b2d631709a34a6c4bf0b7a933a5c6f2453ef8918caaf",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-055-fdad275a2352.txt"
+    },
+    {
+      "id": "chunk-056-4089f59afd33",
+      "index": 56,
+      "contentHash": "4089f59afd3311c666ba44848eb37ca5543364f99c74fe69388437fa7ef58093",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-056-4089f59afd33.txt"
+    },
+    {
+      "id": "chunk-057-e0ebb451c2a5",
+      "index": 57,
+      "contentHash": "e0ebb451c2a594bbfd490bf632b48c7456e5cf3d6b13293831bb0abd62a2c999",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-057-e0ebb451c2a5.txt"
+    },
+    {
+      "id": "chunk-058-ad1f0d268a60",
+      "index": 58,
+      "contentHash": "ad1f0d268a6090dc34cb790f504ddc180621145aa2e375d1d7d342b4e7476f50",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-058-ad1f0d268a60.txt"
+    },
+    {
+      "id": "chunk-059-5715fcab9512",
+      "index": 59,
+      "contentHash": "5715fcab9512d6e4cc11f0df111d67071a396dc846931c4c9525ded8bad9ef53",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-059-5715fcab9512.txt"
+    },
+    {
+      "id": "chunk-060-811a0b00307e",
+      "index": 60,
+      "contentHash": "811a0b00307e5948ae305f7955eb08ec584e1c3fef2d17bb6954954f3d6f4ccc",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-060-811a0b00307e.txt"
+    },
+    {
+      "id": "chunk-061-5dc5bb064d68",
+      "index": 61,
+      "contentHash": "5dc5bb064d686d640dbda318d7f8c9e0ac57c302c3a50fe53a0c3afce199394c",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-061-5dc5bb064d68.txt"
+    },
+    {
+      "id": "chunk-062-89ad2c9de6e6",
+      "index": 62,
+      "contentHash": "89ad2c9de6e6188f7936b42fa9eb7133fa621f8d96d8d9a42b57d9b578542644",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-062-89ad2c9de6e6.txt"
+    },
+    {
+      "id": "chunk-063-2a90c472fab6",
+      "index": 63,
+      "contentHash": "2a90c472fab645fe071e80f17d60a22a97a07d6d6905acd7a707a2d02b962620",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-063-2a90c472fab6.txt"
+    },
+    {
+      "id": "chunk-064-8fdb6589ecac",
+      "index": 64,
+      "contentHash": "8fdb6589ecac6936c037c8829e1e93400c98c9dc3b332a2c13569a59e4e38c52",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-064-8fdb6589ecac.txt"
+    },
+    {
+      "id": "chunk-065-39d0ca2447b9",
+      "index": 65,
+      "contentHash": "39d0ca2447b959822f67b1ca3dcf1040594bb82343c3812f97db8af696f58ed6",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-065-39d0ca2447b9.txt"
+    },
+    {
+      "id": "chunk-066-72a00b4d34ae",
+      "index": 66,
+      "contentHash": "72a00b4d34ae7a33ceec207b28f84743cc81d68d590e88740306dc3fbb504036",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-066-72a00b4d34ae.txt"
+    },
+    {
+      "id": "chunk-067-bb2789c7ac97",
+      "index": 67,
+      "contentHash": "bb2789c7ac97ea3116408e3b0891b4f5be5ab150f446a278d9ef6ee67a09bb04",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-067-bb2789c7ac97.txt"
+    },
+    {
+      "id": "chunk-068-f38809931824",
+      "index": 68,
+      "contentHash": "f388099318247460e2d1a4b13464bc3262ae49cd0f1acd2848a4ae7947b24945",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-068-f38809931824.txt"
+    },
+    {
+      "id": "chunk-069-ef84852bdf7d",
+      "index": 69,
+      "contentHash": "ef84852bdf7d859f736182ea78fcb70714ea5b8121afdc2e2d9c7779729fc5f6",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-069-ef84852bdf7d.txt"
+    },
+    {
+      "id": "chunk-070-1025637f05ad",
+      "index": 70,
+      "contentHash": "1025637f05adc26660fbeebc7a9535fca773a61e40b15ff2e3325dd545095f0f",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-070-1025637f05ad.txt"
+    },
+    {
+      "id": "chunk-071-8cde00e0b776",
+      "index": 71,
+      "contentHash": "8cde00e0b776e14c2c1287b55fa13daf16274c5e1eb5215d524cfe3dadd1f1fb",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-071-8cde00e0b776.txt"
+    },
+    {
+      "id": "chunk-072-a75d92f531ab",
+      "index": 72,
+      "contentHash": "a75d92f531ab845981b67dc2e9e19de9409ae23eef51c37a48c3f442d32610db",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-072-a75d92f531ab.txt"
+    },
+    {
+      "id": "chunk-073-021eb4031975",
+      "index": 73,
+      "contentHash": "021eb403197558819136a7a8df294a89cf0b00bf40ca915069d66b84ca4ccbf1",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-073-021eb4031975.txt"
+    },
+    {
+      "id": "chunk-074-a76d1b2a3bc2",
+      "index": 74,
+      "contentHash": "a76d1b2a3bc241247577501f26b4ae0cf29625fa4718ac8520b3ae00219f1c61",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-074-a76d1b2a3bc2.txt"
+    },
+    {
+      "id": "chunk-075-d65a66ba7050",
+      "index": 75,
+      "contentHash": "d65a66ba7050d09489fd18bd5a6694d7b09f2249853fed24ec39bcd298cf7e47",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-075-d65a66ba7050.txt"
+    },
+    {
+      "id": "chunk-076-63613839da7c",
+      "index": 76,
+      "contentHash": "63613839da7c108feb3f028882b7f3182cb6b7b5ce90a8aa0352f0e59ffccb47",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-076-63613839da7c.txt"
+    },
+    {
+      "id": "chunk-077-9910c249d35d",
+      "index": 77,
+      "contentHash": "9910c249d35d72ccc3abb4417626b7e6d3d73c4741d63e44dec2091fd729317d",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-077-9910c249d35d.txt"
+    },
+    {
+      "id": "chunk-078-25aa3c651553",
+      "index": 78,
+      "contentHash": "25aa3c6515531306c93c60e4447c6abd725ce0ed8366f388838acb70a0b69e8f",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-078-25aa3c651553.txt"
+    },
+    {
+      "id": "chunk-079-39b373d3a25b",
+      "index": 79,
+      "contentHash": "39b373d3a25bc144c21577b0062ab3ed7d30ae7a67a95ebdd4f94cef96e8e82d",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-079-39b373d3a25b.txt"
+    },
+    {
+      "id": "chunk-080-a7ae8ac52add",
+      "index": 80,
+      "contentHash": "a7ae8ac52add776bd3e9cddde511738523a560c9ecc657cf2ebf6c43db62b37c",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-080-a7ae8ac52add.txt"
+    },
+    {
+      "id": "chunk-081-76536da2e2db",
+      "index": 81,
+      "contentHash": "76536da2e2db72084973eb59c5bf2bec6475575e1e352069a164e74f84163d3d",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-081-76536da2e2db.txt"
+    },
+    {
+      "id": "chunk-082-4ddb34048baa",
+      "index": 82,
+      "contentHash": "4ddb34048baa597373509ca5311717287c7de54358511574bc1fdfd47a9917f9",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-082-4ddb34048baa.txt"
+    },
+    {
+      "id": "chunk-083-25751ac0ca5a",
+      "index": 83,
+      "contentHash": "25751ac0ca5a3129899fc3607b6ce9dd450a2ff1ab9192e928820e4e94118313",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-083-25751ac0ca5a.txt"
+    },
+    {
+      "id": "chunk-084-0516c6f39e76",
+      "index": 84,
+      "contentHash": "0516c6f39e76f03fd73e3eb951fab13bce45ab62b32e65069bb349906d62382f",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-084-0516c6f39e76.txt"
+    },
+    {
+      "id": "chunk-085-592d01fef0e7",
+      "index": 85,
+      "contentHash": "592d01fef0e7460bf923ea8358a50163824b46209ff954cfd5a082e64cb48105",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-085-592d01fef0e7.txt"
+    },
+    {
+      "id": "chunk-086-9bc4dc5c2c57",
+      "index": 86,
+      "contentHash": "9bc4dc5c2c57ec4c859902d6f9c4d0664d0299cec25d445d9fc0004bc9d5da92",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-086-9bc4dc5c2c57.txt"
+    },
+    {
+      "id": "chunk-087-dde29d7f170c",
+      "index": 87,
+      "contentHash": "dde29d7f170c34a411b1bb1586f8d26b313a63789ad7bd27fe27691f4babe0c5",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-087-dde29d7f170c.txt"
+    },
+    {
+      "id": "chunk-088-e025d47fc56c",
+      "index": 88,
+      "contentHash": "e025d47fc56cec5117c7a0a46bb5481aa325ae0e2bf718b9284f11ddafb9679c",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-088-e025d47fc56c.txt"
+    },
+    {
+      "id": "chunk-089-29c7c4175ca6",
+      "index": 89,
+      "contentHash": "29c7c4175ca61f1b3b871d72183c4951ad22ece92934c3e044a4f82de19fc587",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-089-29c7c4175ca6.txt"
+    },
+    {
+      "id": "chunk-090-5171fdcfcf9c",
+      "index": 90,
+      "contentHash": "5171fdcfcf9cbd0fd580a172a17ad4a7a0fc1401085add28fe63e4a7cd9d9100",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-090-5171fdcfcf9c.txt"
+    },
+    {
+      "id": "chunk-091-fa93111c5653",
+      "index": 91,
+      "contentHash": "fa93111c5653ddc10b4425fe30a9b0ad5dd29eba77b59e938af8b6261ef96500",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-091-fa93111c5653.txt"
+    },
+    {
+      "id": "chunk-092-1bde551d28c8",
+      "index": 92,
+      "contentHash": "1bde551d28c899519457b7cc11c18114610cf3a46007508c2fd24f4b4d77ebdf",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-092-1bde551d28c8.txt"
+    },
+    {
+      "id": "chunk-093-d6c395346990",
+      "index": 93,
+      "contentHash": "d6c395346990eb5d9a14af9c1256f60134a4e4db12a9aed6fb4ed8a68d77218e",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-093-d6c395346990.txt"
+    },
+    {
+      "id": "chunk-094-6740bce2212f",
+      "index": 94,
+      "contentHash": "6740bce2212f7822ea4660e24bfecfafda3650834b174fd703e5841c2031074e",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-094-6740bce2212f.txt"
+    },
+    {
+      "id": "chunk-095-02342cd68f16",
+      "index": 95,
+      "contentHash": "02342cd68f16e7ee8b7ba33814ff9edc0819c259714d8aca7ca43d804295ff2d",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-095-02342cd68f16.txt"
+    },
+    {
+      "id": "chunk-096-2afe5c499c5c",
+      "index": 96,
+      "contentHash": "2afe5c499c5cd788436af807e7ef7b472ab448e1394a72874a361e5d3e410cc2",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-096-2afe5c499c5c.txt"
+    },
+    {
+      "id": "chunk-097-091dfd3546d0",
+      "index": 97,
+      "contentHash": "091dfd3546d01fa406955c367d15b91a0cd092e1a7be9504c1116645db464bbf",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-097-091dfd3546d0.txt"
+    },
+    {
+      "id": "chunk-098-d2d2d547a4b1",
+      "index": 98,
+      "contentHash": "d2d2d547a4b15ec04668aebc305ed6a9c6b8ccf9946767db6d864806013c30b1",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-098-d2d2d547a4b1.txt"
+    },
+    {
+      "id": "chunk-099-daac8bff5a16",
+      "index": 99,
+      "contentHash": "daac8bff5a160c9f22ad45c01a6d3257c642f561ebef8e0fe30603e4c1df995d",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-099-daac8bff5a16.txt"
+    },
+    {
+      "id": "chunk-100-1180776659f5",
+      "index": 100,
+      "contentHash": "1180776659f5e99791afa428178018dfac65a7f2b27d3ed0c446eed0f0619eb3",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-100-1180776659f5.txt"
+    },
+    {
+      "id": "chunk-101-950792e03ece",
+      "index": 101,
+      "contentHash": "950792e03ece8d66a204284c35472c48ede1411bdacde1cd6375e1f117dcf32b",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-101-950792e03ece.txt"
+    },
+    {
+      "id": "chunk-102-22145906e610",
+      "index": 102,
+      "contentHash": "22145906e61044eedc0ad89d7cfab4f4fcc9050ea91c2aae73883cc55a7c9bfe",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-102-22145906e610.txt"
+    },
+    {
+      "id": "chunk-103-d689df5143b7",
+      "index": 103,
+      "contentHash": "d689df5143b7a572137bcaa7d8d8d2c9a7aa60ca221c06d6409451fb3977b5b6",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-103-d689df5143b7.txt"
+    },
+    {
+      "id": "chunk-104-6a303b445825",
+      "index": 104,
+      "contentHash": "6a303b445825e02ffe942b917e435a00b8b124934214578dcc1e2f6b84b99f52",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-104-6a303b445825.txt"
+    },
+    {
+      "id": "chunk-105-065ef78b5827",
+      "index": 105,
+      "contentHash": "065ef78b58277150bafa1befa8527197a7bde2c8ed23cfa5855ab0f5981bc0e1",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-105-065ef78b5827.txt"
+    },
+    {
+      "id": "chunk-106-58756ec895e0",
+      "index": 106,
+      "contentHash": "58756ec895e042b0c946051e3f2d3452967da91770b00de0d462133d783f0f90",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-106-58756ec895e0.txt"
+    },
+    {
+      "id": "chunk-107-568302a720c0",
+      "index": 107,
+      "contentHash": "568302a720c0d5654f25a777d1ae00a226087eb9dc715336d59b48926576ab84",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-107-568302a720c0.txt"
+    },
+    {
+      "id": "chunk-108-c896009dab3c",
+      "index": 108,
+      "contentHash": "c896009dab3cba8e6fbc72b8440a97495103d2f8d382f9aec3a3deb247cf3172",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-108-c896009dab3c.txt"
+    },
+    {
+      "id": "chunk-109-6139aea68d2e",
+      "index": 109,
+      "contentHash": "6139aea68d2e958a01ba99c4546378d39acfcf53ef9daa8366f7ef1f76a17683",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-109-6139aea68d2e.txt"
+    },
+    {
+      "id": "chunk-110-9c4576492e77",
+      "index": 110,
+      "contentHash": "9c4576492e77a1fb63af4be1e5a5e4f794836b0c1efa047afc189154cceff99a",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-110-9c4576492e77.txt"
+    },
+    {
+      "id": "chunk-111-032e06da15e1",
+      "index": 111,
+      "contentHash": "032e06da15e1930ba50262be5ecbf1ebdb7b562aecd711ffa0f47ed082269093",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-111-032e06da15e1.txt"
+    },
+    {
+      "id": "chunk-112-f775136cf7e2",
+      "index": 112,
+      "contentHash": "f775136cf7e204421f66d1b60cb5e6a849faaf9b7ee4989b5bbeb441de956fb7",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-112-f775136cf7e2.txt"
+    },
+    {
+      "id": "chunk-113-158d0400b71d",
+      "index": 113,
+      "contentHash": "158d0400b71da2a9db90e44d621fe6622fe0380b1f8ae457528c917247e10cc0",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-113-158d0400b71d.txt"
+    },
+    {
+      "id": "chunk-114-086359aebb95",
+      "index": 114,
+      "contentHash": "086359aebb9549a3b846e635a6bfa89867d8b7ddf3c5fbe196bad16cf59e9a92",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-114-086359aebb95.txt"
+    },
+    {
+      "id": "chunk-115-b36bc98e1bc8",
+      "index": 115,
+      "contentHash": "b36bc98e1bc82137197d2e0470e8aabedfa831092f4135b8ff91ab18b5855236",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-115-b36bc98e1bc8.txt"
+    },
+    {
+      "id": "chunk-116-ffe12017fd5e",
+      "index": 116,
+      "contentHash": "ffe12017fd5e27bdcf3c72d88eda23b59c6501cc3bb0088c56d02458c30bf641",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-116-ffe12017fd5e.txt"
+    },
+    {
+      "id": "chunk-117-d4dbb5cb281c",
+      "index": 117,
+      "contentHash": "d4dbb5cb281ce5cc8433e2b72f312f1b5090bc154b13ac77eb7636cff67cd079",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-117-d4dbb5cb281c.txt"
+    },
+    {
+      "id": "chunk-118-e5739865160c",
+      "index": 118,
+      "contentHash": "e5739865160c8e00a2a118554efc2a7ea90d9bdf77aadd9bd3b4abe888375455",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-118-e5739865160c.txt"
+    },
+    {
+      "id": "chunk-119-401f747aa9a9",
+      "index": 119,
+      "contentHash": "401f747aa9a9357a42ff6521a33f071f16a6ee4703da8456fdc817c01766abe3",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-119-401f747aa9a9.txt"
+    },
+    {
+      "id": "chunk-120-24afc09c859d",
+      "index": 120,
+      "contentHash": "24afc09c859db5314ec0a8c581ea2d6ded6ef152f3ff3fa456d0fb98ebae3298",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-120-24afc09c859d.txt"
+    },
+    {
+      "id": "chunk-121-cd12eb845d9f",
+      "index": 121,
+      "contentHash": "cd12eb845d9fa438ffce362d8b1f336b850ca3deda5dcc1a7b15f3e310cb309f",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-121-cd12eb845d9f.txt"
+    },
+    {
+      "id": "chunk-122-6c623ad78229",
+      "index": 122,
+      "contentHash": "6c623ad7822940e0e7b7c5bff92301f9a08581323179988049e32c56970e436d",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-122-6c623ad78229.txt"
+    },
+    {
+      "id": "chunk-123-d6e1f90682b9",
+      "index": 123,
+      "contentHash": "d6e1f90682b90da6135c87a3bc604f7c15bf48b9b6b04881674ab5f2f1800c8a",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-123-d6e1f90682b9.txt"
+    },
+    {
+      "id": "chunk-124-91ba1a003fa2",
+      "index": 124,
+      "contentHash": "91ba1a003fa2876f191573a1639e43e7a462c6c40d4fe7db64d1940bf8e100e2",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-124-91ba1a003fa2.txt"
+    },
+    {
+      "id": "chunk-125-d20be793c857",
+      "index": 125,
+      "contentHash": "d20be793c85760721d45f44dcd072367b9a47aea7611387b8531ac7e9ba55683",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-125-d20be793c857.txt"
+    },
+    {
+      "id": "chunk-126-611404f8908d",
+      "index": 126,
+      "contentHash": "611404f8908dc3f948059f30d722b1e64d35dff118c1de665b3d75e12eb05d83",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-126-611404f8908d.txt"
+    },
+    {
+      "id": "chunk-127-adeef8c15686",
+      "index": 127,
+      "contentHash": "adeef8c15686165dc555ced9f897d73c244d8013faecdfa4f1bd81893cbed028",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-127-adeef8c15686.txt"
+    },
+    {
+      "id": "chunk-128-8acb799aeff4",
+      "index": 128,
+      "contentHash": "8acb799aeff42f3e0ac88b886d3d4d065bff6501a2c8879d70248a2b6d81c6a8",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-128-8acb799aeff4.txt"
+    },
+    {
+      "id": "chunk-129-15aac0f68d71",
+      "index": 129,
+      "contentHash": "15aac0f68d71b4e7057f8bff2af816474e5d02d39768066153e4e3903afdd013",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-129-15aac0f68d71.txt"
+    },
+    {
+      "id": "chunk-130-cddda02acf74",
+      "index": 130,
+      "contentHash": "cddda02acf7454e6d350eb8340f313681376d86dc00c6c35bc45a214ff43e715",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-130-cddda02acf74.txt"
+    },
+    {
+      "id": "chunk-131-f1013dc0be98",
+      "index": 131,
+      "contentHash": "f1013dc0be9890fbcb9a7545efc715cffd40068ed2631c58da8344f40509d4b2",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-131-f1013dc0be98.txt"
+    },
+    {
+      "id": "chunk-132-f079c95080a8",
+      "index": 132,
+      "contentHash": "f079c95080a8d30e96212d99cd8455230b24a06864eae8357715bc6f2f70d255",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-132-f079c95080a8.txt"
+    },
+    {
+      "id": "chunk-133-dae8df9b6af7",
+      "index": 133,
+      "contentHash": "dae8df9b6af7c30015becc72a38bfebc6376892324b6ddb5ed5d5a72f5d22d62",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-133-dae8df9b6af7.txt"
+    },
+    {
+      "id": "chunk-134-c07e166b4ee3",
+      "index": 134,
+      "contentHash": "c07e166b4ee3371b2169cf106f86fd8d969fe30832897145eeb94404214c9e38",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-134-c07e166b4ee3.txt"
+    },
+    {
+      "id": "chunk-135-b8908e0ace67",
+      "index": 135,
+      "contentHash": "b8908e0ace67439c2a2b0ff950a1ce190a05365e130a9b0bf6787c0afd1afcff",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-135-b8908e0ace67.txt"
+    },
+    {
+      "id": "chunk-136-0455044652b7",
+      "index": 136,
+      "contentHash": "0455044652b790375e6079be26d72d56f3d70df25d8c5b802cda1f2a60c20318",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-136-0455044652b7.txt"
+    },
+    {
+      "id": "chunk-137-ddc6daaa04cb",
+      "index": 137,
+      "contentHash": "ddc6daaa04cbc1a84f1cfad0e6a282e5ad12178d9905846b8cae2804e92439c4",
+      "path": "raw/babypips-tus-primeros-pasos-en-forex-6d5491fb/chunk-137-ddc6daaa04cb.txt"
+    }
+  ]
+}
