@@ -69,11 +69,23 @@ tables in every playbook.
 
 ## Knowledge ingest (#82)
 
-Pipeline is **offline tooling** (scripts + Cursor skill), not a NestJS
-endpoint or cron.
+Pipeline is **offline tooling** (scripts + Cursor Agent), not a NestJS
+endpoint or cron. There is **no** fully automatic Nest job that watches
+`sources/` — the one-shot UX is the Cursor command below.
+
+### One-shot (recommended)
+
+```text
+/processBook @knowledge/sources/MiLibro.pdf
+```
+
+Optional: `--draft-only` (no promote to `playbooks/`). The Agent applies Fin
+rules for `--target` / genre, runs prepare → rank → extract → merge → QA →
+promote. You do **not** pick `equity.md` vs `cedear.md` vs `bond.md`.
 
 | Command | What it does |
 |---------|----------------|
+| `/processBook <path>` | Full Agent orchestrated ingest (preferred) |
 | `npm run knowledge:prepare -- <file> [--target equity\|cedear\|bond\|other]` | Extract → chunk → `raw/<docId>/` with content-hash cache |
 | `npm run knowledge:rank-chunks -- <rawDocDir> --genre <id>[,…]` | Score chunks with Finance Advisor themes (`_prompts/filter-themes.json`); writes `selected-chunks.json` |
 | `npm run knowledge:dry-run -- <file> [--target …] [--apply]` | Prepare + deterministic playbook draft (no LLM / API key) |
@@ -81,13 +93,15 @@ endpoint or cron.
 **Who decides `--target` (which playbook)?** **`/fin`** (or the Agent applying
 Fin rules) — not the operator. Default **`equity`** when unsure. Map CEDEAR
 mechanics → `cedear`, fixed income → `bond`. Do **not** create a new playbook
-per PDF; merge into an existing card. See skill `knowledge-ingest`.
+per PDF; merge into an existing card. See skill `knowledge-ingest` and
+`.cursor/commands/processBook.md`.
 
 **Who decides “important” chunks?** Chunking is mechanical (whole text).
 Ranking keywords/themes are owned by **`/fin`**
 (`knowledge/_prompts/filter-themes.md` + `.json`). Agents must not invent
 ad-hoc keyword lists when those files exist. Extract + human Accept still
-decide what enters playbooks (Accept may skip reading the full PDF).
+decide what enters playbooks (Accept may skip reading the full PDF; `/processBook`
+promotes after QA PASS unless `--draft-only`).
 
 `<file>` must resolve under `knowledge/sources/` (symlink escapes rejected).
 `meta.json` / `manifest.sources` store **repo-relative** paths only. `--apply`

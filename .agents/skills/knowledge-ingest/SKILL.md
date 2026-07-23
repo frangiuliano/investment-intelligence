@@ -3,9 +3,9 @@ name: knowledge-ingest
 description: >-
   Orchestrates Knowledge Pack ingest (PDF/text → chunked extracts → merge → QA
   → playbooks/rubrics) for investment-intelligence. Use when the user asks to
-  ingest a PDF or fixture into knowledge/playbooks, run knowledge-ingest,
-  knowledge:prepare, knowledge:dry-run, knowledge:rank-chunks, or update
-  manifest.json from sources.
+  ingest a PDF or fixture into knowledge/playbooks, runs /processBook,
+  knowledge-ingest, knowledge:prepare, knowledge:dry-run, knowledge:rank-chunks,
+  or update manifest.json from sources.
 disable-model-invocation: true
 ---
 
@@ -13,6 +13,10 @@ disable-model-invocation: true
 
 Turn operator sources under `knowledge/sources/` into short, injectable
 playbooks/rubrics. **Never** paste an entire book into one LLM call.
+
+**Preferred operator entry:** Cursor command `/processBook @knowledge/sources/….pdf`
+(see `.cursor/commands/processBook.md`). That command loads this skill end-to-end
+so the operator does not run npm steps by hand or choose the playbook `.md`.
 
 ## Tools (no NestJS runtime)
 
@@ -60,7 +64,9 @@ Ingest progress:
 - [ ] 5. For each selected chunk (top N): extract with _prompts/extract.md (one chunk only)
 - [ ] 6. Merge extracts with _prompts/merge.md into raw/<docId>/playbook.md
 - [ ] 7. QA with _prompts/qa.md → PASS before apply
-- [ ] 8. Human Accept checklist (~10 min) — operator may skip reading the PDF
+- [ ] 8. Accept: for `/processBook` (no `--draft-only`), treat QA PASS as
+      Accept and promote; operator need not read the PDF. Otherwise wait for
+      explicit Accept checklist.
 - [ ] 9. Copy draft to knowledge/playbooks/ (or dry-run --apply) + manifest
 ```
 
