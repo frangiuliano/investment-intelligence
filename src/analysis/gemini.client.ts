@@ -76,7 +76,7 @@ export class GeminiClient {
         return {
           ...parsed,
           promptVersion: ANALYSIS_PROMPT_VERSION,
-          knowledgeVersion: knowledge.knowledgeVersion,
+          knowledgeVersion: knowledge.injection?.knowledgeVersion ?? null,
         };
       } catch (parseError) {
         throw new GeminiApiError(

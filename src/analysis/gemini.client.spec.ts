@@ -149,6 +149,34 @@ describe('GeminiClient', () => {
     expect(request.system).not.toContain('## Knowledge Pack');
   });
 
+  it('should not persist knowledgeVersion when injection is null even if version is reported', async () => {
+    buildInjection.mockResolvedValue({
+      injection: null,
+      knowledgeVersion: '0.1.0',
+    });
+    completeJson.mockResolvedValue({
+      text: JSON.stringify({
+        headline: 'Oil prices fall on inventories',
+        summary: 'Oil prices fell.',
+        sentiment: 'negative',
+        tickers: ['XOM'],
+        materiality: 'medium',
+        event_type: 'none',
+      }),
+      provider: 'gemini',
+      model: 'gemini-test',
+    });
+
+    const result = await client.analyzeArticle({
+      title: 'Oil slides',
+      source: 'Example',
+      url: 'https://news.example.com/oil',
+      content: null,
+    });
+
+    expect(result.knowledgeVersion).toBeNull();
+  });
+
   it('should instruct Spanish summary and headline when APP_LOCALE is es', async () => {
     locale = 'es';
     completeJson.mockResolvedValue({

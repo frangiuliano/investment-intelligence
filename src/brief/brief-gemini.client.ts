@@ -79,7 +79,7 @@ export class BriefGeminiClient {
         });
         return {
           ...parsed,
-          knowledgeVersion: knowledge.knowledgeVersion,
+          knowledgeVersion: knowledge.injection?.knowledgeVersion ?? null,
         };
       } catch (parseError) {
         throw new BriefGeminiApiError(

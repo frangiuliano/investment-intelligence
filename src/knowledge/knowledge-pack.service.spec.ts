@@ -1,4 +1,6 @@
 import { ConfigService } from '@nestjs/config';
+import { promises as fs } from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { KnowledgePackService } from './knowledge-pack.service';
 
@@ -67,5 +69,32 @@ describe('KnowledgePackService', () => {
     });
     expect(result.injection).toBeNull();
     expect(result.knowledgeVersion).toBeNull();
+  });
+
+  it('retries loading after a transient missing root becomes available', async () => {
+    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'kp-retry-'));
+    const missingRoot = path.join(tmp, 'knowledge');
+    const service = new KnowledgePackService({
+      get: (key: string) => {
+        if (key === 'knowledge.root') {
+          return missingRoot;
+        }
+        if (key === 'knowledge.maxContextChars') {
+          return 12_000;
+        }
+        return undefined;
+      },
+    } as unknown as ConfigService);
+
+    const first = await service.buildInjection({ useCase: 'news-analysis' });
+    expect(first.injection).toBeNull();
+
+    await fs.cp(path.join(process.cwd(), 'knowledge'), missingRoot, {
+      recursive: true,
+    });
+
+    const second = await service.buildInjection({ useCase: 'news-analysis' });
+    expect(second.injection).not.toBeNull();
+    expect(second.knowledgeVersion).toBe('0.1.0');
   });
 });

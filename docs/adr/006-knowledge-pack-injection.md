@@ -28,7 +28,10 @@ Separate from offline `src/knowledge-ingest/` (SOLID: Single Responsibility).
 - **Budget:** `KNOWLEDGE_CONTEXT_MAX_CHARS` (default 12_000). Truncate with an
   explicit marker rather than crashing.
 - **Degradation:** missing root/manifest/file → log + continue with prior
-  prompt shape; `knowledgeVersion` persisted as `null`.
+  prompt shape; `knowledgeVersion` persisted as `null` unless injection was
+  actually appended. Load is retried on later calls until the pack caches.
+- **Path safety:** playbook/rubric paths are resolved with `fs.realpath` and
+  must stay under the pack root (same symlink hardening as ingest).
 
 ### Prompt wiring
 

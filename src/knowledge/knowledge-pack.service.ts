@@ -24,7 +24,6 @@ import {
 export class KnowledgePackService {
   private readonly logger = new Logger(KnowledgePackService.name);
   private cache: LoadedKnowledgePack | null = null;
-  private loadFailed = false;
 
   constructor(private readonly configService: ConfigService) {}
 
@@ -38,10 +37,7 @@ export class KnowledgePackService {
 
     const chunks = this.selectChunks(pack, query);
     if (chunks.length === 0) {
-      return {
-        injection: null,
-        knowledgeVersion: pack.knowledgeVersion,
-      };
+      return { injection: null, knowledgeVersion: null };
     }
 
     const maxChars = this.configService.get<number>(
@@ -53,10 +49,7 @@ export class KnowledgePackService {
     );
 
     if (!assembled.markdown.trim()) {
-      return {
-        injection: null,
-        knowledgeVersion: pack.knowledgeVersion,
-      };
+      return { injection: null, knowledgeVersion: null };
     }
 
     return {
@@ -101,9 +94,6 @@ export class KnowledgePackService {
     if (this.cache) {
       return this.cache;
     }
-    if (this.loadFailed) {
-      return null;
-    }
 
     const root = this.resolveRoot();
     try {
@@ -113,7 +103,6 @@ export class KnowledgePackService {
       );
       return this.cache;
     } catch (error) {
-      this.loadFailed = true;
       this.logger.warn(
         `Knowledge Pack unavailable at ${root}: ${errorMessage(error)}. Continuing without injection.`,
       );
