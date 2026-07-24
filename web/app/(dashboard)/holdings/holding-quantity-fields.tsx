@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label"
 import {
   estimateAcquisitionCost,
   formatAcquisitionCostDisplay,
+  syncHoldingQuantityFieldsOnModeChange,
   type HoldingQuantityMode,
 } from "@/lib/forms/portfolio"
 import { cn } from "@/lib/utils"
@@ -31,6 +32,21 @@ export function HoldingQuantityFields({
   const [investedAmount, setInvestedAmount] = useState("")
   const [avgEntryPrice, setAvgEntryPrice] = useState(defaultAvgEntryPrice)
 
+  function handleModeChange(nextMode: HoldingQuantityMode) {
+    if (nextMode === mode) {
+      return
+    }
+    const synced = syncHoldingQuantityFieldsOnModeChange(nextMode, {
+      quantity,
+      investedAmount,
+      avgEntryPrice,
+    })
+    setMode(synced.mode)
+    setQuantity(synced.quantity)
+    setInvestedAmount(synced.investedAmount)
+    setAvgEntryPrice(synced.avgEntryPrice)
+  }
+
   const estimatedCost =
     mode === "investedAmount"
       ? Number.isFinite(Number(investedAmount)) && Number(investedAmount) > 0
@@ -49,7 +65,7 @@ export function HoldingQuantityFields({
               name="quantityMode"
               value="units"
               checked={mode === "units"}
-              onChange={() => setMode("units")}
+              onChange={() => handleModeChange("units")}
             />
             Por unidades
           </label>
@@ -59,7 +75,7 @@ export function HoldingQuantityFields({
               name="quantityMode"
               value="investedAmount"
               checked={mode === "investedAmount"}
-              onChange={() => setMode("investedAmount")}
+              onChange={() => handleModeChange("investedAmount")}
             />
             Por monto invertido
           </label>

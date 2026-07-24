@@ -7,6 +7,7 @@ import {
   formatDerivedQuantity,
   parseHoldingForm,
   parseWatchlistForm,
+  syncHoldingQuantityFieldsOnModeChange,
 } from "./portfolio"
 
 function holdingFormData(
@@ -83,6 +84,68 @@ describe("formatAcquisitionCostDisplay", () => {
   it("formats estimated cost for display", () => {
     expect(formatAcquisitionCostDisplay(2500)).toBe("2500")
     expect(formatAcquisitionCostDisplay(12.5)).toBe("12.5")
+  })
+})
+
+describe("syncHoldingQuantityFieldsOnModeChange", () => {
+  it("syncs quantity from invested amount when switching to units", () => {
+    expect(
+      syncHoldingQuantityFieldsOnModeChange("units", {
+        quantity: "10",
+        investedAmount: "1000",
+        avgEntryPrice: "200",
+      })
+    ).toEqual({
+      mode: "units",
+      quantity: "5",
+      investedAmount: "1000",
+      avgEntryPrice: "200",
+    })
+  })
+
+  it("keeps the previous quantity when invested amount cannot derive units", () => {
+    expect(
+      syncHoldingQuantityFieldsOnModeChange("units", {
+        quantity: "10",
+        investedAmount: "1000",
+        avgEntryPrice: "",
+      })
+    ).toEqual({
+      mode: "units",
+      quantity: "10",
+      investedAmount: "1000",
+      avgEntryPrice: "",
+    })
+  })
+
+  it("prefills invested amount from quantity × price when switching to amount mode", () => {
+    expect(
+      syncHoldingQuantityFieldsOnModeChange("investedAmount", {
+        quantity: "12.5",
+        investedAmount: "",
+        avgEntryPrice: "200",
+      })
+    ).toEqual({
+      mode: "investedAmount",
+      quantity: "12.5",
+      investedAmount: "2500",
+      avgEntryPrice: "200",
+    })
+  })
+
+  it("keeps invested amount when quantity and price cannot estimate cost", () => {
+    expect(
+      syncHoldingQuantityFieldsOnModeChange("investedAmount", {
+        quantity: "",
+        investedAmount: "500",
+        avgEntryPrice: "200",
+      })
+    ).toEqual({
+      mode: "investedAmount",
+      quantity: "",
+      investedAmount: "500",
+      avgEntryPrice: "200",
+    })
   })
 })
 

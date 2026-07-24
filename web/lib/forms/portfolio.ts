@@ -95,6 +95,52 @@ export function formatAcquisitionCostDisplay(value: number): string {
   return formatDerivedQuantity(value) || "0"
 }
 
+export type HoldingQuantityFieldState = {
+  mode: HoldingQuantityMode
+  quantity: string
+  investedAmount: string
+  avgEntryPrice: string
+}
+
+/**
+ * Keeps quantity and invested amount aligned when the operator switches
+ * load mode, so a derived value is not silently discarded.
+ */
+export function syncHoldingQuantityFieldsOnModeChange(
+  nextMode: HoldingQuantityMode,
+  state: Omit<HoldingQuantityFieldState, "mode">
+): HoldingQuantityFieldState {
+  if (nextMode === "units") {
+    const derived = deriveQuantityFromInvestedAmount(
+      state.investedAmount,
+      state.avgEntryPrice
+    )
+    return {
+      mode: "units",
+      quantity: derived.ok ? derived.value : state.quantity,
+      investedAmount: state.investedAmount,
+      avgEntryPrice: state.avgEntryPrice,
+    }
+  }
+
+  const estimated = estimateAcquisitionCost(
+    state.quantity,
+    state.avgEntryPrice
+  )
+  const prefilledAmount =
+    estimated !== null && estimated > 0
+      ? formatDerivedQuantity(estimated)
+      : ""
+
+  return {
+    mode: "investedAmount",
+    quantity: state.quantity,
+    investedAmount:
+      prefilledAmount !== "" ? prefilledAmount : state.investedAmount,
+    avgEntryPrice: state.avgEntryPrice,
+  }
+}
+
 function resolveQuantityFromForm(
   formData: FormData
 ): ParseResult<{ quantity: string; avgEntryPrice: string | null }> {
