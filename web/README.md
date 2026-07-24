@@ -73,6 +73,19 @@ mirrors the Nest status and body (for example `503` with a JSON payload when
 the database is down). It returns `401` without a valid session and `502`
 only when Nest is unreachable.
 
+## BFF asset suggestions
+
+The Briefs form autocomplete calls a session-protected BFF route that proxies
+Nest `GET /assets/suggest` (API key stays server-side):
+
+```bash
+curl "http://localhost:3001/api/assets/suggest?q=AAP" \
+  -H "Cookie: research_desk_session=<session-cookie>"
+```
+
+Without a valid session the route returns `401`. Empty `q` returns `400`.
+The browser never receives `DASHBOARD_API_KEY`.
+
 ## Quality checks
 
 ```bash
