@@ -14,13 +14,20 @@ import {
 } from "@/components/ui/card"
 import { briefChartSrc, shouldShowBriefChart } from "@/lib/api/brief-chart"
 import { BackendApiError } from "@/lib/api/client"
-import { getBrief } from "@/lib/api/research"
+import { getBrief, listHypotheses } from "@/lib/api/research"
 import {
   BRIEF_SECTION_KEYS,
   type BriefSectionKey,
+  type Hypothesis,
   type ResearchBrief,
 } from "@/lib/api/types"
-import { formatDateTime, stanceLabel, stanceTone } from "@/lib/display"
+import {
+  formatDateTime,
+  hypothesisSourceLabel,
+  stanceLabel,
+  stanceTone,
+} from "@/lib/display"
+import { findHypothesisForBrief } from "@/lib/hypotheses"
 
 export const dynamic = "force-dynamic"
 
@@ -35,6 +42,42 @@ const SECTION_TITLES: Record<BriefSectionKey, string> = {
 
 type BriefDetailPageProps = {
   params: Promise<{ id: string }>
+}
+
+function BriefHypothesisLink({
+  hypothesis,
+}: {
+  hypothesis: Hypothesis | null | undefined
+}) {
+  if (hypothesis === undefined) {
+    return null
+  }
+
+  if (hypothesis === null) {
+    return (
+      <p className="mt-4 text-sm text-muted-foreground">
+        Este informe no tiene una hipótesis vinculada (suele ocurrir si no hubo
+        postura o faltaron datos de mercado).
+      </p>
+    )
+  }
+
+  const statusLabel = hypothesis.status === "open" ? "abierta" : "cerrada"
+
+  return (
+    <p className="mt-4 text-sm">
+      <span className="text-muted-foreground">Hipótesis {statusLabel}</span>
+      {" · "}
+      <Badge tone="positive">{hypothesisSourceLabel(hypothesis.source)}</Badge>
+      {" "}
+      <Link
+        href={`/hypotheses#hypothesis-${hypothesis.id}`}
+        className="font-medium underline decoration-ink/30 underline-offset-2 transition-colors hover:text-foreground hover:decoration-ink/60"
+      >
+        Ver en Hipótesis
+      </Link>
+    </p>
+  )
 }
 
 export default async function BriefDetailPage({
@@ -54,6 +97,17 @@ export default async function BriefDetailPage({
         <ErrorState message="No se pudo cargar el informe. Verificá que la API Nest esté activa y recargá la página." />
       </section>
     )
+  }
+
+  let linkedHypothesis: Hypothesis | null | undefined
+  try {
+    const matches = await listHypotheses({
+      source: "brief",
+      sourceRefId: brief.id,
+    })
+    linkedHypothesis = findHypothesisForBrief(matches, brief.id)
+  } catch {
+    linkedHypothesis = undefined
   }
 
   const contentSections = BRIEF_SECTION_KEYS.filter(
@@ -95,6 +149,7 @@ export default async function BriefDetailPage({
             {brief.stanceRationale}
           </p>
         ) : null}
+        <BriefHypothesisLink hypothesis={linkedHypothesis} />
         <div className="mt-6">
           <FeedbackButtons
             targetType="brief"

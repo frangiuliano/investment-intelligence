@@ -19,8 +19,12 @@ export class HypothesesController {
   constructor(private readonly hypothesesService: HypothesesService) {}
 
   @Get()
-  async list(@Query('status') status?: string) {
-    return this.hypothesesService.findAll(status);
+  async list(
+    @Query('status') status?: string,
+    @Query('source') source?: string,
+    @Query('sourceRefId') sourceRefId?: string,
+  ) {
+    return this.hypothesesService.findAll(status, source, sourceRefId);
   }
 
   @Post()

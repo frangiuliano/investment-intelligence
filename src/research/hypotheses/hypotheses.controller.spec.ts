@@ -37,7 +37,15 @@ describe('HypothesesController', () => {
 
   it('should list hypotheses using the requested status', async () => {
     await expect(controller.list('open')).resolves.toEqual([sampleHypothesis]);
-    expect(findAll).toHaveBeenCalledWith('open');
+    expect(findAll).toHaveBeenCalledWith('open', undefined, undefined);
+  });
+
+  it('should forward source and sourceRefId filters', async () => {
+    const briefId = '22222222-2222-4222-8222-222222222222';
+    await expect(controller.list('open', 'brief', briefId)).resolves.toEqual([
+      sampleHypothesis,
+    ]);
+    expect(findAll).toHaveBeenCalledWith('open', 'brief', briefId);
   });
 
   it('should create a hypothesis', async () => {

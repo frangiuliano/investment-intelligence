@@ -131,10 +131,50 @@ export class HypothesesService {
     });
   }
 
-  async findAll(status?: string): Promise<Hypothesis[]> {
-    const parsedStatus = this.parseStatus(status ?? HypothesisStatus.OPEN);
+  async findAll(
+    status?: string,
+    source?: string,
+    sourceRefId?: string,
+  ): Promise<Hypothesis[]> {
+    const where: {
+      status?: HypothesisStatus;
+      source?: HypothesisSource;
+      sourceRefId?: string;
+    } = {};
+
+    const hasSourceRef =
+      sourceRefId !== undefined &&
+      sourceRefId !== null &&
+      String(sourceRefId).trim() !== '';
+
+    if (
+      status !== undefined &&
+      status !== null &&
+      String(status).trim() !== ''
+    ) {
+      where.status = this.parseStatus(status);
+    } else if (!hasSourceRef) {
+      where.status = HypothesisStatus.OPEN;
+    }
+
+    if (
+      source !== undefined &&
+      source !== null &&
+      String(source).trim() !== ''
+    ) {
+      where.source = this.parseSource(source);
+    }
+
+    if (hasSourceRef) {
+      const parsedRef = this.parseSourceRefId(sourceRefId);
+      if (!parsedRef) {
+        throw new BadRequestException('sourceRefId must be a valid UUID');
+      }
+      where.sourceRefId = parsedRef;
+    }
+
     return this.hypothesesRepository.find({
-      where: { status: parsedStatus },
+      where,
       order: { createdAt: 'DESC' },
     });
   }
