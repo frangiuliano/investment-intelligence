@@ -2,10 +2,12 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { QueryFailedError, Repository } from 'typeorm';
+import { mapBriefStanceToBias } from './brief-stance-to-bias';
 import {
   Hypothesis,
   HypothesisBias,
@@ -33,12 +35,22 @@ export interface CreateHypothesisInput {
 /** Default review horizon when the operator omits `horizonDays`. */
 export const DEFAULT_HYPOTHESIS_HORIZON_DAYS = 30;
 
+export interface CreateHypothesisFromBriefInput {
+  briefId: string;
+  symbol: string;
+  stance: string;
+  thesis: string;
+  invalidation: string;
+}
+
 export interface CloseHypothesisInput {
   closeNote?: string | null;
 }
 
 @Injectable()
 export class HypothesesService {
+  private readonly logger = new Logger(HypothesesService.name);
+
   constructor(
     @InjectRepository(Hypothesis)
     private readonly hypothesesRepository: Repository<Hypothesis>,
@@ -63,6 +75,60 @@ export class HypothesesService {
     });
 
     return this.hypothesesRepository.save(hypothesis);
+  }
+
+  /**
+   * Opens a journal hypothesis linked to a research brief with a validated
+   * stance. Idempotent on `(source=brief, sourceRefId=briefId)`.
+   */
+  async createFromBrief(
+    input: CreateHypothesisFromBriefInput,
+  ): Promise<Hypothesis | null> {
+    const bias = mapBriefStanceToBias(input.stance);
+    if (!bias) {
+      this.logger.warn(
+        `Skipping hypothesis for brief ${input.briefId}: unknown stance "${input.stance}"`,
+      );
+      return null;
+    }
+
+    const existing = await this.findByBriefId(input.briefId);
+    if (existing) {
+      return existing;
+    }
+
+    try {
+      return await this.create({
+        symbol: input.symbol,
+        bias,
+        thesis: input.thesis,
+        invalidation: input.invalidation,
+        source: HypothesisSource.BRIEF,
+        sourceRefId: input.briefId,
+      });
+    } catch (error) {
+      if (!isUniqueViolation(error)) {
+        throw error;
+      }
+      const raced = await this.findByBriefId(input.briefId);
+      if (raced) {
+        return raced;
+      }
+      throw error;
+    }
+  }
+
+  async findByBriefId(briefId: string): Promise<Hypothesis | null> {
+    const sourceRefId = this.parseSourceRefId(briefId);
+    if (!sourceRefId) {
+      return null;
+    }
+    return this.hypothesesRepository.findOne({
+      where: {
+        source: HypothesisSource.BRIEF,
+        sourceRefId,
+      },
+    });
   }
 
   async findAll(status?: string): Promise<Hypothesis[]> {
@@ -214,4 +280,14 @@ export class HypothesesService {
     }
     return normalized === '' ? null : normalized;
   }
+}
+
+function isUniqueViolation(error: unknown): boolean {
+  return (
+    error instanceof QueryFailedError &&
+    typeof error.driverError === 'object' &&
+    error.driverError !== null &&
+    'code' in error.driverError &&
+    (error.driverError as { code?: string }).code === '23505'
+  );
 }

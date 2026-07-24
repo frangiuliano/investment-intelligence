@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { QueryFailedError } from 'typeorm';
 import {
   Hypothesis,
   HypothesisBias,
@@ -190,5 +191,91 @@ describe('HypothesesService', () => {
     await expect(service.close(sampleHypothesis.id, {})).rejects.toBeInstanceOf(
       NotFoundException,
     );
+  });
+
+  describe('createFromBrief', () => {
+    const briefId = '22222222-2222-4222-8222-222222222222';
+
+    it('creates an open brief-sourced hypothesis with mapped bias and default horizon', async () => {
+      findOne.mockResolvedValue(null);
+
+      const hypothesis = await service.createFromBrief({
+        briefId,
+        symbol: 'aapl',
+        stance: 'enter',
+        thesis: 'Uptrend on verified closes',
+        invalidation: 'Break of support',
+      });
+
+      expect(create).toHaveBeenCalledWith({
+        symbol: 'AAPL',
+        bias: HypothesisBias.BULLISH,
+        thesis: 'Uptrend on verified closes',
+        invalidation: 'Break of support',
+        horizonDays: 30,
+        status: HypothesisStatus.OPEN,
+        source: HypothesisSource.BRIEF,
+        sourceRefId: briefId,
+        closedAt: null,
+        closeNote: null,
+      });
+      expect(hypothesis?.source).toBe(HypothesisSource.BRIEF);
+      expect(hypothesis?.sourceRefId).toBe(briefId);
+    });
+
+    it('returns the existing hypothesis when one is already linked to the brief', async () => {
+      const existing = {
+        ...sampleHypothesis,
+        source: HypothesisSource.BRIEF,
+        sourceRefId: briefId,
+      };
+      findOne.mockResolvedValue(existing);
+
+      await expect(
+        service.createFromBrief({
+          briefId,
+          symbol: 'AAPL',
+          stance: 'enter',
+          thesis: 'Uptrend',
+          invalidation: 'Break',
+        }),
+      ).resolves.toEqual(existing);
+      expect(save).not.toHaveBeenCalled();
+    });
+
+    it('is idempotent when a unique violation races another insert', async () => {
+      const existing = {
+        ...sampleHypothesis,
+        source: HypothesisSource.BRIEF,
+        sourceRefId: briefId,
+      };
+      findOne.mockResolvedValueOnce(null).mockResolvedValueOnce(existing);
+      save.mockRejectedValueOnce(
+        new QueryFailedError('INSERT', [], { code: '23505' }),
+      );
+
+      await expect(
+        service.createFromBrief({
+          briefId,
+          symbol: 'AAPL',
+          stance: 'hold',
+          thesis: 'Hold thesis',
+          invalidation: 'Exit trigger',
+        }),
+      ).resolves.toEqual(existing);
+    });
+
+    it('skips unknown stance values without creating', async () => {
+      await expect(
+        service.createFromBrief({
+          briefId,
+          symbol: 'AAPL',
+          stance: 'buy',
+          thesis: 'Thesis',
+          invalidation: 'Invalidation',
+        }),
+      ).resolves.toBeNull();
+      expect(save).not.toHaveBeenCalled();
+    });
   });
 });
