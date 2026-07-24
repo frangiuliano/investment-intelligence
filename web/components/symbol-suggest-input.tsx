@@ -14,6 +14,7 @@ import {
   ASSET_SUGGEST_DEBOUNCE_MS,
   assetSuggestSrc,
   shouldFetchAssetSuggestions,
+  shouldSelectSuggestionOnEnter,
 } from "@/lib/api/asset-suggest"
 import type { AssetSuggestion, AssetSuggestResult } from "@/lib/api/types"
 import { cn } from "@/lib/utils"
@@ -44,56 +45,67 @@ export function SymbolSuggestInput({
   const [open, setOpen] = useState(false)
   const [activeIndex, setActiveIndex] = useState(-1)
 
-  const fetchSuggestions = useEffectEvent(async (value: string) => {
+  const fetchSuggestions = useEffectEvent(
+    async (value: string, signal: AbortSignal) => {
+      try {
+        const response = await fetch(assetSuggestSrc(value), {
+          method: "GET",
+          cache: "no-store",
+          signal,
+        })
+
+        if (signal.aborted) {
+          return
+        }
+
+        if (!response.ok) {
+          setItems([])
+          setStatus("error")
+          setActiveIndex(-1)
+          return
+        }
+
+        const body = (await response.json()) as AssetSuggestResult
+        if (signal.aborted) {
+          return
+        }
+
+        const nextItems = Array.isArray(body.items) ? body.items : []
+        setItems(nextItems)
+        setStatus(nextItems.length === 0 ? "empty" : "ready")
+        // Leave highlight unset so Enter submits the typed ticker unless the
+        // operator navigates with arrows or hover.
+        setActiveIndex(-1)
+        setOpen(true)
+      } catch (error) {
+        if (signal.aborted || isAbortError(error)) {
+          return
+        }
+        setItems([])
+        setStatus("error")
+        setActiveIndex(-1)
+      }
+    }
+  )
+
+  useEffect(() => {
     if (skipNextFetchRef.current) {
       skipNextFetchRef.current = false
       return
     }
 
-    if (!shouldFetchAssetSuggestions(value)) {
-      setItems([])
-      setStatus("idle")
-      setOpen(false)
-      setActiveIndex(-1)
+    if (!shouldFetchAssetSuggestions(query)) {
       return
     }
 
-    setStatus("loading")
-    setOpen(true)
-
-    try {
-      const response = await fetch(assetSuggestSrc(value), {
-        method: "GET",
-        cache: "no-store",
-      })
-
-      if (!response.ok) {
-        setItems([])
-        setStatus("error")
-        setActiveIndex(-1)
-        return
-      }
-
-      const body = (await response.json()) as AssetSuggestResult
-      const nextItems = Array.isArray(body.items) ? body.items : []
-      setItems(nextItems)
-      setStatus(nextItems.length === 0 ? "empty" : "ready")
-      setActiveIndex(nextItems.length > 0 ? 0 : -1)
-      setOpen(true)
-    } catch {
-      setItems([])
-      setStatus("error")
-      setActiveIndex(-1)
-    }
-  })
-
-  useEffect(() => {
+    const controller = new AbortController()
     const handle = window.setTimeout(() => {
-      void fetchSuggestions(query)
+      void fetchSuggestions(query, controller.signal)
     }, ASSET_SUGGEST_DEBOUNCE_MS)
 
     return () => {
       window.clearTimeout(handle)
+      controller.abort()
     }
   }, [query])
 
@@ -109,6 +121,23 @@ export function SymbolSuggestInput({
     return () => document.removeEventListener("mousedown", onPointerDown)
   }, [])
 
+  function resetSuggestionsForTypedQuery(value: string) {
+    if (!shouldFetchAssetSuggestions(value)) {
+      setItems([])
+      setStatus("idle")
+      setOpen(false)
+      setActiveIndex(-1)
+      return
+    }
+
+    // Drop previous results immediately so debounce never shows/selects stale
+    // suggestions for another query.
+    setItems([])
+    setActiveIndex(-1)
+    setStatus("loading")
+    setOpen(true)
+  }
+
   function selectSuggestion(item: AssetSuggestion) {
     skipNextFetchRef.current = true
     setQuery(item.symbol)
@@ -120,7 +149,7 @@ export function SymbolSuggestInput({
 
   function onKeyDown(event: KeyboardEvent<HTMLInputElement>) {
     if (!open) {
-      if (event.key === "ArrowDown" && items.length > 0) {
+      if (event.key === "ArrowDown" && status === "ready" && items.length > 0) {
         event.preventDefault()
         setOpen(true)
         setActiveIndex(0)
@@ -137,7 +166,7 @@ export function SymbolSuggestInput({
 
     if (event.key === "ArrowDown") {
       event.preventDefault()
-      if (items.length === 0) {
+      if (status !== "ready" || items.length === 0) {
         return
       }
       setActiveIndex((current) =>
@@ -148,7 +177,7 @@ export function SymbolSuggestInput({
 
     if (event.key === "ArrowUp") {
       event.preventDefault()
-      if (items.length === 0) {
+      if (status !== "ready" || items.length === 0) {
         return
       }
       setActiveIndex((current) =>
@@ -157,7 +186,13 @@ export function SymbolSuggestInput({
       return
     }
 
-    if (event.key === "Enter" && activeIndex >= 0 && items[activeIndex]) {
+    // Enter selects only after explicit highlight (arrows/hover). Otherwise
+    // the form submits the typed symbol. Never select while loading/stale.
+    if (
+      event.key === "Enter" &&
+      shouldSelectSuggestionOnEnter(status, activeIndex, items.length) &&
+      items[activeIndex]
+    ) {
       event.preventDefault()
       selectSuggestion(items[activeIndex])
     }
@@ -172,7 +207,7 @@ export function SymbolSuggestInput({
       status === "error")
 
   const activeOptionId =
-    activeIndex >= 0 && items[activeIndex]
+    status === "ready" && activeIndex >= 0 && items[activeIndex]
       ? `${listboxId}-option-${activeIndex}`
       : undefined
 
@@ -182,8 +217,9 @@ export function SymbolSuggestInput({
         name={name}
         value={query}
         onChange={(event) => {
-          setQuery(event.target.value)
-          setOpen(true)
+          const value = event.target.value
+          setQuery(value)
+          resetSuggestionsForTypedQuery(value)
         }}
         onFocus={() => {
           if (shouldFetchAssetSuggestions(query)) {
@@ -269,4 +305,8 @@ export function SymbolSuggestInput({
       ) : null}
     </div>
   )
+}
+
+function isAbortError(error: unknown): boolean {
+  return error instanceof DOMException && error.name === "AbortError"
 }

@@ -4,6 +4,7 @@ import {
   assetSuggestSrc,
   mapAssetSuggestProxyStatus,
   shouldFetchAssetSuggestions,
+  shouldSelectSuggestionOnEnter,
 } from "./asset-suggest"
 
 describe("asset suggest helpers", () => {
@@ -27,5 +28,12 @@ describe("asset suggest helpers", () => {
     expect(mapAssetSuggestProxyStatus(403)).toBe(401)
     expect(mapAssetSuggestProxyStatus(503)).toBe(503)
     expect(mapAssetSuggestProxyStatus(500)).toBe(502)
+  })
+
+  it("only confirms Enter on a ready highlighted suggestion", () => {
+    expect(shouldSelectSuggestionOnEnter("loading", 0, 3)).toBe(false)
+    expect(shouldSelectSuggestionOnEnter("ready", -1, 3)).toBe(false)
+    expect(shouldSelectSuggestionOnEnter("ready", 0, 3)).toBe(true)
+    expect(shouldSelectSuggestionOnEnter("ready", 3, 3)).toBe(false)
   })
 })

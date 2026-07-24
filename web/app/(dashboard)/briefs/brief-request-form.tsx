@@ -28,8 +28,9 @@ export function BriefRequestForm() {
         </SubmitButton>
       </div>
       <p className="text-xs text-muted-foreground">
-        Empezá a escribir un símbolo o el nombre de la empresa y elegí una
-        sugerencia.
+        Empezá a escribir un símbolo o el nombre; elegí con click o flechas +
+        Enter. Enter sin resaltar envía el texto escrito; Escape cierra la
+        lista.
       </p>
       <ActionMessage state={state} />
     </form>

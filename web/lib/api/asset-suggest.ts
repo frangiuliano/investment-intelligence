@@ -24,3 +24,14 @@ export function mapAssetSuggestProxyStatus(
   }
   return 502
 }
+
+/** Enter confirms a list option only when results are ready and highlighted. */
+export function shouldSelectSuggestionOnEnter(
+  status: "idle" | "loading" | "ready" | "empty" | "error",
+  activeIndex: number,
+  itemCount: number
+): boolean {
+  return (
+    status === "ready" && activeIndex >= 0 && activeIndex < itemCount
+  )
+}
