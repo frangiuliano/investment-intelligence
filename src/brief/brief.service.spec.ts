@@ -7,6 +7,7 @@ import { MarketDataService } from '../market-data/market-data.service';
 import { MarketSeries } from '../market-data/market-data.types';
 import { TelegramClient } from '../notifications/telegram.client';
 import { HoldingsService } from '../portfolio/holdings/holdings.service';
+import { HypothesesService } from '../research/hypotheses/hypotheses.service';
 import { BriefGeminiClient } from './brief-gemini.client';
 import { BriefService } from './brief.service';
 import { BriefGenerationResult, BriefSections } from './brief.types';
@@ -57,6 +58,7 @@ describe('BriefService', () => {
     update?: jest.Mock;
     chartEnabled?: boolean;
     renderTechnicalChart?: jest.Mock;
+    createFromBrief?: jest.Mock;
   }) {
     const holdingsService = {
       findBySymbol: jest.fn().mockResolvedValue(overrides?.holdings ?? []),
@@ -97,8 +99,14 @@ describe('BriefService', () => {
       renderTechnicalChart,
     } as unknown as TechnicalChartService;
 
+    const createFromBrief =
+      overrides?.createFromBrief ?? jest.fn().mockResolvedValue(null);
+    const hypothesesService = {
+      createFromBrief,
+    } as unknown as HypothesesService;
+
     const saved: ResearchBrief = {
-      id: 'brief-1',
+      id: '11111111-1111-4111-8111-111111111111',
       symbol: 'AAPL',
       locale: 'en',
       sections,
@@ -143,6 +151,7 @@ describe('BriefService', () => {
       briefGeminiClient,
       technicalChartService,
       telegramClient,
+      hypothesesService,
       repository,
     );
 
@@ -156,6 +165,7 @@ describe('BriefService', () => {
       renderTechnicalChart,
       save,
       update,
+      createFromBrief,
     };
   }
 
@@ -172,6 +182,7 @@ describe('BriefService', () => {
       sendMessage,
       save,
       getSeries,
+      createFromBrief,
     } = createService({ generateBrief });
 
     const result = await service.requestBrief('aapl');
@@ -203,6 +214,13 @@ describe('BriefService', () => {
     expect(sendMessage).toHaveBeenCalledWith(
       expect.stringContaining('Not a broker order'),
     );
+    expect(createFromBrief).toHaveBeenCalledWith({
+      briefId: '11111111-1111-4111-8111-111111111111',
+      symbol: 'AAPL',
+      stance: 'enter',
+      thesis: 'Uptrend on verified window closes',
+      invalidation: 'invalidation',
+    });
   });
 
   it('persists position-relative stance when a holding exists', async () => {
@@ -217,6 +235,7 @@ describe('BriefService', () => {
       generateBrief: generate,
       save,
       sendMessage,
+      createFromBrief,
     } = createService({
       holdings: [
         {
@@ -253,6 +272,12 @@ describe('BriefService', () => {
     expect(sendMessage).toHaveBeenCalledWith(
       expect.stringContaining('relative to that position'),
     );
+    expect(createFromBrief).toHaveBeenCalledWith(
+      expect.objectContaining({
+        stance: 'hold',
+        thesis: 'Position intact; no exit trigger on verified data',
+      }),
+    );
   });
 
   it('omits stance and does not invent prices when market data is unavailable', async () => {
@@ -267,7 +292,7 @@ describe('BriefService', () => {
       .mockRejectedValue(
         new MarketDataUnavailableError('AAPL', 'not_found', 'missing'),
       );
-    const { service, save, sendMessage } = createService({
+    const { service, save, sendMessage, createFromBrief } = createService({
       generateBrief,
       getSeries,
     });
@@ -291,6 +316,7 @@ describe('BriefService', () => {
     expect(sendMessage).toHaveBeenCalledWith(
       expect.stringContaining('Stance was not issued'),
     );
+    expect(createFromBrief).not.toHaveBeenCalled();
   });
 
   it('persists educational brief with null stance when Gemini stance is invalid', async () => {
@@ -300,7 +326,9 @@ describe('BriefService', () => {
       stanceRationale: null,
       knowledgeVersion: '0.1.0',
     } satisfies BriefGenerationResult);
-    const { service, save, sendMessage } = createService({ generateBrief });
+    const { service, save, sendMessage, createFromBrief } = createService({
+      generateBrief,
+    });
 
     const result = await service.requestBrief('AAPL');
 
@@ -319,6 +347,21 @@ describe('BriefService', () => {
     expect(sendMessage).toHaveBeenCalledWith(
       expect.stringContaining('disclaimer not advice'),
     );
+    expect(createFromBrief).not.toHaveBeenCalled();
+  });
+
+  it('keeps the brief when opening a hypothesis fails', async () => {
+    const createFromBrief = jest
+      .fn()
+      .mockRejectedValue(new Error('journal down'));
+    const { service, save } = createService({ createFromBrief });
+
+    const result = await service.requestBrief('AAPL');
+
+    expect(result.ok).toBe(true);
+    expect(result.brief?.symbol).toBe('AAPL');
+    expect(save).toHaveBeenCalled();
+    expect(createFromBrief).toHaveBeenCalled();
   });
 
   it('sends usage message for invalid tickers without calling Gemini', async () => {
@@ -379,7 +422,7 @@ describe('BriefService', () => {
       expect.objectContaining({ symbol: 'AAPL', bars: seriesFixture.bars }),
     );
     expect(update).toHaveBeenCalledWith(
-      'brief-1',
+      '11111111-1111-4111-8111-111111111111',
       expect.objectContaining({
         chartPng: expect.any(Buffer) as Buffer,
       }),
@@ -450,7 +493,7 @@ describe('BriefService', () => {
 
     expect(result.ok).toBe(true);
     expect(update).toHaveBeenCalledWith(
-      'brief-1',
+      '11111111-1111-4111-8111-111111111111',
       expect.objectContaining({
         chartPng: expect.any(Buffer) as Buffer,
       }),
@@ -475,7 +518,7 @@ describe('BriefService', () => {
     expect(result.brief?.symbol).toBe('AAPL');
     expect(result.message).toContain('delivery failed');
     expect(update).toHaveBeenCalledWith(
-      'brief-1',
+      '11111111-1111-4111-8111-111111111111',
       expect.objectContaining({
         chartPng: expect.any(Buffer) as Buffer,
       }),

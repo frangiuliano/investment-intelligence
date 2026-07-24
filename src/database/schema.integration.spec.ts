@@ -44,6 +44,7 @@ import { AddResearchBriefStance1752590000000 } from './migrations/1752590000000-
 import { AddResearchBriefChartPng1752600000000 } from './migrations/1752600000000-AddResearchBriefChartPng';
 import { AddKnowledgeVersionColumns1752610000000 } from './migrations/1752610000000-AddKnowledgeVersionColumns';
 import { CreateOperatorFeedback1752620000000 } from './migrations/1752620000000-CreateOperatorFeedback';
+import { AddHypothesesSourceRefUnique1752630000000 } from './migrations/1752630000000-AddHypothesesSourceRefUnique';
 import {
   DEFAULT_TEST_DATABASE_URL,
   resolveTestDatabaseUrl,
@@ -107,6 +108,7 @@ describe('Database schema (integration)', () => {
         AddResearchBriefChartPng1752600000000,
         AddKnowledgeVersionColumns1752610000000,
         CreateOperatorFeedback1752620000000,
+        AddHypothesesSourceRefUnique1752630000000,
       ],
       synchronize: false,
       logging: false,
@@ -544,6 +546,39 @@ describe('Database schema (integration)', () => {
       }),
     );
     expect(fromBrief.sourceRefId).toBe(brief.id);
+
+    await expect(
+      hypotheses.save(
+        hypotheses.create({
+          symbol: 'AAPL',
+          bias: HypothesisBias.BULLISH,
+          thesis: 'Duplicate link must fail.',
+          invalidation: 'Should not insert.',
+          horizonDays: 30,
+          status: HypothesisStatus.OPEN,
+          source: HypothesisSource.BRIEF,
+          sourceRefId: brief.id,
+          closedAt: null,
+          closeNote: null,
+        }),
+      ),
+    ).rejects.toBeInstanceOf(QueryFailedError);
+
+    const secondManual = await hypotheses.save(
+      hypotheses.create({
+        symbol: 'MSFT',
+        bias: HypothesisBias.WATCH,
+        thesis: 'Manual hypotheses may omit source_ref_id.',
+        invalidation: 'Still allowed when null.',
+        horizonDays: 30,
+        status: HypothesisStatus.OPEN,
+        source: HypothesisSource.MANUAL,
+        sourceRefId: null,
+        closedAt: null,
+        closeNote: null,
+      }),
+    );
+    expect(secondManual.sourceRefId).toBeNull();
   });
 
   it('should persist hypothesis reviews linked to a run', async () => {

@@ -7,6 +7,7 @@ import { LlmModule } from '../llm/llm.module';
 import { MarketDataModule } from '../market-data/market-data.module';
 import { NotificationsModule } from '../notifications/notifications.module';
 import { PortfolioModule } from '../portfolio/portfolio.module';
+import { ResearchModule } from '../research/research.module';
 import { BriefGeminiClient } from './brief-gemini.client';
 import { BriefService } from './brief.service';
 import { BriefsController } from './briefs.controller';
@@ -22,6 +23,7 @@ import { ResearchBrief } from './entities/research-brief.entity';
     NotificationsModule,
     LlmModule,
     KnowledgeModule,
+    ResearchModule,
   ],
   controllers: [BriefsController],
   providers: [

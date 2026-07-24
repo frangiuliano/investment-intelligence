@@ -13,6 +13,7 @@ import { MarketDataUnavailableError } from '../market-data/market-data.errors';
 import { MarketDataService } from '../market-data/market-data.service';
 import { TelegramClient } from '../notifications/telegram.client';
 import { HoldingsService } from '../portfolio/holdings/holdings.service';
+import { HypothesesService } from '../research/hypotheses/hypotheses.service';
 import { BRIEF_TICKER_PATTERN } from './brief.constants';
 import { BriefGeminiClient } from './brief-gemini.client';
 import { buildMarketFactsBlock } from './brief-market-facts';
@@ -52,6 +53,7 @@ export class BriefService {
     private readonly briefGeminiClient: BriefGeminiClient,
     private readonly technicalChartService: TechnicalChartService,
     private readonly telegramClient: TelegramClient,
+    private readonly hypothesesService: HypothesesService,
     @InjectRepository(ResearchBrief)
     private readonly researchBriefsRepository: Repository<ResearchBrief>,
   ) {}
@@ -112,6 +114,8 @@ export class BriefService {
           holdingId: holdingLookup?.holdingId ?? null,
         }),
       );
+
+      await this.openHypothesisFromBrief(persistedBrief);
 
       const message = formatBriefMessage(
         {
@@ -180,6 +184,41 @@ export class BriefService {
       throw new BadRequestException(result.message);
     }
     return result.brief;
+  }
+
+  /**
+   * Fail-soft: a journal write must never undo an already-persisted brief.
+   * Only briefs with a validated stance open a hypothesis (idempotent).
+   */
+  private async openHypothesisFromBrief(brief: ResearchBrief): Promise<void> {
+    if (!brief.stance) {
+      return;
+    }
+
+    const thesis =
+      brief.stanceRationale?.trim() || brief.sections.overview.trim();
+    const invalidation = brief.sections.invalidation.trim();
+    if (!thesis || !invalidation) {
+      this.logger.warn(
+        `Skipping hypothesis for brief ${brief.id}: missing thesis or invalidation text`,
+      );
+      return;
+    }
+
+    try {
+      await this.hypothesesService.createFromBrief({
+        briefId: brief.id,
+        symbol: brief.symbol,
+        stance: brief.stance,
+        thesis,
+        invalidation,
+      });
+    } catch (error) {
+      const detail = error instanceof Error ? error.message : String(error);
+      this.logger.error(
+        `Failed to open hypothesis from brief ${brief.id}: ${detail}`,
+      );
+    }
   }
 
   /**
