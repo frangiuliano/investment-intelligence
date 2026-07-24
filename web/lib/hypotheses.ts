@@ -23,6 +23,10 @@ export function partitionOpenHypotheses(
   return { fromReports, manual }
 }
 
+function sameUuid(left: string, right: string): boolean {
+  return left.toLowerCase() === right.toLowerCase()
+}
+
 export function findHypothesisForBrief(
   hypotheses: Hypothesis[],
   briefId: string
@@ -30,7 +34,9 @@ export function findHypothesisForBrief(
   return (
     hypotheses.find(
       (hypothesis) =>
-        hypothesis.source === "brief" && hypothesis.sourceRefId === briefId
+        hypothesis.source === "brief" &&
+        hypothesis.sourceRefId !== null &&
+        sameUuid(hypothesis.sourceRefId, briefId)
     ) ?? null
   )
 }

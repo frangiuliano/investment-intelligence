@@ -103,9 +103,9 @@ export default async function BriefDetailPage({
   try {
     const matches = await listHypotheses({
       source: "brief",
-      sourceRefId: id,
+      sourceRefId: brief.id,
     })
-    linkedHypothesis = findHypothesisForBrief(matches, id)
+    linkedHypothesis = findHypothesisForBrief(matches, brief.id)
   } catch {
     linkedHypothesis = undefined
   }

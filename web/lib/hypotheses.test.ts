@@ -67,4 +67,19 @@ describe("findHypothesisForBrief", () => {
       )
     ).toBeNull()
   })
+
+  it("matches sourceRefId regardless of UUID casing", () => {
+    const linked = hypothesis({
+      id: "h1",
+      source: "brief",
+      sourceRefId: "aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee",
+    })
+
+    expect(
+      findHypothesisForBrief(
+        [linked],
+        "AAAAAAAA-BBBB-4CCC-8DDD-EEEEEEEEEEEE"
+      )
+    ).toEqual(linked)
+  })
 })
