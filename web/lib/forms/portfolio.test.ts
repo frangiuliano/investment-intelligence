@@ -1,6 +1,14 @@
 import { describe, expect, it } from "vitest"
 
-import { parseHoldingForm, parseWatchlistForm } from "./portfolio"
+import {
+  deriveQuantityFromInvestedAmount,
+  estimateAcquisitionCost,
+  formatAcquisitionCostDisplay,
+  formatDerivedQuantity,
+  parseHoldingForm,
+  parseWatchlistForm,
+  syncHoldingQuantityFieldsOnModeChange,
+} from "./portfolio"
 
 function holdingFormData(
   overrides: Record<string, string> = {}
@@ -16,10 +24,130 @@ function holdingFormData(
     ...overrides,
   }
   for (const [key, value] of Object.entries(fields)) {
+    if (value === "__omit__") {
+      continue
+    }
     formData.set(key, value)
   }
   return formData
 }
+
+describe("formatDerivedQuantity", () => {
+  it("trims trailing zeros from fixed precision", () => {
+    expect(formatDerivedQuantity(5)).toBe("5")
+    expect(formatDerivedQuantity(5.12)).toBe("5.12")
+    expect(formatDerivedQuantity(0.5)).toBe("0.5")
+  })
+
+  it("returns empty string for non-positive values", () => {
+    expect(formatDerivedQuantity(0)).toBe("")
+    expect(formatDerivedQuantity(-1)).toBe("")
+  })
+})
+
+describe("deriveQuantityFromInvestedAmount", () => {
+  it("derives units from invested amount and entry price", () => {
+    expect(deriveQuantityFromInvestedAmount("1000", "200")).toEqual({
+      ok: true,
+      value: "5",
+    })
+  })
+
+  it("rejects invested amount without a positive entry price", () => {
+    expect(deriveQuantityFromInvestedAmount("1000", "").ok).toBe(false)
+    expect(deriveQuantityFromInvestedAmount("1000", "0").ok).toBe(false)
+    const missingPrice = deriveQuantityFromInvestedAmount("1000", "")
+    expect(missingPrice.ok).toBe(false)
+    if (!missingPrice.ok) {
+      expect(missingPrice.error).toMatch(/precio promedio de entrada/i)
+    }
+  })
+
+  it("rejects a non-positive invested amount", () => {
+    expect(deriveQuantityFromInvestedAmount("0", "200").ok).toBe(false)
+    expect(deriveQuantityFromInvestedAmount("", "200").ok).toBe(false)
+  })
+})
+
+describe("estimateAcquisitionCost", () => {
+  it("multiplies quantity by entry price when both are present", () => {
+    expect(estimateAcquisitionCost("12.5", "200")).toBe(2500)
+  })
+
+  it("returns null when data is incomplete", () => {
+    expect(estimateAcquisitionCost("10", null)).toBeNull()
+    expect(estimateAcquisitionCost("", "10")).toBeNull()
+  })
+})
+
+describe("formatAcquisitionCostDisplay", () => {
+  it("formats estimated cost for display", () => {
+    expect(formatAcquisitionCostDisplay(2500)).toBe("2500")
+    expect(formatAcquisitionCostDisplay(12.5)).toBe("12.5")
+  })
+})
+
+describe("syncHoldingQuantityFieldsOnModeChange", () => {
+  it("syncs quantity from invested amount when switching to units", () => {
+    expect(
+      syncHoldingQuantityFieldsOnModeChange("units", {
+        quantity: "10",
+        investedAmount: "1000",
+        avgEntryPrice: "200",
+      })
+    ).toEqual({
+      mode: "units",
+      quantity: "5",
+      investedAmount: "1000",
+      avgEntryPrice: "200",
+    })
+  })
+
+  it("keeps the previous quantity when invested amount cannot derive units", () => {
+    expect(
+      syncHoldingQuantityFieldsOnModeChange("units", {
+        quantity: "10",
+        investedAmount: "1000",
+        avgEntryPrice: "",
+      })
+    ).toEqual({
+      mode: "units",
+      quantity: "10",
+      investedAmount: "1000",
+      avgEntryPrice: "",
+    })
+  })
+
+  it("prefills invested amount from quantity × price when switching to amount mode", () => {
+    expect(
+      syncHoldingQuantityFieldsOnModeChange("investedAmount", {
+        quantity: "12.5",
+        investedAmount: "",
+        avgEntryPrice: "200",
+      })
+    ).toEqual({
+      mode: "investedAmount",
+      quantity: "12.5",
+      investedAmount: "2500",
+      avgEntryPrice: "200",
+    })
+  })
+
+  it("keeps invested amount when quantity and price cannot estimate cost", () => {
+    expect(
+      syncHoldingQuantityFieldsOnModeChange("investedAmount", {
+        quantity: "",
+        investedAmount: "500",
+        avgEntryPrice: "200",
+      })
+    ).toEqual({
+      mode: "investedAmount",
+      quantity: "",
+      investedAmount: "500",
+      avgEntryPrice: "200",
+    })
+  })
+})
 
 describe("parseHoldingForm", () => {
   it("normalizes symbol and currency to uppercase", () => {
@@ -53,6 +181,56 @@ describe("parseHoldingForm", () => {
         notes: null,
       },
     })
+  })
+
+  it("accepts fractional unit quantities", () => {
+    const result = parseHoldingForm(holdingFormData({ quantity: "12.5" }))
+
+    expect(result).toEqual({
+      ok: true,
+      value: expect.objectContaining({
+        quantity: "12.5",
+      }),
+    })
+  })
+
+  it("derives quantity from invested amount mode", () => {
+    const result = parseHoldingForm(
+      holdingFormData({
+        quantityMode: "investedAmount",
+        investedAmount: "1000",
+        avgEntryPrice: "200",
+        quantity: "__omit__",
+      })
+    )
+
+    expect(result).toEqual({
+      ok: true,
+      value: {
+        symbol: "AAPL",
+        assetType: "equity",
+        quantity: "5",
+        currency: "USD",
+        avgEntryPrice: "200",
+        notes: "core position",
+      },
+    })
+  })
+
+  it("rejects invested amount mode without entry price", () => {
+    const result = parseHoldingForm(
+      holdingFormData({
+        quantityMode: "investedAmount",
+        investedAmount: "1000",
+        avgEntryPrice: "",
+        quantity: "__omit__",
+      })
+    )
+
+    expect(result.ok).toBe(false)
+    if (!result.ok) {
+      expect(result.error).toMatch(/precio promedio de entrada/i)
+    }
   })
 
   it("rejects an invalid asset type", () => {

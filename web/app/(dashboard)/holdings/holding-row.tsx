@@ -12,8 +12,13 @@ import { TableCell, TableRow } from "@/components/ui/table"
 import { HOLDING_ASSET_TYPES, type Holding } from "@/lib/api/types"
 import { assetTypeLabel } from "@/lib/display"
 import { idleActionState } from "@/lib/forms/action-state"
+import {
+  estimateAcquisitionCost,
+  formatAcquisitionCostDisplay,
+} from "@/lib/forms/portfolio"
 
 import { deleteHoldingAction, updateHoldingAction } from "./actions"
+import { HoldingQuantityFields } from "./holding-quantity-fields"
 
 export function HoldingRow({ holding }: { holding: Holding }) {
   const [isEditing, setIsEditing] = useState(false)
@@ -26,10 +31,15 @@ export function HoldingRow({ holding }: { holding: Holding }) {
     idleActionState
   )
 
+  const listedCost = estimateAcquisitionCost(
+    holding.quantity,
+    holding.avgEntryPrice
+  )
+
   if (isEditing) {
     return (
       <TableRow>
-        <TableCell colSpan={7} className="bg-muted/30">
+        <TableCell colSpan={8} className="bg-muted/30">
           <form action={updateFormAction} className="space-y-4 py-2">
             <input type="hidden" name="id" value={holding.id} />
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -60,31 +70,11 @@ export function HoldingRow({ holding }: { holding: Holding }) {
                   ))}
                 </NativeSelect>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor={`edit-quantity-${holding.id}`}>Cantidad</Label>
-                <Input
-                  id={`edit-quantity-${holding.id}`}
-                  name="quantity"
-                  type="number"
-                  step="any"
-                  min="0"
-                  defaultValue={holding.quantity}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor={`edit-avg-entry-${holding.id}`}>
-                  Precio promedio de entrada
-                </Label>
-                <Input
-                  id={`edit-avg-entry-${holding.id}`}
-                  name="avgEntryPrice"
-                  type="number"
-                  step="any"
-                  min="0"
-                  defaultValue={holding.avgEntryPrice ?? ""}
-                />
-              </div>
+              <HoldingQuantityFields
+                idPrefix={`edit-${holding.id}`}
+                defaultQuantity={holding.quantity}
+                defaultAvgEntryPrice={holding.avgEntryPrice ?? ""}
+              />
               <div className="space-y-2">
                 <Label htmlFor={`edit-currency-${holding.id}`}>Moneda</Label>
                 <Input
@@ -135,6 +125,11 @@ export function HoldingRow({ holding }: { holding: Holding }) {
       <TableCell className="font-mono text-xs">{holding.quantity}</TableCell>
       <TableCell className="font-mono text-xs">
         {holding.avgEntryPrice ?? "—"}
+      </TableCell>
+      <TableCell className="font-mono text-xs">
+        {listedCost === null
+          ? "—"
+          : formatAcquisitionCostDisplay(listedCost)}
       </TableCell>
       <TableCell className="font-mono text-xs">{holding.currency}</TableCell>
       <TableCell className="max-w-56 truncate text-muted-foreground">
