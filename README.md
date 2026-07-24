@@ -639,6 +639,31 @@ Campos principales:
 - `source`: `manual` (default), `brief` o `alert`.
 - `sourceRefId`: UUID opcional y opaco del brief/alerta de origen. No es una FK
   porque puede referenciar distintos tipos de registro.
+- Unicidad parcial: `(source, source_ref_id)` cuando `source_ref_id` no es null
+  (varias manuales con `source_ref_id` null siguen permitidas).
+
+### Auto-creación desde brief
+
+Al persistir un research brief **con stance no nulo** (Telegram `/brief`,
+`POST /briefs` o `brief:once`), el journal abre automáticamente una hipótesis:
+
+- `source = brief`, `sourceRefId = id` del brief.
+- `horizonDays` = **30** (default del journal).
+- `thesis` = `stanceRationale` del brief (fallback: `sections.overview`).
+- `invalidation` = `sections.invalidation`.
+- `bias` según el mapeo stance → bias:
+
+| Stance | Bias |
+|--------|------|
+| `enter`, `add` | `bullish` |
+| `avoid`, `exit`, `reduce` | `bearish` |
+| `watch`, `hold` | `watch` |
+
+Si el brief **no** tiene stance (fail-soft / sin market data), **no** se crea
+hipótesis. Reintentar el mismo brief es idempotente: no hay segunda fila para
+el mismo `(source=brief, sourceRefId)`. Un fallo al abrir la hipótesis se
+loguea y **no** deshace el brief ya persistido. La creación manual por
+`POST /hypotheses` sigue disponible.
 
 ```bash
 # Crear una hipótesis manual (horizonDays opcional → 30)
