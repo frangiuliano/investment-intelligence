@@ -35,3 +35,14 @@ export function shouldSelectSuggestionOnEnter(
     status === "ready" && activeIndex >= 0 && activeIndex < itemCount
   )
 }
+
+/**
+ * Arm a one-shot fetch skip only when select will change `query`.
+ * Same-symbol select does not re-run the effect, so a skip flag would stick.
+ */
+export function shouldSkipFetchAfterSelect(
+  previousQuery: string,
+  selectedSymbol: string
+): boolean {
+  return selectedSymbol !== previousQuery
+}

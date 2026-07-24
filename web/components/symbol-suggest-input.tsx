@@ -15,6 +15,7 @@ import {
   assetSuggestSrc,
   shouldFetchAssetSuggestions,
   shouldSelectSuggestionOnEnter,
+  shouldSkipFetchAfterSelect,
 } from "@/lib/api/asset-suggest"
 import type { AssetSuggestion, AssetSuggestResult } from "@/lib/api/types"
 import { cn } from "@/lib/utils"
@@ -38,7 +39,13 @@ export function SymbolSuggestInput({
 }: SymbolSuggestInputProps) {
   const listboxId = useId()
   const rootRef = useRef<HTMLDivElement>(null)
-  const skipNextFetchRef = useRef(false)
+  const abortRef = useRef<AbortController | null>(null)
+  // Only skip the effect when selectSuggestion actually changes `query`
+  // (otherwise React bails out, the flag never clears, and the next keystroke
+  // gets stuck in "Buscando…" without a fetch).
+  const skipFetchForQueryChangeRef = useRef(false)
+  // Blocks fetch resolution from reopening the panel after Escape / outside click / select.
+  const openAllowedRef = useRef(true)
   const [query, setQuery] = useState("")
   const [items, setItems] = useState<AssetSuggestion[]>([])
   const [status, setStatus] = useState<SuggestStatus>("idle")
@@ -54,7 +61,7 @@ export function SymbolSuggestInput({
           signal,
         })
 
-        if (signal.aborted) {
+        if (signal.aborted || !openAllowedRef.current) {
           return
         }
 
@@ -66,7 +73,7 @@ export function SymbolSuggestInput({
         }
 
         const body = (await response.json()) as AssetSuggestResult
-        if (signal.aborted) {
+        if (signal.aborted || !openAllowedRef.current) {
           return
         }
 
@@ -78,7 +85,7 @@ export function SymbolSuggestInput({
         setActiveIndex(-1)
         setOpen(true)
       } catch (error) {
-        if (signal.aborted || isAbortError(error)) {
+        if (signal.aborted || isAbortError(error) || !openAllowedRef.current) {
           return
         }
         setItems([])
@@ -89,8 +96,8 @@ export function SymbolSuggestInput({
   )
 
   useEffect(() => {
-    if (skipNextFetchRef.current) {
-      skipNextFetchRef.current = false
+    if (skipFetchForQueryChangeRef.current) {
+      skipFetchForQueryChangeRef.current = false
       return
     }
 
@@ -99,6 +106,7 @@ export function SymbolSuggestInput({
     }
 
     const controller = new AbortController()
+    abortRef.current = controller
     const handle = window.setTimeout(() => {
       void fetchSuggestions(query, controller.signal)
     }, ASSET_SUGGEST_DEBOUNCE_MS)
@@ -106,14 +114,16 @@ export function SymbolSuggestInput({
     return () => {
       window.clearTimeout(handle)
       controller.abort()
+      if (abortRef.current === controller) {
+        abortRef.current = null
+      }
     }
   }, [query])
 
   useEffect(() => {
     function onPointerDown(event: MouseEvent) {
       if (!rootRef.current?.contains(event.target as Node)) {
-        setOpen(false)
-        setActiveIndex(-1)
+        dismissPanel()
       }
     }
 
@@ -121,7 +131,18 @@ export function SymbolSuggestInput({
     return () => document.removeEventListener("mousedown", onPointerDown)
   }, [])
 
+  function dismissPanel() {
+    openAllowedRef.current = false
+    abortRef.current?.abort()
+    abortRef.current = null
+    setOpen(false)
+    setActiveIndex(-1)
+    setStatus((current) => (current === "loading" ? "idle" : current))
+  }
+
   function resetSuggestionsForTypedQuery(value: string) {
+    openAllowedRef.current = true
+
     if (!shouldFetchAssetSuggestions(value)) {
       setItems([])
       setStatus("idle")
@@ -139,7 +160,16 @@ export function SymbolSuggestInput({
   }
 
   function selectSuggestion(item: AssetSuggestion) {
-    skipNextFetchRef.current = true
+    openAllowedRef.current = false
+    abortRef.current?.abort()
+    abortRef.current = null
+
+    // Only arm skip when query will change; same-symbol select does not re-run
+    // the effect, so a lingering skip flag would poison the next keystroke.
+    if (shouldSkipFetchAfterSelect(query, item.symbol)) {
+      skipFetchForQueryChangeRef.current = true
+    }
+
     setQuery(item.symbol)
     setItems([])
     setStatus("idle")
@@ -151,6 +181,7 @@ export function SymbolSuggestInput({
     if (!open) {
       if (event.key === "ArrowDown" && status === "ready" && items.length > 0) {
         event.preventDefault()
+        openAllowedRef.current = true
         setOpen(true)
         setActiveIndex(0)
       }
@@ -159,8 +190,7 @@ export function SymbolSuggestInput({
 
     if (event.key === "Escape") {
       event.preventDefault()
-      setOpen(false)
-      setActiveIndex(-1)
+      dismissPanel()
       return
     }
 
@@ -222,7 +252,8 @@ export function SymbolSuggestInput({
           resetSuggestionsForTypedQuery(value)
         }}
         onFocus={() => {
-          if (shouldFetchAssetSuggestions(query)) {
+          if (shouldFetchAssetSuggestions(query) && status !== "idle") {
+            openAllowedRef.current = true
             setOpen(true)
           }
         }}

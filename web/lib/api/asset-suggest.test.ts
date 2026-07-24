@@ -5,6 +5,7 @@ import {
   mapAssetSuggestProxyStatus,
   shouldFetchAssetSuggestions,
   shouldSelectSuggestionOnEnter,
+  shouldSkipFetchAfterSelect,
 } from "./asset-suggest"
 
 describe("asset suggest helpers", () => {
@@ -35,5 +36,10 @@ describe("asset suggest helpers", () => {
     expect(shouldSelectSuggestionOnEnter("ready", -1, 3)).toBe(false)
     expect(shouldSelectSuggestionOnEnter("ready", 0, 3)).toBe(true)
     expect(shouldSelectSuggestionOnEnter("ready", 3, 3)).toBe(false)
+  })
+
+  it("skips the next fetch only when select changes the query", () => {
+    expect(shouldSkipFetchAfterSelect("AAP", "AAPL")).toBe(true)
+    expect(shouldSkipFetchAfterSelect("AAPL", "AAPL")).toBe(false)
   })
 })
