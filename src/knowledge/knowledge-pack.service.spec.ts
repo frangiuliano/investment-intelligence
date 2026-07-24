@@ -7,7 +7,14 @@ import { KnowledgePackService } from './knowledge-pack.service';
 describe('KnowledgePackService', () => {
   const root = path.join(process.cwd(), 'knowledge');
 
-  function createService(maxChars = 12_000): KnowledgePackService {
+  async function readSeedKnowledgeVersion(): Promise<string> {
+    const manifest = JSON.parse(
+      await fs.readFile(path.join(root, 'manifest.json'), 'utf8'),
+    ) as { knowledgeVersion: string };
+    return manifest.knowledgeVersion;
+  }
+
+  function createService(maxChars = 80_000): KnowledgePackService {
     return new KnowledgePackService({
       get: (key: string) => {
         if (key === 'knowledge.root') {
@@ -28,7 +35,7 @@ describe('KnowledgePackService', () => {
       textHints: 'Apple reports quarterly earnings',
     });
 
-    expect(result.knowledgeVersion).toBe('0.1.0');
+    expect(result.knowledgeVersion).toBe(await readSeedKnowledgeVersion());
     expect(result.injection).not.toBeNull();
     expect(result.injection?.matchedIds).toEqual(
       expect.arrayContaining(['equity', 'materiality', 'event-types']),
@@ -80,7 +87,7 @@ describe('KnowledgePackService', () => {
           return missingRoot;
         }
         if (key === 'knowledge.maxContextChars') {
-          return 12_000;
+          return 80_000;
         }
         return undefined;
       },
@@ -95,6 +102,6 @@ describe('KnowledgePackService', () => {
 
     const second = await service.buildInjection({ useCase: 'news-analysis' });
     expect(second.injection).not.toBeNull();
-    expect(second.knowledgeVersion).toBe('0.1.0');
+    expect(second.knowledgeVersion).toBe(await readSeedKnowledgeVersion());
   });
 });

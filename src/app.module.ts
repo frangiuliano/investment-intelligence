@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AppConfigModule } from './config/config.module';
+import { AssetsModule } from './assets/assets.module';
 import { DatabaseModule } from './database/database.module';
 import { HealthModule } from './health/health.module';
 import { NewsModule } from './news/news.module';
@@ -27,6 +28,7 @@ import { TelegramBotModule } from './telegram-bot/telegram-bot.module';
     PortfolioModule,
     BriefModule,
     FeedbackModule,
+    AssetsModule,
     MarketDataModule,
     ResearchModule,
     TelegramBotModule,
