@@ -11,6 +11,7 @@ import { assetTypeLabel } from "@/lib/display"
 import { idleActionState } from "@/lib/forms/action-state"
 
 import { createHoldingAction } from "./actions"
+import { HoldingQuantityFields } from "./holding-quantity-fields"
 
 export function HoldingCreateForm() {
   const [state, formAction] = useActionState(
@@ -41,28 +42,7 @@ export function HoldingCreateForm() {
             ))}
           </NativeSelect>
         </div>
-        <div className="space-y-2">
-          <Label htmlFor="holding-quantity">Cantidad</Label>
-          <Input
-            id="holding-quantity"
-            name="quantity"
-            type="number"
-            step="any"
-            min="0"
-            required
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="holding-avg-entry">Precio promedio de entrada</Label>
-          <Input
-            id="holding-avg-entry"
-            name="avgEntryPrice"
-            type="number"
-            step="any"
-            min="0"
-            placeholder="Opcional"
-          />
-        </div>
+        <HoldingQuantityFields idPrefix="holding" />
         <div className="space-y-2">
           <Label htmlFor="holding-currency">Moneda</Label>
           <Input

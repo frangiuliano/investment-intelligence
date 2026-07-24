@@ -70,6 +70,7 @@ export default async function HoldingsPage() {
                   <TableHead>Tipo</TableHead>
                   <TableHead>Cantidad</TableHead>
                   <TableHead>Entrada prom.</TableHead>
+                  <TableHead>Costo est.</TableHead>
                   <TableHead>Moneda</TableHead>
                   <TableHead>Notas</TableHead>
                   <TableHead className="text-right">Acciones</TableHead>
