@@ -1,8 +1,6 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class AddHypothesesSourceRefUnique1752630000000
-  implements MigrationInterface
-{
+export class AddHypothesesSourceRefUnique1752630000000 implements MigrationInterface {
   name = 'AddHypothesesSourceRefUnique1752630000000';
 
   public async up(queryRunner: QueryRunner): Promise<void> {

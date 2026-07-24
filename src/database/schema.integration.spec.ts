@@ -44,6 +44,7 @@ import { AddResearchBriefStance1752590000000 } from './migrations/1752590000000-
 import { AddResearchBriefChartPng1752600000000 } from './migrations/1752600000000-AddResearchBriefChartPng';
 import { AddKnowledgeVersionColumns1752610000000 } from './migrations/1752610000000-AddKnowledgeVersionColumns';
 import { CreateOperatorFeedback1752620000000 } from './migrations/1752620000000-CreateOperatorFeedback';
+import { AddHypothesesSourceRefUnique1752630000000 } from './migrations/1752630000000-AddHypothesesSourceRefUnique';
 import {
   DEFAULT_TEST_DATABASE_URL,
   resolveTestDatabaseUrl,
@@ -107,6 +108,7 @@ describe('Database schema (integration)', () => {
         AddResearchBriefChartPng1752600000000,
         AddKnowledgeVersionColumns1752610000000,
         CreateOperatorFeedback1752620000000,
+        AddHypothesesSourceRefUnique1752630000000,
       ],
       synchronize: false,
       logging: false,
