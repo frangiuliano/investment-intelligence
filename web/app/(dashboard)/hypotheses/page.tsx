@@ -1,3 +1,5 @@
+import Link from "next/link"
+
 import { EmptyState, ErrorState } from "@/components/data-states"
 import { PageHeader } from "@/components/page-header"
 import { Badge } from "@/components/ui/badge"
@@ -16,7 +18,9 @@ import {
   biasTone,
   formatDate,
   hypothesisSourceLabel,
+  hypothesisSourceTone,
 } from "@/lib/display"
+import { partitionOpenHypotheses } from "@/lib/hypotheses"
 
 import { HypothesisCloseForm } from "./hypothesis-close-form"
 import { HypothesisCreateForm } from "./hypothesis-create-form"
@@ -25,16 +29,22 @@ export const dynamic = "force-dynamic"
 
 function HypothesisCard({ hypothesis }: { hypothesis: Hypothesis }) {
   const isOpen = hypothesis.status === "open"
+  const briefHref =
+    hypothesis.source === "brief" && hypothesis.sourceRefId
+      ? `/briefs/${hypothesis.sourceRefId}`
+      : null
 
   return (
-    <Card size="sm">
+    <Card id={`hypothesis-${hypothesis.id}`} size="sm">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 font-mono text-sm">
+        <CardTitle className="flex flex-wrap items-center gap-2 font-mono text-sm">
           {hypothesis.symbol}
           <Badge tone={biasTone(hypothesis.bias)}>
             {biasLabel(hypothesis.bias)}
           </Badge>
-          <Badge>{hypothesisSourceLabel(hypothesis.source)}</Badge>
+          <Badge tone={hypothesisSourceTone(hypothesis.source)}>
+            {hypothesisSourceLabel(hypothesis.source)}
+          </Badge>
         </CardTitle>
         <CardDescription>
           Abierta el {formatDate(hypothesis.createdAt)} · horizonte de{" "}
@@ -42,6 +52,17 @@ function HypothesisCard({ hypothesis }: { hypothesis: Hypothesis }) {
           {hypothesis.closedAt
             ? ` · cerrada el ${formatDate(hypothesis.closedAt)}`
             : ""}
+          {briefHref ? (
+            <>
+              {" · "}
+              <Link
+                href={briefHref}
+                className="underline decoration-ink/30 underline-offset-2 transition-colors hover:text-foreground hover:decoration-ink/60"
+              >
+                Ver informe
+              </Link>
+            </>
+          ) : null}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-3 text-sm">
@@ -78,6 +99,26 @@ function HypothesisCard({ hypothesis }: { hypothesis: Hypothesis }) {
   )
 }
 
+function HypothesisList({
+  items,
+  emptyMessage,
+}: {
+  items: Hypothesis[]
+  emptyMessage: string
+}) {
+  if (items.length === 0) {
+    return <EmptyState message={emptyMessage} />
+  }
+
+  return (
+    <div className="space-y-4">
+      {items.map((hypothesis) => (
+        <HypothesisCard key={hypothesis.id} hypothesis={hypothesis} />
+      ))}
+    </div>
+  )
+}
+
 export default async function HypothesesPage() {
   let open: Hypothesis[]
   let closed: Hypothesis[]
@@ -99,12 +140,14 @@ export default async function HypothesesPage() {
     )
   }
 
+  const { fromReports, manual } = partitionOpenHypotheses(open)
+
   return (
     <section className="space-y-10">
       <PageHeader
         areaCode="02"
         title="Hipótesis"
-        description="Diario de análisis: cada tesis con su condición de invalidación y su horizonte."
+        description="Diario de análisis: cada tesis con su condición de invalidación y su horizonte. Las de informes se abren solas al pedir un análisis con postura."
       />
 
       <div className="grid gap-8 lg:grid-cols-[1.4fr_1fr]">
@@ -114,12 +157,27 @@ export default async function HypothesesPage() {
               Abiertas ({open.length})
             </h2>
             {open.length === 0 ? (
-              <EmptyState message="No hay hipótesis abiertas. Creá una desde el formulario de la derecha." />
+              <EmptyState message="No hay hipótesis abiertas. Pedí un informe en Informes para que se abra sola, o usá el formulario opcional a la derecha." />
             ) : (
-              <div className="space-y-4">
-                {open.map((hypothesis) => (
-                  <HypothesisCard key={hypothesis.id} hypothesis={hypothesis} />
-                ))}
+              <div className="space-y-8">
+                <div>
+                  <h3 className="mb-3 font-mono text-[0.68rem] uppercase tracking-[0.16em] text-muted-foreground">
+                    Desde informes ({fromReports.length})
+                  </h3>
+                  <HypothesisList
+                    items={fromReports}
+                    emptyMessage="Todavía no hay hipótesis nacidas de un informe. Pedí un análisis con postura en Informes."
+                  />
+                </div>
+                <div>
+                  <h3 className="mb-3 font-mono text-[0.68rem] uppercase tracking-[0.16em] text-muted-foreground">
+                    Manuales ({manual.length})
+                  </h3>
+                  <HypothesisList
+                    items={manual}
+                    emptyMessage="No hay hipótesis manuales abiertas."
+                  />
+                </div>
               </div>
             )}
           </div>
@@ -142,12 +200,16 @@ export default async function HypothesesPage() {
           </div>
         </div>
 
-        <Card className="h-fit">
+        <Card className="h-fit border-ink/10 bg-muted/20">
           <CardHeader>
-            <CardTitle>Abrir una hipótesis</CardTitle>
+            <p className="mb-2 font-mono text-[0.62rem] uppercase tracking-[0.16em] text-muted-foreground">
+              Opcional
+            </p>
+            <CardTitle>Abrir una hipótesis a mano</CardTitle>
             <CardDescription>
-              Una tesis solo es útil con una invalidación explícita y un
-              horizonte. Las revisiones la evaluarán más adelante.
+              El camino principal es pedir un informe: si trae postura, la
+              hipótesis se abre sola. Usá este formulario solo cuando quieras
+              registrar una tesis que no salió de un informe.
             </CardDescription>
           </CardHeader>
           <CardContent>

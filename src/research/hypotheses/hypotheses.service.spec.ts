@@ -107,6 +107,37 @@ describe('HypothesesService', () => {
     });
   });
 
+  it('should filter by source when provided', async () => {
+    find.mockResolvedValue([sampleHypothesis]);
+
+    await expect(service.findAll('open', 'brief')).resolves.toEqual([
+      sampleHypothesis,
+    ]);
+    expect(find).toHaveBeenCalledWith({
+      where: {
+        status: HypothesisStatus.OPEN,
+        source: HypothesisSource.BRIEF,
+      },
+      order: { createdAt: 'DESC' },
+    });
+  });
+
+  it('should look up by sourceRefId without forcing status', async () => {
+    const briefId = '22222222-2222-4222-8222-222222222222';
+    find.mockResolvedValue([sampleHypothesis]);
+
+    await expect(service.findAll(undefined, 'brief', briefId)).resolves.toEqual(
+      [sampleHypothesis],
+    );
+    expect(find).toHaveBeenCalledWith({
+      where: {
+        source: HypothesisSource.BRIEF,
+        sourceRefId: briefId,
+      },
+      order: { createdAt: 'DESC' },
+    });
+  });
+
   it('should reject invalid bias and horizon values', async () => {
     const input = {
       symbol: 'AAPL',

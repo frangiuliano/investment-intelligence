@@ -680,6 +680,10 @@ curl -s -X POST http://localhost:3000/hypotheses \
 # Listar abiertas (open es el filtro default)
 curl -s 'http://localhost:3000/hypotheses?status=open' | jq
 
+# Filtrar por origen (manual | brief | alert); sourceRefId opcional (UUID)
+curl -s 'http://localhost:3000/hypotheses?status=open&source=brief' | jq
+curl -s 'http://localhost:3000/hypotheses?source=brief&sourceRefId=<brief-uuid>' | jq
+
 # Cerrar con nota opcional
 curl -s -X PATCH http://localhost:3000/hypotheses/<id>/close \
   -H 'Content-Type: application/json' \
@@ -688,6 +692,9 @@ curl -s -X PATCH http://localhost:3000/hypotheses/<id>/close \
 # Listar cerradas
 curl -s 'http://localhost:3000/hypotheses?status=closed' | jq
 ```
+
+Con `sourceRefId` (y sin `status`) el listado no fuerza `open`: sirve para
+encontrar la hipótesis vinculada a un brief aunque ya esté cerrada.
 
 El cierre es irreversible desde esta API. Un segundo intento devuelve `409`;
 un identificador inexistente devuelve `404`.

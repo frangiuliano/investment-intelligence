@@ -11,10 +11,35 @@ import type {
   ReviewRunResult,
 } from "@/lib/api/types"
 
+export type ListHypothesesParams = {
+  status?: HypothesisStatus
+  source?: Hypothesis["source"]
+  sourceRefId?: string
+}
+
 export function listHypotheses(
-  status: HypothesisStatus
+  statusOrParams: HypothesisStatus | ListHypothesesParams
 ): Promise<Hypothesis[]> {
-  return backendFetch<Hypothesis[]>(`/hypotheses?status=${status}`)
+  const params: ListHypothesesParams =
+    typeof statusOrParams === "string"
+      ? { status: statusOrParams }
+      : statusOrParams
+
+  const search = new URLSearchParams()
+  if (params.status) {
+    search.set("status", params.status)
+  }
+  if (params.source) {
+    search.set("source", params.source)
+  }
+  if (params.sourceRefId) {
+    search.set("sourceRefId", params.sourceRefId)
+  }
+
+  const query = search.toString()
+  return backendFetch<Hypothesis[]>(
+    query ? `/hypotheses?${query}` : "/hypotheses"
+  )
 }
 
 export type HypothesisInput = {

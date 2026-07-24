@@ -99,6 +99,18 @@ export function hypothesisSourceLabel(source: string): string {
   return HYPOTHESIS_SOURCE_LABELS[source] ?? source
 }
 
+export function hypothesisSourceTone(
+  source: string
+): "neutral" | "positive" | "caution" {
+  if (source === "brief") {
+    return "positive"
+  }
+  if (source === "alert") {
+    return "caution"
+  }
+  return "neutral"
+}
+
 const SENTIMENT_LABELS: Record<string, string> = {
   positive: "Positivo",
   negative: "Negativo",

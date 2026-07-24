@@ -75,7 +75,9 @@ export function HypothesisCreateForm() {
         />
       </div>
       <div className="flex items-center gap-4">
-        <SubmitButton pendingLabel="Abriendo…">Abrir hipótesis</SubmitButton>
+        <SubmitButton pendingLabel="Abriendo…">
+          Abrir hipótesis manual
+        </SubmitButton>
         <ActionMessage state={state} />
       </div>
     </form>

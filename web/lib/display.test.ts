@@ -6,6 +6,8 @@ import {
   eventTypeLabel,
   formatDateTime,
   formatReturnPct,
+  hypothesisSourceLabel,
+  hypothesisSourceTone,
   materialityLabel,
   outcomeLabel,
   sentimentLabel,
@@ -43,6 +45,16 @@ describe("Spanish display labels", () => {
     expect(materialityLabel("high")).toBe("Alta")
     expect(eventTypeLabel("m_and_a")).toBe("Fusión/adquisición")
     expect(eventTypeLabel("none")).toBeNull()
+    expect(hypothesisSourceLabel("brief")).toBe("Informe")
+    expect(hypothesisSourceLabel("manual")).toBe("Manual")
+  })
+})
+
+describe("hypothesisSourceTone", () => {
+  it("highlights brief-sourced hypotheses over manuals", () => {
+    expect(hypothesisSourceTone("brief")).toBe("positive")
+    expect(hypothesisSourceTone("alert")).toBe("caution")
+    expect(hypothesisSourceTone("manual")).toBe("neutral")
   })
 })
 
